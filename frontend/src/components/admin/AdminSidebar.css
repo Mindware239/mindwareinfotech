@@ -64,10 +64,13 @@
   padding: 20px 0;
 }
 
-.nav-list {
+/* Admin sidebar navigation - vertical layout */
+.admin-sidebar .nav-list {
   list-style: none;
   padding: 0;
   margin: 0;
+  display: block; /* Ensure vertical layout */
+  flex-direction: column; /* Explicitly set vertical direction */
 }
 
 .nav-item {
@@ -301,6 +304,17 @@
   flex-direction: column !important;
   height: 100vh !important;
   width: 280px !important;
+}
+
+/* Force admin sidebar nav to be vertical */
+.admin-sidebar .nav-list {
+  display: block !important; /* Override any flex display */
+  flex-direction: column !important;
+}
+
+.admin-sidebar .nav-item {
+  display: block !important; /* Ensure nav items stack vertically */
+  width: 100% !important;
 }
 
 /* Prevent any horizontal layout */

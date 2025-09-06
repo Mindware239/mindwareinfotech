@@ -151,7 +151,8 @@
   align-items: center;
 }
 
-.nav-list {
+/* Website header navigation - horizontal layout */
+.website-header .nav-list {
   display: flex;
   align-items: center;
   gap: 0;
