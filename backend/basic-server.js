@@ -636,6 +636,221 @@ app.delete('/api/users/:id', (req, res) => {
   res.status(200).json({ success: true, message: 'User deleted successfully' });
 });
 
+// Enrollment CRUD
+app.get('/api/enrollments', (req, res) => {
+  const { page = 1, limit = 10, search, status } = req.query;
+  
+  // Mock data for enrollments
+  const mockEnrollments = [
+    {
+      id: 1,
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'john.doe@example.com',
+      phone: '+91-9876543210',
+      courseInterest: 'web-development',
+      trainingMode: 'online',
+      status: 'pending',
+      paymentStatus: 'pending',
+      createdAt: new Date().toISOString()
+    },
+    {
+      id: 2,
+      firstName: 'Jane',
+      lastName: 'Smith',
+      email: 'jane.smith@example.com',
+      phone: '+91-9876543211',
+      courseInterest: 'data-science',
+      trainingMode: 'offline',
+      status: 'approved',
+      paymentStatus: 'completed',
+      createdAt: new Date().toISOString()
+    }
+  ];
+  
+  res.status(200).json({
+    success: true,
+    count: mockEnrollments.length,
+    pages: 1,
+    currentPage: parseInt(page),
+    data: mockEnrollments
+  });
+});
+
+app.get('/api/enrollments/:id', (req, res) => {
+  const { id } = req.params;
+  const enrollment = {
+    id: parseInt(id),
+    firstName: 'John',
+    lastName: 'Doe',
+    email: 'john.doe@example.com',
+    phone: '+91-9876543210',
+    dateOfBirth: '1995-01-01',
+    gender: 'male',
+    address: '123 Main Street',
+    city: 'Mumbai',
+    state: 'Maharashtra',
+    pincode: '400001',
+    country: 'India',
+    highestQualification: 'bachelor',
+    institution: 'Mumbai University',
+    yearOfPassing: 2017,
+    percentage: '85%',
+    courseInterest: 'web-development',
+    preferredBatch: 'evening',
+    trainingMode: 'online',
+    experience: '1-2',
+    motivation: 'I want to learn web development to advance my career',
+    careerGoals: 'Become a full-stack developer',
+    paymentMode: 'online',
+    paymentAmount: 25000,
+    paymentStatus: 'pending',
+    status: 'pending',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+  
+  res.status(200).json({ success: true, data: enrollment });
+});
+
+app.post('/api/enrollments', (req, res) => {
+  const enrollmentData = req.body;
+  const newEnrollment = {
+    id: Date.now(),
+    ...enrollmentData,
+    status: 'pending',
+    paymentStatus: 'pending',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+  
+  res.status(201).json({
+    success: true,
+    message: 'Enrollment created successfully',
+    data: newEnrollment
+  });
+});
+
+app.put('/api/enrollments/:id', (req, res) => {
+  const { id } = req.params;
+  const updateData = req.body;
+  const updatedEnrollment = {
+    id: parseInt(id),
+    ...updateData,
+    updatedAt: new Date().toISOString()
+  };
+  
+  res.status(200).json({
+    success: true,
+    message: 'Enrollment updated successfully',
+    data: updatedEnrollment
+  });
+});
+
+app.patch('/api/enrollments/:id/status', (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  
+  res.status(200).json({
+    success: true,
+    message: 'Enrollment status updated successfully',
+    data: { id: parseInt(id), status }
+  });
+});
+
+app.delete('/api/enrollments/:id', (req, res) => {
+  const { id } = req.params;
+  res.status(200).json({ success: true, message: 'Enrollment deleted successfully' });
+});
+
+app.get('/api/enrollments/stats', (req, res) => {
+  const stats = {
+    total: 150,
+    pending: 25,
+    approved: 80,
+    enrolled: 40,
+    completed: 5,
+    byCourse: [
+      { courseInterest: 'web-development', count: 45 },
+      { courseInterest: 'data-science', count: 30 },
+      { courseInterest: 'mobile-development', count: 25 },
+      { courseInterest: 'cybersecurity', count: 20 },
+      { courseInterest: 'cloud-computing', count: 15 },
+      { courseInterest: 'other', count: 15 }
+    ],
+    monthly: [
+      { month: '2024-01', count: 12 },
+      { month: '2024-02', count: 18 },
+      { month: '2024-03', count: 25 },
+      { month: '2024-04', count: 22 },
+      { month: '2024-05', count: 30 },
+      { month: '2024-06', count: 28 },
+      { month: '2024-07', count: 35 },
+      { month: '2024-08', count: 32 },
+      { month: '2024-09', count: 28 }
+    ]
+  };
+  
+  res.status(200).json({ success: true, data: stats });
+});
+
+app.get('/api/enrollments/search', (req, res) => {
+  const { q, page = 1, limit = 10 } = req.query;
+  
+  res.status(200).json({
+    success: true,
+    count: 0,
+    pages: 0,
+    currentPage: parseInt(page),
+    data: []
+  });
+});
+
+app.get('/api/enrollments/recent', (req, res) => {
+  const { limit = 10 } = req.query;
+  
+  const recentEnrollments = [
+    {
+      id: 1,
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'john.doe@example.com',
+      courseInterest: 'web-development',
+      status: 'pending',
+      createdAt: new Date().toISOString()
+    },
+    {
+      id: 2,
+      firstName: 'Jane',
+      lastName: 'Smith',
+      email: 'jane.smith@example.com',
+      courseInterest: 'data-science',
+      status: 'approved',
+      createdAt: new Date().toISOString()
+    }
+  ];
+  
+  res.status(200).json({ success: true, data: recentEnrollments });
+});
+
+app.patch('/api/enrollments/bulk-update', (req, res) => {
+  const { ids, data } = req.body;
+  
+  res.status(200).json({
+    success: true,
+    message: `${ids.length} enrollments updated successfully`
+  });
+});
+
+app.delete('/api/enrollments/bulk-delete', (req, res) => {
+  const { ids } = req.body;
+  
+  res.status(200).json({
+    success: true,
+    message: `${ids.length} enrollments deleted successfully`
+  });
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);

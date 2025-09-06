@@ -19,8 +19,8 @@ const AdminSidebar = ({ isOpen, onClose }) => {
       icon: 'fas fa-user-graduate',
       submenu: [
         { title: 'All Students', path: '/admin/students' },
-        { title: 'Applications', path: '/admin/students/applications' },
-        { title: 'Enrollments', path: '/admin/students/enrollments' }
+        { title: 'Enrollments', path: '/admin/enrollments' },
+        { title: 'Applications', path: '/admin/students/applications' }
       ]
     },
     {

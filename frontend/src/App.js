@@ -35,6 +35,7 @@ import AdminDashboard from './pages/admin/Dashboard';
 import LoginPage from './pages/admin/LoginPage';
 import InternshipManagement from './pages/admin/InternshipManagement';
 import StudentManagement from './pages/admin/StudentManagement';
+import EnrollmentManagement from './pages/admin/EnrollmentManagement';
 import PaymentTracking from './pages/admin/PaymentTracking';
 import CertificateGeneration from './pages/admin/CertificateGeneration';
 import BlogManagement from './pages/admin/BlogManagement';
@@ -99,6 +100,7 @@ function App() {
                   <Route path="dashboard" element={<AdminDashboard />} />
                   <Route path="internships" element={<InternshipManagement />} />
                   <Route path="students" element={<StudentManagement />} />
+                  <Route path="enrollments" element={<EnrollmentManagement />} />
                   <Route path="payments" element={<PaymentTracking />} />
                   <Route path="certificates" element={<CertificateGeneration />} />
                   <Route path="blogs" element={<BlogManagement />} />
