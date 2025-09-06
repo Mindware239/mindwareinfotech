@@ -119,6 +119,7 @@
   transition: all 0.3s ease;
   border-left: 3px solid transparent;
   position: relative;
+  user-select: none;
 }
 
 .nav-group-header:hover {
@@ -144,6 +145,10 @@
   transition: transform 0.3s ease;
 }
 
+.nav-arrow.rotated {
+  transform: rotate(180deg);
+}
+
 .nav-group.active .nav-arrow {
   transform: rotate(180deg);
 }
@@ -156,6 +161,10 @@
   overflow: hidden;
   transition: max-height 0.3s ease;
   background: rgba(0, 0, 0, 0.1);
+}
+
+.nav-submenu.open {
+  max-height: 300px;
 }
 
 .nav-group.active .nav-submenu {

@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import './AdminSidebar.css';
 
 const AdminSidebar = ({ isOpen, onClose }) => {
   const location = useLocation();
+  const [openDropdowns, setOpenDropdowns] = useState({});
 
   const menuItems = [
     {
@@ -108,6 +109,13 @@ const AdminSidebar = ({ isOpen, onClose }) => {
     return submenu.some(item => location.pathname === item.path);
   };
 
+  const toggleDropdown = (index) => {
+    setOpenDropdowns(prev => ({
+      ...prev,
+      [index]: !prev[index]
+    }));
+  };
+
   return (
     <aside className={`admin-sidebar ${isOpen ? 'open' : ''}`}>
       <div className="sidebar-header">
@@ -125,13 +133,16 @@ const AdminSidebar = ({ isOpen, onClose }) => {
           {menuItems.map((item, index) => (
             <li key={index} className="nav-item">
               {item.submenu ? (
-                <div className={`nav-group ${hasActiveSubmenu(item.submenu) ? 'active' : ''}`}>
-                  <div className="nav-group-header">
+                <div className={`nav-group ${hasActiveSubmenu(item.submenu) || openDropdowns[index] ? 'active' : ''}`}>
+                  <div 
+                    className="nav-group-header"
+                    onClick={() => toggleDropdown(index)}
+                  >
                     <i className={item.icon}></i>
                     <span>{item.title}</span>
-                    <i className="fas fa-chevron-down nav-arrow"></i>
+                    <i className={`fas fa-chevron-down nav-arrow ${openDropdowns[index] ? 'rotated' : ''}`}></i>
                   </div>
-                  <ul className="nav-submenu">
+                  <ul className={`nav-submenu ${openDropdowns[index] ? 'open' : ''}`}>
                     {item.submenu.map((subItem, subIndex) => (
                       <li key={subIndex} className="nav-subitem">
                         <NavLink
