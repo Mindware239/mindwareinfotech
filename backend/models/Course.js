@@ -1,0 +1,199 @@
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/database');
+
+const Course = sequelize.define('Course', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
+  title: {
+    type: DataTypes.STRING(200),
+    allowNull: false,
+    validate: {
+      len: [10, 200]
+    }
+  },
+  description: {
+    type: DataTypes.TEXT,
+    allowNull: false,
+    validate: {
+      len: [50, 2000]
+    }
+  },
+  short_description: {
+    type: DataTypes.STRING(300),
+    allowNull: false,
+    validate: {
+      len: [20, 300]
+    }
+  },
+  instructor_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'users',
+      key: 'id'
+    }
+  },
+  category: {
+    type: DataTypes.ENUM(
+      'web-development',
+      'mobile-development',
+      'data-science',
+      'ai-ml',
+      'design',
+      'programming',
+      'database',
+      'devops',
+      'cybersecurity',
+      'other'
+    ),
+    allowNull: false
+  },
+  level: {
+    type: DataTypes.ENUM('beginner', 'intermediate', 'advanced', 'expert'),
+    allowNull: false
+  },
+  duration: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    comment: 'Duration in hours'
+  },
+  price: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: false,
+    validate: {
+      min: 0
+    }
+  },
+  currency: {
+    type: DataTypes.STRING(3),
+    defaultValue: 'INR'
+  },
+  is_free: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  thumbnail: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    defaultValue: {}
+  },
+  banner: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    defaultValue: {}
+  },
+  videos: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    defaultValue: []
+  },
+  chapters: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    defaultValue: []
+  },
+  requirements: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    defaultValue: []
+  },
+  learning_outcomes: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    defaultValue: []
+  },
+  skills: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    defaultValue: []
+  },
+  language: {
+    type: DataTypes.STRING(50),
+    defaultValue: 'English'
+  },
+  status: {
+    type: DataTypes.ENUM('draft', 'published', 'archived'),
+    defaultValue: 'draft'
+  },
+  is_featured: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  rating: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    defaultValue: {
+      average: 0,
+      count: 0
+    }
+  },
+  students: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    defaultValue: {
+      enrolled: 0,
+      completed: 0
+    }
+  },
+  views: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
+  tags: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    defaultValue: []
+  },
+  certificate: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    defaultValue: {}
+  },
+  seo: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    defaultValue: {}
+  }
+}, {
+  tableName: 'courses',
+  hooks: {
+    beforeCreate: (course) => {
+      if (course.videos) {
+        course.metadata = {
+          total_videos: course.videos.length,
+          ...course.metadata
+        };
+      }
+    }
+  }
+});
+
+// Instance methods
+Course.prototype.calculateRating = async function() {
+  // This would be called when a new review is added
+  // Implementation depends on your review system
+};
+
+Course.prototype.incrementViews = async function() {
+  this.views += 1;
+  return await this.save();
+};
+
+Course.prototype.addStudent = async function() {
+  const students = this.students || { enrolled: 0, completed: 0 };
+  students.enrolled += 1;
+  this.students = students;
+  return await this.save();
+};
+
+Course.prototype.completeStudent = async function() {
+  const students = this.students || { enrolled: 0, completed: 0 };
+  students.completed += 1;
+  this.students = students;
+  return await this.save();
+};
+
+module.exports = Course;

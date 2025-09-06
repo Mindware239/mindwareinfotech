@@ -1,0 +1,461 @@
+.about-section {
+  padding: 80px 0;
+  background: #f8f9fa;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+}
+
+.about-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: 60px;
+  align-items: start;
+}
+
+/* Left Sidebar */
+.about-sidebar {
+  background: white;
+  padding: 40px 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  position: relative;
+  height: fit-content;
+}
+
+/* Social Media Icons */
+.social-icons {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.close-icon {
+  width: 30px;
+  height: 30px;
+  background: #6b7280;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.close-icon:hover {
+  background: #374151;
+  transform: scale(1.1);
+}
+
+.social-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.social-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.social-icon.linkedin {
+  background: #0077b5;
+}
+
+.social-icon.email {
+  background: #f59e0b;
+}
+
+.social-icon.share {
+  background: #10b981;
+}
+
+.social-icon:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Logo Section */
+/* .sidebar-logo {
+  margin-top: 60px;
+  margin-bottom: 40px;
+} */
+
+/* .logo-circle {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 20px rgba(220, 38, 38, 0.3);
+} */
+
+/* .logo-m {
+  color: white;
+  font-size: 2rem;
+  font-weight: 800;
+  font-family: 'Arial', sans-serif;
+  line-height: 1;
+}
+
+.logo-since {
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.logo-text h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin: 0;
+  background: linear-gradient(135deg, #f59e0b 0%, #10b981 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+}
+
+.logo-text p {
+  color: #6b7280;
+  font-size: 0.9rem;
+  margin: 8px 0 0 0;
+  font-style: italic;
+} */
+
+/* Excellence Badge */
+.excellence-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 30px auto;
+  position: relative;
+}
+
+/* .excellence-image {
+  max-width: 200px;
+  height: auto;
+  border-radius: 50%;
+  box-shadow: 0 15px 35px rgba(59, 130, 246, 0.3);
+  transition: all 0.3s ease;
+}
+
+.excellence-image:hover {
+  transform: scale(1.05);
+  box-shadow: 0 20px 40px rgba(59, 130, 246, 0.4);
+} */
+
+/* Call to Action */
+.cta-text {
+  text-align: center;
+  margin: 30px 0;
+}
+
+.cta-text h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #3b82f6 0%, #f59e0b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+  line-height: 1.3;
+}
+
+/* Contact Info */
+.contact-info {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.contact-info p {
+  color: #374151;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* Main Content */
+.about-main {
+  background: white;
+  padding: 50px 40px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+/* About Header */
+.about-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.header-icon {
+  font-size: 1.5rem;
+  color: #f59e0b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.about-header h2 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #1e40af;
+  margin: 0;
+}
+
+.header-underline {
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(135deg, #f59e0b 0%, #dc2626 100%);
+  border-radius: 2px;
+  margin-left: 10px;
+}
+
+/* About Content */
+.about-content {
+  margin-bottom: 40px;
+}
+
+.about-description,
+.about-mission {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: #374151;
+  margin-bottom: 25px;
+}
+
+.about-mission {
+  font-weight: 500;
+}
+
+/* Offerings Grid */
+.offerings-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+  margin-top: 40px;
+}
+
+.offering-card {
+  background: #f8f9fa;
+  padding: 30px 20px;
+  border-radius: 15px;
+  text-align: center;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.offering-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  border-color: #e5e7eb;
+}
+
+.card-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.card-icon i {
+  font-size: 1.5rem;
+}
+
+.card-icon.training {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+}
+
+.card-icon.internship {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+}
+
+.card-icon.software {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+}
+
+.offering-card h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 10px 0;
+}
+
+.offering-card p {
+  font-size: 0.95rem;
+  color: #6b7280;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Chat Widget */
+.chat-widget {
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+}
+
+.chat-widget:hover {
+  transform: scale(1.1);
+  box-shadow: 0 12px 25px rgba(59, 130, 246, 0.4);
+}
+
+.chat-icon {
+  font-size: 1.5rem;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-icon i {
+  font-size: 1.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .about-container {
+    grid-template-columns: 350px 1fr;
+    gap: 40px;
+  }
+  
+  .about-main {
+    padding: 40px 30px;
+  }
+  
+  .offerings-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .about-container {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  
+  .about-sidebar {
+    padding: 30px 20px;
+  }
+  
+  .about-main {
+    padding: 30px 20px;
+  }
+  
+  .about-header h2 {
+    font-size: 1.8rem;
+  }
+  
+  .offerings-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .excellence-badge {
+    width: 150px;
+    height: 150px;
+  }
+  
+  .years {
+    font-size: 2.5rem;
+  }
+  
+  .years-text {
+    font-size: 1rem;
+  }
+  
+  .excellence-text {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-section {
+    padding: 40px 0;
+  }
+  
+  .about-container {
+    padding: 0 15px;
+  }
+  
+  .about-sidebar {
+    padding: 25px 15px;
+  }
+  
+  .about-main {
+    padding: 25px 15px;
+  }
+  
+  .logo-text h1 {
+    font-size: 2rem;
+  }
+  
+  .cta-text h3 {
+    font-size: 1.1rem;
+  }
+  
+  .about-header h2 {
+    font-size: 1.5rem;
+  }
+  
+  .about-description,
+  .about-mission {
+    font-size: 1rem;
+  }
+  
+  .chat-widget {
+    width: 50px;
+    height: 50px;
+    bottom: 20px;
+    right: 20px;
+  }
+  
+  .chat-icon {
+    font-size: 1.2rem;
+  }
+}

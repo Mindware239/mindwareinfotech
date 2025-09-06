@@ -1,0 +1,25 @@
+.home-page {
+  width: 100%;
+}
+
+/* Ensure proper spacing between sections */
+.home-page > * {
+  margin-bottom: 0;
+}
+
+/* Add specific spacing for better visual separation */
+.home-page > *:not(:last-child) {
+  margin-bottom: 80px;
+}
+
+@media (max-width: 768px) {
+  .home-page > *:not(:last-child) {
+    margin-bottom: 60px;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-page > *:not(:last-child) {
+    margin-bottom: 40px;
+  }
+}

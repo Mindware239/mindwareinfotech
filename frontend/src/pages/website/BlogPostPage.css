@@ -1,0 +1,30 @@
+.blog-post-page {
+  min-height: 100vh;
+  background: #f8f9fa;
+  padding: 100px 0;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.content-card {
+  background: white;
+  padding: 60px;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.content-card h1 {
+  font-size: 2rem;
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+.content-card p {
+  color: #6c757d;
+  font-size: 1.1rem;
+}
