@@ -152,17 +152,20 @@
 }
 
 /* Website header navigation - horizontal layout */
-.website-header .nav-list {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  list-style: none;
-  margin: 0;
-  padding: 0;
+.header .nav-list {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0 !important;
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  flex-direction: row !important; /* Ensure horizontal layout */
 }
 
-.nav-item {
+/* Website header nav items - horizontal layout */
+.header .nav-item {
   position: relative;
+  display: inline-block !important; /* Ensure horizontal layout */
 }
 
 .nav-link {
