@@ -102,11 +102,14 @@ const InternshipManagement = () => {
     {
       key: 'type',
       label: 'Type',
-      render: (internship) => (
-        <span className={`type-badge type-${internship.type}`}>
-          {internship.type.toUpperCase()}
-        </span>
-      )
+      render: (internship) => {
+        const type = internship.type || '';
+        return (
+          <span className={`type-badge type-${type}`}>
+            {type ? type.toUpperCase() : 'N/A'}
+          </span>
+        );
+      }
     },
     {
       key: 'duration',

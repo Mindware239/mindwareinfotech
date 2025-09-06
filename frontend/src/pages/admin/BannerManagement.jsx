@@ -103,11 +103,14 @@ const BannerManagement = () => {
       key: 'position',
       title: 'Position',
       width: '120px',
-      render: (position) => (
-        <span className={`position-badge ${position}`}>
-          {position.charAt(0).toUpperCase() + position.slice(1)}
-        </span>
-      )
+      render: (banner) => {
+        const position = banner.position || '';
+        return (
+          <span className={`position-badge ${position}`}>
+            {position ? position.charAt(0).toUpperCase() + position.slice(1) : 'N/A'}
+          </span>
+        );
+      }
     },
     {
       key: 'order',

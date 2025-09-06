@@ -89,11 +89,14 @@ const PaymentTracking = () => {
     {
       key: 'payment_method',
       label: 'Method',
-      render: (payment) => (
-        <span className={`method-badge method-${payment.payment_method}`}>
-          {payment.payment_method.toUpperCase()}
-        </span>
-      )
+      render: (payment) => {
+        const method = payment.payment_method || '';
+        return (
+          <span className={`method-badge method-${method}`}>
+            {method ? method.toUpperCase() : 'N/A'}
+          </span>
+        );
+      }
     },
     {
       key: 'status',

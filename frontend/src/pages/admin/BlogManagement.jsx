@@ -112,11 +112,14 @@ const BlogManagement = () => {
     {
       key: 'category',
       label: 'Category',
-      render: (blog) => (
-        <span className={`category-badge category-${blog.category}`}>
-          {blog.category.replace('-', ' ').toUpperCase()}
-        </span>
-      )
+      render: (blog) => {
+        const category = blog.category || '';
+        return (
+          <span className={`category-badge category-${category}`}>
+            {category ? category.replace('-', ' ').toUpperCase() : 'N/A'}
+          </span>
+        );
+      }
     },
     {
       key: 'author',
