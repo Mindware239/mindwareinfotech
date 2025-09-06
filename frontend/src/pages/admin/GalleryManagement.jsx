@@ -466,8 +466,8 @@ const GalleryManagement = () => {
             <div className="modal-body">
               <FormModal
                 title={editingGallery ? 'Edit Gallery Item' : 'Add New Gallery Item'}
-                fields={galleryFormFields}
-                initialData={editingGallery}
+                fields={galleryFormFields || []}
+                initialData={editingGallery || {}}
                 onSubmit={handleFormSubmit}
                 onClose={() => {
                   setShowModal(false);

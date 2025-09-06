@@ -3,7 +3,7 @@ import './FormModal.css';
 
 const FormModal = ({ 
   title, 
-  fields, 
+  fields = [], 
   initialData = {}, 
   onSubmit, 
   onClose, 
@@ -13,11 +13,11 @@ const FormModal = ({
     const data = {};
     fields.forEach(field => {
       if (field.type === 'checkbox') {
-        data[field.name] = initialData[field.name] || false;
+        data[field.name] = (initialData && initialData[field.name]) || false;
       } else if (field.type === 'file') {
-        data[field.name] = initialData[field.name] || null;
+        data[field.name] = (initialData && initialData[field.name]) || null;
       } else {
-        data[field.name] = initialData[field.name] || '';
+        data[field.name] = (initialData && initialData[field.name]) || '';
       }
     });
     return data;
@@ -105,6 +105,8 @@ const FormModal = ({
   };
 
   const renderField = (field) => {
+    if (!field || !field.name) return null;
+    
     const fieldValue = formData[field.name];
     const fieldError = errors[field.name];
 
@@ -259,7 +261,11 @@ const FormModal = ({
     <div className="form-modal">
       <form onSubmit={handleSubmit} className="modal-form">
         <div className="form-fields">
-          {fields.map(renderField)}
+          {fields && fields.length > 0 ? fields.map(renderField) : (
+            <div className="no-fields-message">
+              <p>No form fields configured</p>
+            </div>
+          )}
         </div>
         
         <div className="form-actions">

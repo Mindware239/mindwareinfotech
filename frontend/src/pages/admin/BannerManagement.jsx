@@ -433,8 +433,8 @@ const BannerManagement = () => {
             <div className="modal-body">
               <FormModal
                 title={editingBanner ? 'Edit Banner' : 'Add New Banner'}
-                fields={bannerFormFields}
-                initialData={editingBanner}
+                fields={bannerFormFields || []}
+                initialData={editingBanner || {}}
                 onSubmit={handleFormSubmit}
                 onClose={() => {
                   setShowModal(false);

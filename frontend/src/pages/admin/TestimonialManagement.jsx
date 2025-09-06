@@ -444,8 +444,8 @@ const TestimonialManagement = () => {
             <div className="modal-body">
               <FormModal
                 title={editingTestimonial ? 'Edit Testimonial' : 'Add New Testimonial'}
-                fields={testimonialFormFields}
-                initialData={editingTestimonial}
+                fields={testimonialFormFields || []}
+                initialData={editingTestimonial || {}}
                 onSubmit={handleFormSubmit}
                 onClose={() => {
                   setShowModal(false);
