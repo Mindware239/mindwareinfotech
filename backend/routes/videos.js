@@ -12,6 +12,7 @@ const {
 
 const { protect, authorize, optionalAuth } = require('../middleware/auth');
 const { validateObjectId, validatePagination } = require('../middleware/validation');
+const { uploadVideo: uploadVideoMiddleware, handleUploadError } = require('../middleware/upload');
 
 const router = express.Router();
 
@@ -24,7 +25,7 @@ router.get('/:id', validateObjectId('id'), optionalAuth, getVideo);
 router.post('/', protect, authorize('admin', 'instructor'), createVideo);
 router.put('/:id', protect, authorize('admin', 'instructor'), validateObjectId('id'), updateVideo);
 router.delete('/:id', protect, authorize('admin'), validateObjectId('id'), deleteVideo);
-router.post('/upload', protect, authorize('admin', 'instructor'), uploadVideo);
+router.post('/upload', protect, authorize('admin', 'instructor'), uploadVideoMiddleware.single('video'), handleUploadError, uploadVideo);
 
 // Student routes
 router.get('/:id/progress', protect, validateObjectId('id'), getVideoProgress);

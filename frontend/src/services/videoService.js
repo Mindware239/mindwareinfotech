@@ -21,6 +21,46 @@ const videoService = {
     }
   },
 
+  // Create video
+  createVideo: async (videoData) => {
+    try {
+      const response = await api.post('/videos', videoData);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  // Update video
+  updateVideo: async (id, videoData) => {
+    try {
+      const response = await api.put(`/videos/${id}`, videoData);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  // Delete video
+  deleteVideo: async (id) => {
+    try {
+      const response = await api.delete(`/videos/${id}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  // Get videos by category
+  getVideosByCategory: async (category, params = {}) => {
+    try {
+      const response = await api.get(`/videos/category/${category}`, { params });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
   // Get videos by course
   getVideosByCourse: async (courseId, params = {}) => {
     try {
@@ -31,44 +71,13 @@ const videoService = {
     }
   },
 
-  // Create video (Admin/Instructor only)
-  createVideo: async (videoData) => {
-    try {
-      const response = await api.post('/videos', videoData);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
-
-  // Update video (Admin/Instructor only)
-  updateVideo: async (id, videoData) => {
-    try {
-      const response = await api.put(`/videos/${id}`, videoData);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
-
-  // Delete video (Admin only)
-  deleteVideo: async (id) => {
-    try {
-      const response = await api.delete(`/videos/${id}`);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
-
-  // Upload video (Admin/Instructor only)
-  uploadVideo: async (formData, onUploadProgress) => {
+  // Upload video file
+  uploadVideo: async (formData) => {
     try {
       const response = await api.post('/videos/upload', formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-        onUploadProgress,
+          'Content-Type': 'multipart/form-data'
+        }
       });
       return response.data;
     } catch (error) {
