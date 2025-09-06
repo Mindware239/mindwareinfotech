@@ -1,172 +1,259 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import testimonialService from '../../services/testimonialService';
 import DataTable from '../../components/admin/DataTable';
 import FormModal from '../../components/admin/FormModal';
+import testimonialService from '../../services/testimonialService';
 import './TestimonialManagement.css';
 
 const TestimonialManagement = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [editingTestimonial, setEditingTestimonial] = useState(null);
   const [viewingTestimonial, setViewingTestimonial] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [courseFilter, setCourseFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
   const queryClient = useQueryClient();
 
   // Fetch testimonials
   const { data: testimonialsData, isLoading, error } = useQuery({
-    queryKey: ['testimonials'],
-    queryFn: () => testimonialService.getTestimonials({ limit: 50 })
+    queryKey: ['testimonials', currentPage, pageSize, searchTerm, courseFilter, statusFilter],
+    queryFn: () => testimonialService.getTestimonials({
+      page: currentPage,
+      limit: pageSize,
+      search: searchTerm,
+      course: courseFilter !== 'all' ? courseFilter : undefined,
+      status: statusFilter !== 'all' ? statusFilter : undefined
+    })
   });
 
   // Create testimonial mutation
-  const createMutation = useMutation({
+  const createTestimonialMutation = useMutation({
     mutationFn: testimonialService.createTestimonial,
     onSuccess: () => {
       queryClient.invalidateQueries(['testimonials']);
-      setIsModalOpen(false);
+      setShowModal(false);
       setEditingTestimonial(null);
     }
   });
 
   // Update testimonial mutation
-  const updateMutation = useMutation({
+  const updateTestimonialMutation = useMutation({
     mutationFn: ({ id, data }) => testimonialService.updateTestimonial(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries(['testimonials']);
-      setIsModalOpen(false);
+      setShowModal(false);
       setEditingTestimonial(null);
     }
   });
 
   // Delete testimonial mutation
-  const deleteMutation = useMutation({
+  const deleteTestimonialMutation = useMutation({
     mutationFn: testimonialService.deleteTestimonial,
     onSuccess: () => {
       queryClient.invalidateQueries(['testimonials']);
     }
   });
 
-  const handleAdd = () => {
+  const handleCreateTestimonial = () => {
     setEditingTestimonial(null);
-    setIsModalOpen(true);
+    setShowModal(true);
   };
 
-  const handleEdit = (testimonial) => {
+  const handleEditTestimonial = (testimonial) => {
     setEditingTestimonial(testimonial);
-    setIsModalOpen(true);
+    setShowModal(true);
   };
 
-  const handleView = (testimonial) => {
+  const handleViewTestimonial = (testimonial) => {
     setViewingTestimonial(testimonial);
   };
 
-  const handleDelete = async (id) => {
+  const handleDeleteTestimonial = async (id) => {
     if (window.confirm('Are you sure you want to delete this testimonial?')) {
-      await deleteMutation.mutateAsync(id);
+      await deleteTestimonialMutation.mutateAsync(id);
     }
   };
 
-  const handleSubmit = async (formData) => {
+  const handleFormSubmit = async (formData) => {
     try {
       if (editingTestimonial) {
-        await updateMutation.mutateAsync({
+        await updateTestimonialMutation.mutateAsync({
           id: editingTestimonial.testimonial_id,
           data: formData
         });
       } else {
-        await createMutation.mutateAsync(formData);
+        await createTestimonialMutation.mutateAsync(formData);
       }
     } catch (error) {
       console.error('Error saving testimonial:', error);
+      alert('Failed to save testimonial');
+    }
+  };
+
+  const handleStatusChange = async (id, newStatus) => {
+    try {
+      await updateTestimonialMutation.mutateAsync({
+        id,
+        data: { testimonial_status: newStatus }
+      });
+    } catch (error) {
+      console.error('Error updating status:', error);
+      alert('Failed to update status');
     }
   };
 
   const columns = [
     {
-      key: 'testimonial_id',
-      title: 'ID',
-      width: '60px'
-    },
-    {
-      key: 'client_name',
-      title: 'Name',
-      width: '150px'
-    },
-    {
-      key: 'client_designation',
-      title: 'Designation',
-      width: '150px'
-    },
-    {
-      key: 'course',
-      title: 'Course',
-      width: '150px'
-    },
-    {
-      key: 'testimonial_rating',
-      title: 'Rating',
-      width: '100px',
-      render: (rating) => (
-        <div className="rating-display">
-          {[...Array(5)].map((_, i) => (
-            <span
-              key={i}
-              className={`star ${i < rating ? 'filled' : ''}`}
-            >
-              ★
-            </span>
-          ))}
+      key: 'client_info',
+      title: 'Client Information',
+      render: (testimonial) => (
+        <div className="client-info-cell">
+          <div className="client-avatar">
+            {testimonial.client_image ? (
+              <img 
+                src={testimonial.client_image} 
+                alt={testimonial.client_name}
+                onError={(e) => {
+                  e.target.src = '/images/avatars/default-avatar.jpg';
+                }}
+              />
+            ) : (
+              <div className="avatar-placeholder">
+                <i className="fas fa-user"></i>
+              </div>
+            )}
+          </div>
+          <div className="client-details">
+            <h4>{testimonial.client_name}</h4>
+            <p className="client-designation">{testimonial.client_designation || 'N/A'}</p>
+            <p className="client-company">{testimonial.client_company || 'N/A'}</p>
+          </div>
         </div>
       )
     },
     {
-      key: 'testimonial_status',
+      key: 'testimonial_text',
+      title: 'Testimonial',
+      render: (testimonial) => (
+        <div className="testimonial-text-cell">
+          <p className="testimonial-preview">
+            {testimonial.testimonial_text.length > 100 
+              ? testimonial.testimonial_text.substring(0, 100) + '...'
+              : testimonial.testimonial_text
+            }
+          </p>
+          <div className="testimonial-rating">
+            {[...Array(5)].map((_, index) => (
+              <i 
+                key={index}
+                className={`fas fa-star ${index < testimonial.testimonial_rating ? 'filled' : ''}`}
+              ></i>
+            ))}
+          </div>
+        </div>
+      )
+    },
+    {
+      key: 'course',
+      title: 'Course',
+      render: (testimonial) => (
+        <div className="course-cell">
+          <span className="course-badge">{testimonial.course || 'N/A'}</span>
+        </div>
+      )
+    },
+    {
+      key: 'success_metrics',
+      title: 'Success Metrics',
+      render: (testimonial) => {
+        const metrics = testimonial.success_metrics || {};
+        return (
+          <div className="metrics-cell">
+            {metrics.projects && (
+              <div className="metric-item">
+                <i className="fas fa-project-diagram"></i>
+                <span>{metrics.projects} projects</span>
+              </div>
+            )}
+            {metrics.duration && (
+              <div className="metric-item">
+                <i className="fas fa-clock"></i>
+                <span>{metrics.duration}</span>
+              </div>
+            )}
+            {metrics.outcome && (
+              <div className="metric-item">
+                <i className="fas fa-trophy"></i>
+                <span>{metrics.outcome}</span>
+              </div>
+            )}
+          </div>
+        );
+      }
+    },
+    {
+      key: 'order',
+      title: 'Order',
+      render: (testimonial) => (
+        <div className="order-cell">
+          <span className="order-number">{testimonial.testimonial_order || 0}</span>
+        </div>
+      )
+    },
+    {
+      key: 'status',
       title: 'Status',
-      width: '100px',
-      render: (status) => (
-        <span className={`status-badge ${status === '1' ? 'active' : 'inactive'}`}>
-          {status === '1' ? 'Active' : 'Inactive'}
-        </span>
+      render: (testimonial) => (
+        <select 
+          value={testimonial.testimonial_status || '1'}
+          onChange={(e) => handleStatusChange(testimonial.testimonial_id, e.target.value)}
+          className={`status-select status-${testimonial.testimonial_status || '1'}`}
+        >
+          <option value="1">Active</option>
+          <option value="0">Inactive</option>
+        </select>
       )
     },
     {
       key: 'created_at',
       title: 'Created',
-      width: '120px',
-      render: (date) => new Date(date).toLocaleDateString()
+      render: (testimonial) => new Date(testimonial.created_at).toLocaleDateString()
     },
     {
       key: 'actions',
       title: 'Actions',
-      width: '120px',
-      render: (_, testimonial) => (
+      render: (testimonial) => (
         <div className="action-buttons">
           <button
-            className="btn-action view"
-            onClick={() => handleView(testimonial)}
+            className="btn btn-sm btn-outline"
+            onClick={() => handleViewTestimonial(testimonial)}
             title="View"
           >
-            👁️
+            <i className="fas fa-eye"></i>
           </button>
           <button
-            className="btn-action edit"
-            onClick={() => handleEdit(testimonial)}
+            className="btn btn-sm btn-primary"
+            onClick={() => handleEditTestimonial(testimonial)}
             title="Edit"
           >
-            ✏️
+            <i className="fas fa-edit"></i>
           </button>
           <button
-            className="btn-action delete"
-            onClick={() => handleDelete(testimonial.testimonial_id)}
+            className="btn btn-sm btn-danger"
+            onClick={() => handleDeleteTestimonial(testimonial.testimonial_id)}
             title="Delete"
           >
-            🗑️
+            <i className="fas fa-trash"></i>
           </button>
         </div>
       )
     }
   ];
 
-  const formFields = [
+  const testimonialFormFields = [
     {
       name: 'client_name',
       label: 'Client Name',
@@ -179,7 +266,7 @@ const TestimonialManagement = () => {
       label: 'Designation',
       type: 'text',
       required: false,
-      placeholder: 'Enter designation'
+      placeholder: 'Enter client designation'
     },
     {
       name: 'client_company',
@@ -190,7 +277,7 @@ const TestimonialManagement = () => {
     },
     {
       name: 'course',
-      label: 'Course/Program',
+      label: 'Course',
       type: 'text',
       required: false,
       placeholder: 'Enter course name'
@@ -205,10 +292,10 @@ const TestimonialManagement = () => {
     },
     {
       name: 'client_image',
-      label: 'Profile Image URL',
-      type: 'text',
-      required: false,
-      placeholder: 'Enter image URL'
+      label: 'Client Photo',
+      type: 'file',
+      accept: 'image/*',
+      required: false
     },
     {
       name: 'testimonial_rating',
@@ -216,12 +303,27 @@ const TestimonialManagement = () => {
       type: 'select',
       required: true,
       options: [
-        { value: 1, label: '1 Star - Poor' },
-        { value: 2, label: '2 Stars - Fair' },
-        { value: 3, label: '3 Stars - Good' },
-        { value: 4, label: '4 Stars - Very Good' },
-        { value: 5, label: '5 Stars - Excellent' }
+        { value: 1, label: '1 Star' },
+        { value: 2, label: '2 Stars' },
+        { value: 3, label: '3 Stars' },
+        { value: 4, label: '4 Stars' },
+        { value: 5, label: '5 Stars' }
       ]
+    },
+    {
+      name: 'testimonial_order',
+      label: 'Display Order',
+      type: 'number',
+      required: false,
+      placeholder: 'Enter display order (0 = first)'
+    },
+    {
+      name: 'success_metrics',
+      label: 'Success Metrics (JSON)',
+      type: 'textarea',
+      required: false,
+      placeholder: 'Enter success metrics as JSON: {"projects": "5", "duration": "6 months", "outcome": "Got job"}',
+      rows: 3
     },
     {
       name: 'testimonial_status',
@@ -232,144 +334,196 @@ const TestimonialManagement = () => {
         { value: '1', label: 'Active' },
         { value: '0', label: 'Inactive' }
       ]
-    },
-    {
-      name: 'testimonial_order',
-      label: 'Display Order',
-      type: 'number',
-      required: false,
-      placeholder: 'Enter display order (0 = first)'
     }
   ];
 
-  if (isLoading) return <div className="loading">Loading testimonials...</div>;
-  if (error) return <div className="error">Error loading testimonials: {error.message}</div>;
+  if (isLoading) {
+    return (
+      <div className="testimonial-management loading">
+        <div className="loading-spinner">
+          <div className="spinner"></div>
+          <p>Loading testimonials...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="testimonial-management-page">
+    <div className="testimonial-management">
       <div className="page-header">
-        <div className="header-content">
-          <div className="header-left">
-            <h1>Testimonials & Reviews</h1>
-            <p>Manage student testimonials and reviews</p>
-          </div>
-          <div className="header-right">
-            <button className="btn btn-primary" onClick={handleAdd}>
-              <span className="btn-icon">+</span>
-              Add Testimonial
-            </button>
-          </div>
+        <div className="page-title">
+          <h1>Testimonial Management</h1>
+          <p>Manage client testimonials and success stories</p>
         </div>
+        <button 
+          className="btn btn-primary"
+          onClick={handleCreateTestimonial}
+        >
+          <i className="fas fa-plus"></i>
+          Add New Testimonial
+        </button>
       </div>
 
       <div className="page-content">
-        <div className="content-section">
-          <h2>All Testimonials</h2>
-          <DataTable
-            columns={columns}
-            data={testimonialsData?.data || []}
-            loading={isLoading}
-          />
+        <div className="content-card">
+          <div className="card-header">
+            <div className="filters">
+              <div className="search-box">
+                <i className="fas fa-search"></i>
+                <input 
+                  type="text"
+                  placeholder="Search testimonials..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <select 
+                value={courseFilter}
+                onChange={(e) => setCourseFilter(e.target.value)}
+                className="filter-select"
+              >
+                <option value="all">All Courses</option>
+                <option value="web-development">Web Development</option>
+                <option value="data-science">Data Science</option>
+                <option value="mobile-development">Mobile Development</option>
+                <option value="cybersecurity">Cybersecurity</option>
+                <option value="cloud-computing">Cloud Computing</option>
+                <option value="other">Other</option>
+              </select>
+              <select 
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="filter-select"
+              >
+                <option value="all">All Status</option>
+                <option value="1">Active</option>
+                <option value="0">Inactive</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="card-body">
+            {error ? (
+              <div className="error-message">
+                <i className="fas fa-exclamation-triangle"></i>
+                <p>Failed to load testimonials</p>
+                <button onClick={() => window.location.reload()} className="btn btn-primary">
+                  Try Again
+                </button>
+              </div>
+            ) : (
+              <DataTable
+                columns={columns}
+                data={testimonialsData?.data || []}
+                loading={isLoading}
+                currentPage={currentPage}
+                totalPages={testimonialsData?.pages || 0}
+                onPageChange={setCurrentPage}
+              />
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Add/Edit Modal */}
-      <FormModal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setEditingTestimonial(null);
-        }}
-        title={editingTestimonial ? 'Edit Testimonial' : 'Add Testimonial'}
-        fields={formFields}
-        initialData={editingTestimonial}
-        onSubmit={handleSubmit}
-        loading={createMutation.isPending || updateMutation.isPending}
-      />
-
-      {/* View Modal */}
-      {viewingTestimonial && (
-        <div className="modal-overlay" onClick={() => setViewingTestimonial(null)}>
-          <div className="modal-content view-modal" onClick={(e) => e.stopPropagation()}>
+      {/* Testimonial Form Modal */}
+      {showModal && (
+        <div className="modal-overlay">
+          <div className="modal-container">
             <div className="modal-header">
-              <h2>View Testimonial</h2>
-              <button
+              <h2>{editingTestimonial ? 'Edit Testimonial' : 'Add New Testimonial'}</h2>
+              <button 
+                className="modal-close"
+                onClick={() => {
+                  setShowModal(false);
+                  setEditingTestimonial(null);
+                }}
+              >
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+            <div className="modal-body">
+              <FormModal
+                title={editingTestimonial ? 'Edit Testimonial' : 'Add New Testimonial'}
+                fields={testimonialFormFields}
+                initialData={editingTestimonial}
+                onSubmit={handleFormSubmit}
+                onClose={() => {
+                  setShowModal(false);
+                  setEditingTestimonial(null);
+                }}
+                loading={createTestimonialMutation.isPending || updateTestimonialMutation.isPending}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Testimonial View Modal */}
+      {viewingTestimonial && (
+        <div className="modal-overlay">
+          <div className="modal-container large">
+            <div className="modal-header">
+              <h2>{viewingTestimonial.client_name}'s Testimonial</h2>
+              <button 
                 className="modal-close"
                 onClick={() => setViewingTestimonial(null)}
               >
-                ×
+                <i className="fas fa-times"></i>
               </button>
             </div>
             <div className="modal-body">
               <div className="testimonial-view">
-                <div className="testimonial-profile">
-                  {viewingTestimonial.client_image && (
-                    <img
-                      src={viewingTestimonial.client_image}
-                      alt={viewingTestimonial.client_name}
-                      className="profile-image"
-                    />
-                  )}
-                  <div className="profile-info">
-                    <h3>{viewingTestimonial.client_name}</h3>
-                    <p className="designation">{viewingTestimonial.client_designation}</p>
-                    {viewingTestimonial.client_company && (
-                      <p className="company">{viewingTestimonial.client_company}</p>
-                    )}
-                    <div className="rating">
-                      {[...Array(5)].map((_, i) => (
-                        <span
-                          key={i}
-                          className={`star ${i < viewingTestimonial.testimonial_rating ? 'filled' : ''}`}
-                        >
-                          ★
-                        </span>
-                      ))}
+                <div className="testimonial-header">
+                  <div className="client-info">
+                    <div className="client-avatar-large">
+                      {viewingTestimonial.client_image ? (
+                        <img 
+                          src={viewingTestimonial.client_image} 
+                          alt={viewingTestimonial.client_name}
+                        />
+                      ) : (
+                        <div className="avatar-placeholder-large">
+                          <i className="fas fa-user"></i>
+                        </div>
+                      )}
                     </div>
+                    <div className="client-details-large">
+                      <h3>{viewingTestimonial.client_name}</h3>
+                      <p className="client-designation">{viewingTestimonial.client_designation || 'N/A'}</p>
+                      <p className="client-company">{viewingTestimonial.client_company || 'N/A'}</p>
+                      {viewingTestimonial.course && (
+                        <span className="course-badge">{viewingTestimonial.course}</span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="testimonial-rating-large">
+                    {[...Array(5)].map((_, index) => (
+                      <i 
+                        key={index}
+                        className={`fas fa-star ${index < viewingTestimonial.testimonial_rating ? 'filled' : ''}`}
+                      ></i>
+                    ))}
                   </div>
                 </div>
                 <div className="testimonial-content">
-                  {viewingTestimonial.course && (
-                    <div className="course-info">
-                      <span className="course-icon">🎓</span>
-                      <span>{viewingTestimonial.course}</span>
-                    </div>
-                  )}
-                  <blockquote className="testimonial-text">
+                  <blockquote>
                     "{viewingTestimonial.testimonial_text}"
                   </blockquote>
-                  {viewingTestimonial.success_metrics && (
-                    <div className="success-metrics">
-                      <h4>Success Metrics</h4>
-                      <div className="metrics-grid">
-                        {Object.entries(viewingTestimonial.success_metrics).map(([key, value]) => (
-                          <div key={key} className="metric-item">
-                            <span className="metric-label">{key}:</span>
-                            <span className="metric-value">{value}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </div>
+                {viewingTestimonial.success_metrics && Object.keys(viewingTestimonial.success_metrics).length > 0 && (
+                  <div className="success-metrics">
+                    <h4>Success Metrics</h4>
+                    <div className="metrics-grid">
+                      {Object.entries(viewingTestimonial.success_metrics).map(([key, value]) => (
+                        <div key={key} className="metric-item-large">
+                          <strong>{key.replace('_', ' ').toUpperCase()}:</strong>
+                          <span>{value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
-            <div className="modal-footer">
-              <button
-                className="btn btn-secondary"
-                onClick={() => setViewingTestimonial(null)}
-              >
-                Close
-              </button>
-              <button
-                className="btn btn-primary"
-                onClick={() => {
-                  setViewingTestimonial(null);
-                  handleEdit(viewingTestimonial);
-                }}
-              >
-                Edit Testimonial
-              </button>
             </div>
           </div>
         </div>

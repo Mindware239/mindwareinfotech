@@ -851,6 +851,401 @@ app.delete('/api/enrollments/bulk-delete', (req, res) => {
   });
 });
 
+// Gallery CRUD
+app.get('/api/gallery', (req, res) => {
+  const { page = 1, limit = 10, search, category, status } = req.query;
+  
+  // Mock data for gallery
+  const mockGallery = [
+    {
+      id: 1,
+      title: 'Web Development Workshop',
+      description: 'Students learning modern web development techniques',
+      category: 'training',
+      subcategory: 'workshop',
+      images: [
+        { url: '/images/gallery/workshop1.jpg', name: 'workshop1.jpg' },
+        { url: '/images/gallery/workshop2.jpg', name: 'workshop2.jpg' }
+      ],
+      event_date: '2024-01-15T10:00:00Z',
+      location: 'Mumbai Office',
+      status: 'active',
+      is_featured: true,
+      is_public: true,
+      views: 150,
+      likes: 25,
+      created_at: new Date().toISOString()
+    },
+    {
+      id: 2,
+      title: 'Student Success Stories',
+      description: 'Our graduates achieving their career goals',
+      category: 'students',
+      subcategory: 'success',
+      images: [
+        { url: '/images/gallery/success1.jpg', name: 'success1.jpg' }
+      ],
+      event_date: '2024-01-10T14:00:00Z',
+      location: 'Online',
+      status: 'active',
+      is_featured: false,
+      is_public: true,
+      views: 89,
+      likes: 12,
+      created_at: new Date().toISOString()
+    }
+  ];
+  
+  res.status(200).json({
+    success: true,
+    count: mockGallery.length,
+    pages: 1,
+    currentPage: parseInt(page),
+    data: mockGallery
+  });
+});
+
+app.get('/api/gallery/:id', (req, res) => {
+  const { id } = req.params;
+  const gallery = {
+    id: parseInt(id),
+    title: 'Web Development Workshop',
+    description: 'Students learning modern web development techniques',
+    category: 'training',
+    subcategory: 'workshop',
+    images: [
+      { url: '/images/gallery/workshop1.jpg', name: 'workshop1.jpg' },
+      { url: '/images/gallery/workshop2.jpg', name: 'workshop2.jpg' }
+    ],
+    event_date: '2024-01-15T10:00:00Z',
+    location: 'Mumbai Office',
+    status: 'active',
+    is_featured: true,
+    is_public: true,
+    views: 150,
+    likes: 25,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+  
+  res.status(200).json({ success: true, data: gallery });
+});
+
+app.post('/api/gallery', (req, res) => {
+  const galleryData = req.body;
+  const newGallery = {
+    id: Date.now(),
+    ...galleryData,
+    status: 'active',
+    is_featured: false,
+    is_public: true,
+    views: 0,
+    likes: 0,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+  
+  res.status(201).json({
+    success: true,
+    message: 'Gallery item created successfully',
+    data: newGallery
+  });
+});
+
+app.put('/api/gallery/:id', (req, res) => {
+  const { id } = req.params;
+  const updateData = req.body;
+  const updatedGallery = {
+    id: parseInt(id),
+    ...updateData,
+    updated_at: new Date().toISOString()
+  };
+  
+  res.status(200).json({
+    success: true,
+    message: 'Gallery item updated successfully',
+    data: updatedGallery
+  });
+});
+
+app.delete('/api/gallery/:id', (req, res) => {
+  const { id } = req.params;
+  res.status(200).json({ success: true, message: 'Gallery item deleted successfully' });
+});
+
+app.get('/api/gallery/stats', (req, res) => {
+  const stats = {
+    total: 45,
+    active: 38,
+    featured: 12,
+    byCategory: [
+      { category: 'training', count: 15 },
+      { category: 'events', count: 12 },
+      { category: 'students', count: 8 },
+      { category: 'workshops', count: 6 },
+      { category: 'other', count: 4 }
+    ]
+  };
+  
+  res.status(200).json({ success: true, data: stats });
+});
+
+// Banners CRUD
+app.get('/api/banners', (req, res) => {
+  const { page = 1, limit = 10, search, type, status } = req.query;
+  
+  // Mock data for banners
+  const mockBanners = [
+    {
+      banner_id: 1,
+      title: 'Welcome to Mindware India',
+      subtitle: 'Transform Your Career with Our Courses',
+      description: 'Join thousands of students who have successfully launched their tech careers',
+      image_url: '/images/banners/hero-banner.jpg',
+      button_text: 'Get Started',
+      button_url: '/courses',
+      banner_type: 'hero',
+      banner_position: 1,
+      is_active: true,
+      start_date: '2024-01-01T00:00:00Z',
+      end_date: '2024-12-31T23:59:59Z',
+      created_at: new Date().toISOString()
+    },
+    {
+      banner_id: 2,
+      title: 'About Our Mission',
+      subtitle: 'Empowering Future Developers',
+      description: 'We are committed to providing quality education and career guidance',
+      image_url: '/images/banners/about-banner.jpg',
+      button_text: 'Learn More',
+      button_url: '/about',
+      banner_type: 'about',
+      banner_position: 2,
+      is_active: true,
+      created_at: new Date().toISOString()
+    }
+  ];
+  
+  res.status(200).json({
+    success: true,
+    count: mockBanners.length,
+    pages: 1,
+    currentPage: parseInt(page),
+    data: mockBanners
+  });
+});
+
+app.get('/api/banners/:id', (req, res) => {
+  const { id } = req.params;
+  const banner = {
+    banner_id: parseInt(id),
+    title: 'Welcome to Mindware India',
+    subtitle: 'Transform Your Career with Our Courses',
+    description: 'Join thousands of students who have successfully launched their tech careers',
+    image_url: '/images/banners/hero-banner.jpg',
+    button_text: 'Get Started',
+    button_url: '/courses',
+    banner_type: 'hero',
+    banner_position: 1,
+    is_active: true,
+    start_date: '2024-01-01T00:00:00Z',
+    end_date: '2024-12-31T23:59:59Z',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+  
+  res.status(200).json({ success: true, data: banner });
+});
+
+app.post('/api/banners', (req, res) => {
+  const bannerData = req.body;
+  const newBanner = {
+    banner_id: Date.now(),
+    ...bannerData,
+    is_active: true,
+    banner_position: 0,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+  
+  res.status(201).json({
+    success: true,
+    message: 'Banner created successfully',
+    data: newBanner
+  });
+});
+
+app.put('/api/banners/:id', (req, res) => {
+  const { id } = req.params;
+  const updateData = req.body;
+  const updatedBanner = {
+    banner_id: parseInt(id),
+    ...updateData,
+    updated_at: new Date().toISOString()
+  };
+  
+  res.status(200).json({
+    success: true,
+    message: 'Banner updated successfully',
+    data: updatedBanner
+  });
+});
+
+app.delete('/api/banners/:id', (req, res) => {
+  const { id } = req.params;
+  res.status(200).json({ success: true, message: 'Banner deleted successfully' });
+});
+
+app.get('/api/banners/stats', (req, res) => {
+  const stats = {
+    total: 8,
+    active: 6,
+    byType: [
+      { type: 'hero', count: 2 },
+      { type: 'about', count: 2 },
+      { type: 'service', count: 2 },
+      { type: 'testimonial', count: 1 },
+      { type: 'contact', count: 1 }
+    ]
+  };
+  
+  res.status(200).json({ success: true, data: stats });
+});
+
+// Testimonials CRUD
+app.get('/api/testimonials', (req, res) => {
+  const { page = 1, limit = 10, search, course, status } = req.query;
+  
+  // Mock data for testimonials
+  const mockTestimonials = [
+    {
+      testimonial_id: 1,
+      client_name: 'John Doe',
+      client_designation: 'Software Developer',
+      client_company: 'Tech Corp',
+      course: 'web-development',
+      testimonial_text: 'The course was excellent and helped me land my dream job. The instructors were knowledgeable and supportive throughout the learning journey.',
+      client_image: '/images/testimonials/john-doe.jpg',
+      success_metrics: {
+        projects: '5',
+        duration: '6 months',
+        outcome: 'Got job at Tech Corp'
+      },
+      testimonial_rating: 5,
+      testimonial_status: '1',
+      testimonial_order: 1,
+      created_at: new Date().toISOString()
+    },
+    {
+      testimonial_id: 2,
+      client_name: 'Jane Smith',
+      client_designation: 'Data Scientist',
+      client_company: 'Data Inc',
+      course: 'data-science',
+      testimonial_text: 'Amazing learning experience! The practical approach and real-world projects made all the difference in my career transition.',
+      client_image: '/images/testimonials/jane-smith.jpg',
+      success_metrics: {
+        projects: '8',
+        duration: '4 months',
+        outcome: 'Salary increased by 150%'
+      },
+      testimonial_rating: 5,
+      testimonial_status: '1',
+      testimonial_order: 2,
+      created_at: new Date().toISOString()
+    }
+  ];
+  
+  res.status(200).json({
+    success: true,
+    count: mockTestimonials.length,
+    pages: 1,
+    currentPage: parseInt(page),
+    data: mockTestimonials
+  });
+});
+
+app.get('/api/testimonials/:id', (req, res) => {
+  const { id } = req.params;
+  const testimonial = {
+    testimonial_id: parseInt(id),
+    client_name: 'John Doe',
+    client_designation: 'Software Developer',
+    client_company: 'Tech Corp',
+    course: 'web-development',
+    testimonial_text: 'The course was excellent and helped me land my dream job. The instructors were knowledgeable and supportive throughout the learning journey.',
+    client_image: '/images/testimonials/john-doe.jpg',
+    success_metrics: {
+      projects: '5',
+      duration: '6 months',
+      outcome: 'Got job at Tech Corp'
+    },
+    testimonial_rating: 5,
+    testimonial_status: '1',
+    testimonial_order: 1,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+  
+  res.status(200).json({ success: true, data: testimonial });
+});
+
+app.post('/api/testimonials', (req, res) => {
+  const testimonialData = req.body;
+  const newTestimonial = {
+    testimonial_id: Date.now(),
+    ...testimonialData,
+    testimonial_rating: 5,
+    testimonial_status: '1',
+    testimonial_order: 0,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+  
+  res.status(201).json({
+    success: true,
+    message: 'Testimonial created successfully',
+    data: newTestimonial
+  });
+});
+
+app.put('/api/testimonials/:id', (req, res) => {
+  const { id } = req.params;
+  const updateData = req.body;
+  const updatedTestimonial = {
+    testimonial_id: parseInt(id),
+    ...updateData,
+    updated_at: new Date().toISOString()
+  };
+  
+  res.status(200).json({
+    success: true,
+    message: 'Testimonial updated successfully',
+    data: updatedTestimonial
+  });
+});
+
+app.delete('/api/testimonials/:id', (req, res) => {
+  const { id } = req.params;
+  res.status(200).json({ success: true, message: 'Testimonial deleted successfully' });
+});
+
+app.get('/api/testimonials/stats', (req, res) => {
+  const stats = {
+    total: 25,
+    active: 22,
+    averageRating: 4.8,
+    byCourse: [
+      { course: 'web-development', count: 10 },
+      { course: 'data-science', count: 8 },
+      { course: 'mobile-development', count: 4 },
+      { course: 'cybersecurity', count: 3 }
+    ]
+  };
+  
+  res.status(200).json({ success: true, data: stats });
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
