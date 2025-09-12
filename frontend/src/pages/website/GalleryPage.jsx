@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import galleryService from '../../services/galleryService';
 import { getGalleryImageUrl } from '../../utils/imageUtils';
+import SEOHead from '../../components/SEOHead';
 import './GalleryPage.css';
 
 const GalleryPage = () => {
@@ -221,14 +222,58 @@ const GalleryPage = () => {
     );
   }
 
+  // Generate structured data for the gallery
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "ImageGallery",
+    "name": "Mindware India Gallery",
+    "description": "Photo gallery showcasing our events, training sessions, workshops, and company activities",
+    "url": window.location.href,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Mindware India",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "/mindware-logo.png"
+      }
+    },
+    "mainEntity": galleryItems.map(item => ({
+      "@type": "ImageObject",
+      "name": item.title,
+      "description": item.description,
+      "url": item.images?.[0]?.url || '/images/gallery-placeholder.jpg',
+      "thumbnailUrl": item.images?.[0]?.url || '/images/gallery-placeholder.jpg',
+      "dateCreated": item.created_at,
+      "creator": {
+        "@type": "Organization",
+        "name": "Mindware India"
+      }
+    }))
+  };
+
   return (
-    <div className="gallery-page">
-      <div className="page-hero">
-        <div className="container">
-          <h1>Gallery</h1>
-          <p>View our photos and events</p>
+    <>
+      <SEOHead
+        title="Gallery - Mindware India | Events, Training & Company Photos"
+        description="Explore our photo gallery showcasing training sessions, workshops, events, team building activities, and company milestones at Mindware India."
+        keywords="gallery, photos, events, training, workshops, team building, Mindware India, company photos, student activities"
+        ogTitle="Gallery - Mindware India | Events, Training & Company Photos"
+        ogDescription="Explore our photo gallery showcasing training sessions, workshops, events, team building activities, and company milestones at Mindware India."
+        ogImage="/mindware-logo.png"
+        ogUrl={window.location.href}
+        twitterTitle="Gallery - Mindware India | Events, Training & Company Photos"
+        twitterDescription="Explore our photo gallery showcasing training sessions, workshops, events, team building activities, and company milestones at Mindware India."
+        twitterImage="/mindware-logo.png"
+        canonicalUrl={window.location.href}
+        structuredData={structuredData}
+      />
+      <div className="gallery-page">
+        <div className="page-hero">
+          <div className="container">
+            <h1>Gallery</h1>
+            <p>View our photos and events</p>
+          </div>
         </div>
-      </div>
       
       <div className="page-content">
         <div className="container">
@@ -415,6 +460,7 @@ const GalleryPage = () => {
         </div>
       )}
     </div>
+    </>
   );
 };
 

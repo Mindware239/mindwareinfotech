@@ -100,6 +100,91 @@ const Blog = sequelize.define('Blog', {
     allowNull: true,
     defaultValue: []
   },
+  // SEO Fields
+  meta_title: {
+    type: DataTypes.STRING(60),
+    allowNull: true,
+    validate: {
+      len: [0, 60]
+    }
+  },
+  meta_description: {
+    type: DataTypes.STRING(160),
+    allowNull: true,
+    validate: {
+      len: [0, 160]
+    }
+  },
+  meta_keywords: {
+    type: DataTypes.STRING(500),
+    allowNull: true,
+    validate: {
+      len: [0, 500]
+    }
+  },
+  // Open Graph Fields
+  og_title: {
+    type: DataTypes.STRING(100),
+    allowNull: true,
+    validate: {
+      len: [0, 100]
+    }
+  },
+  og_description: {
+    type: DataTypes.STRING(200),
+    allowNull: true,
+    validate: {
+      len: [0, 200]
+    }
+  },
+  og_image: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    defaultValue: {}
+  },
+  // Twitter Card Fields
+  twitter_title: {
+    type: DataTypes.STRING(70),
+    allowNull: true,
+    validate: {
+      len: [0, 70]
+    }
+  },
+  twitter_description: {
+    type: DataTypes.STRING(200),
+    allowNull: true,
+    validate: {
+      len: [0, 200]
+    }
+  },
+  twitter_image: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    defaultValue: {}
+  },
+  // Additional SEO Fields
+  canonical_url: {
+    type: DataTypes.STRING(500),
+    allowNull: true
+  },
+  robots_meta: {
+    type: DataTypes.STRING(100),
+    allowNull: true,
+    defaultValue: 'index, follow'
+  },
+  focus_keyword: {
+    type: DataTypes.STRING(100),
+    allowNull: true
+  },
+  seo_score: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    defaultValue: 0,
+    validate: {
+      min: 0,
+      max: 100
+    }
+  },
   seo: {
     type: DataTypes.JSON,
     allowNull: true,
@@ -128,6 +213,31 @@ const Blog = sequelize.define('Blog', {
         const wordCount = blog.content.split(/\s+/).length;
         blog.reading_time = Math.ceil(wordCount / wordsPerMinute);
       }
+
+      // Auto-generate SEO fields if not provided
+      if (!blog.meta_title && blog.title) {
+        blog.meta_title = blog.title.length > 60 ? blog.title.substring(0, 57) + '...' : blog.title;
+      }
+      
+      if (!blog.meta_description && blog.excerpt) {
+        blog.meta_description = blog.excerpt.length > 160 ? blog.excerpt.substring(0, 157) + '...' : blog.excerpt;
+      }
+      
+      if (!blog.og_title && blog.title) {
+        blog.og_title = blog.title.length > 100 ? blog.title.substring(0, 97) + '...' : blog.title;
+      }
+      
+      if (!blog.og_description && blog.excerpt) {
+        blog.og_description = blog.excerpt.length > 200 ? blog.excerpt.substring(0, 197) + '...' : blog.excerpt;
+      }
+      
+      if (!blog.twitter_title && blog.title) {
+        blog.twitter_title = blog.title.length > 70 ? blog.title.substring(0, 67) + '...' : blog.title;
+      }
+      
+      if (!blog.twitter_description && blog.excerpt) {
+        blog.twitter_description = blog.excerpt.length > 200 ? blog.excerpt.substring(0, 197) + '...' : blog.excerpt;
+      }
     },
     beforeUpdate: (blog) => {
       if (blog.changed('status') && blog.status === 'published' && !blog.published_at) {
@@ -139,6 +249,15 @@ const Blog = sequelize.define('Blog', {
         const wordsPerMinute = 200;
         const wordCount = blog.content.split(/\s+/).length;
         blog.reading_time = Math.ceil(wordCount / wordsPerMinute);
+      }
+
+      // Auto-update SEO fields if title or excerpt changed
+      if (blog.changed('title') && !blog.meta_title) {
+        blog.meta_title = blog.title.length > 60 ? blog.title.substring(0, 57) + '...' : blog.title;
+      }
+      
+      if (blog.changed('excerpt') && !blog.meta_description) {
+        blog.meta_description = blog.excerpt.length > 160 ? blog.excerpt.substring(0, 157) + '...' : blog.excerpt;
       }
     }
   }

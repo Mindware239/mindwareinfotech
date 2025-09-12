@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { HelmetProvider } from 'react-helmet-async';
 
 // Context Providers
 import { AuthProvider } from './context/AuthContext';
@@ -70,12 +71,13 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <AuthProvider>
-          <CartProvider>
-            <NotificationProvider>
-              <Router>
+    <HelmetProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <AuthProvider>
+            <CartProvider>
+              <NotificationProvider>
+                <Router>
               <Routes>
                 {/* Website Routes */}
                 <Route path="/" element={<WebsiteLayout />}>
@@ -121,12 +123,13 @@ function App() {
                   <Route path="settings" element={<SettingsPage />} />
                 </Route>
               </Routes>
-              </Router>
-            </NotificationProvider>
-          </CartProvider>
-        </AuthProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+                </Router>
+              </NotificationProvider>
+            </CartProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </HelmetProvider>
   );
 }
 

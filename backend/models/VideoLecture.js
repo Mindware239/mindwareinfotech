@@ -122,13 +122,136 @@ const VideoLecture = sequelize.define('VideoLecture', {
       key: 'id'
     }
   },
+  // SEO Fields
+  meta_title: {
+    type: DataTypes.STRING(60),
+    allowNull: true,
+    validate: {
+      len: [0, 60]
+    }
+  },
+  meta_description: {
+    type: DataTypes.STRING(160),
+    allowNull: true,
+    validate: {
+      len: [0, 160]
+    }
+  },
+  meta_keywords: {
+    type: DataTypes.STRING(500),
+    allowNull: true,
+    validate: {
+      len: [0, 500]
+    }
+  },
+  // Open Graph Fields
+  og_title: {
+    type: DataTypes.STRING(100),
+    allowNull: true,
+    validate: {
+      len: [0, 100]
+    }
+  },
+  og_description: {
+    type: DataTypes.STRING(200),
+    allowNull: true,
+    validate: {
+      len: [0, 200]
+    }
+  },
+  og_image: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    defaultValue: {}
+  },
+  // Twitter Card Fields
+  twitter_title: {
+    type: DataTypes.STRING(70),
+    allowNull: true,
+    validate: {
+      len: [0, 70]
+    }
+  },
+  twitter_description: {
+    type: DataTypes.STRING(200),
+    allowNull: true,
+    validate: {
+      len: [0, 200]
+    }
+  },
+  twitter_image: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    defaultValue: {}
+  },
+  // Additional SEO Fields
+  canonical_url: {
+    type: DataTypes.STRING(500),
+    allowNull: true
+  },
+  robots_meta: {
+    type: DataTypes.STRING(100),
+    allowNull: true,
+    defaultValue: 'index, follow'
+  },
+  focus_keyword: {
+    type: DataTypes.STRING(100),
+    allowNull: true
+  },
+  seo_score: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    defaultValue: 0,
+    validate: {
+      min: 0,
+      max: 100
+    }
+  },
   metadata: {
     type: DataTypes.JSON,
     allowNull: true,
     defaultValue: {}
   }
 }, {
-  tableName: 'video_lectures'
+  tableName: 'video_lectures',
+  hooks: {
+    beforeCreate: (video) => {
+      // Auto-generate SEO fields if not provided
+      if (!video.meta_title && video.title) {
+        video.meta_title = video.title.length > 60 ? video.title.substring(0, 57) + '...' : video.title;
+      }
+      
+      if (!video.meta_description && video.description) {
+        video.meta_description = video.description.length > 160 ? video.description.substring(0, 157) + '...' : video.description;
+      }
+      
+      if (!video.og_title && video.title) {
+        video.og_title = video.title.length > 100 ? video.title.substring(0, 97) + '...' : video.title;
+      }
+      
+      if (!video.og_description && video.description) {
+        video.og_description = video.description.length > 200 ? video.description.substring(0, 197) + '...' : video.description;
+      }
+      
+      if (!video.twitter_title && video.title) {
+        video.twitter_title = video.title.length > 70 ? video.title.substring(0, 67) + '...' : video.title;
+      }
+      
+      if (!video.twitter_description && video.description) {
+        video.twitter_description = video.description.length > 200 ? video.description.substring(0, 197) + '...' : video.description;
+      }
+    },
+    beforeUpdate: (video) => {
+      // Auto-update SEO fields if title or description changed
+      if (video.changed('title') && !video.meta_title) {
+        video.meta_title = video.title.length > 60 ? video.title.substring(0, 57) + '...' : video.title;
+      }
+      
+      if (video.changed('description') && !video.meta_description) {
+        video.meta_description = video.description.length > 160 ? video.description.substring(0, 157) + '...' : video.description;
+      }
+    }
+  }
 });
 
 // Instance methods

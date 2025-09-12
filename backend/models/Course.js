@@ -152,6 +152,91 @@ const Course = sequelize.define('Course', {
     allowNull: true,
     defaultValue: {}
   },
+  // SEO Fields
+  meta_title: {
+    type: DataTypes.STRING(60),
+    allowNull: true,
+    validate: {
+      len: [0, 60]
+    }
+  },
+  meta_description: {
+    type: DataTypes.STRING(160),
+    allowNull: true,
+    validate: {
+      len: [0, 160]
+    }
+  },
+  meta_keywords: {
+    type: DataTypes.STRING(500),
+    allowNull: true,
+    validate: {
+      len: [0, 500]
+    }
+  },
+  // Open Graph Fields
+  og_title: {
+    type: DataTypes.STRING(100),
+    allowNull: true,
+    validate: {
+      len: [0, 100]
+    }
+  },
+  og_description: {
+    type: DataTypes.STRING(200),
+    allowNull: true,
+    validate: {
+      len: [0, 200]
+    }
+  },
+  og_image: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    defaultValue: {}
+  },
+  // Twitter Card Fields
+  twitter_title: {
+    type: DataTypes.STRING(70),
+    allowNull: true,
+    validate: {
+      len: [0, 70]
+    }
+  },
+  twitter_description: {
+    type: DataTypes.STRING(200),
+    allowNull: true,
+    validate: {
+      len: [0, 200]
+    }
+  },
+  twitter_image: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    defaultValue: {}
+  },
+  // Additional SEO Fields
+  canonical_url: {
+    type: DataTypes.STRING(500),
+    allowNull: true
+  },
+  robots_meta: {
+    type: DataTypes.STRING(100),
+    allowNull: true,
+    defaultValue: 'index, follow'
+  },
+  focus_keyword: {
+    type: DataTypes.STRING(100),
+    allowNull: true
+  },
+  seo_score: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    defaultValue: 0,
+    validate: {
+      min: 0,
+      max: 100
+    }
+  },
   seo: {
     type: DataTypes.JSON,
     allowNull: true,
@@ -166,6 +251,41 @@ const Course = sequelize.define('Course', {
           total_videos: course.videos.length,
           ...course.metadata
         };
+      }
+
+      // Auto-generate SEO fields if not provided
+      if (!course.meta_title && course.title) {
+        course.meta_title = course.title.length > 60 ? course.title.substring(0, 57) + '...' : course.title;
+      }
+      
+      if (!course.meta_description && course.short_description) {
+        course.meta_description = course.short_description.length > 160 ? course.short_description.substring(0, 157) + '...' : course.short_description;
+      }
+      
+      if (!course.og_title && course.title) {
+        course.og_title = course.title.length > 100 ? course.title.substring(0, 97) + '...' : course.title;
+      }
+      
+      if (!course.og_description && course.short_description) {
+        course.og_description = course.short_description.length > 200 ? course.short_description.substring(0, 197) + '...' : course.short_description;
+      }
+      
+      if (!course.twitter_title && course.title) {
+        course.twitter_title = course.title.length > 70 ? course.title.substring(0, 67) + '...' : course.title;
+      }
+      
+      if (!course.twitter_description && course.short_description) {
+        course.twitter_description = course.short_description.length > 200 ? course.short_description.substring(0, 197) + '...' : course.short_description;
+      }
+    },
+    beforeUpdate: (course) => {
+      // Auto-update SEO fields if title or description changed
+      if (course.changed('title') && !course.meta_title) {
+        course.meta_title = course.title.length > 60 ? course.title.substring(0, 57) + '...' : course.title;
+      }
+      
+      if (course.changed('short_description') && !course.meta_description) {
+        course.meta_description = course.short_description.length > 160 ? course.short_description.substring(0, 157) + '...' : course.short_description;
       }
     }
   }

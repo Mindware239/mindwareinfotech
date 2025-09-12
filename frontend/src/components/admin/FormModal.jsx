@@ -7,7 +7,8 @@ const FormModal = ({
   initialData = {}, 
   onSubmit, 
   onClose, 
-  loading = false 
+  loading = false,
+  onFormDataChange
 }) => {
   const [formData, setFormData] = useState(() => {
     const data = {};
@@ -65,6 +66,12 @@ const FormModal = ({
         ...prev,
         [name]: ''
       }));
+    }
+    
+    // Call onFormDataChange if provided
+    if (onFormDataChange) {
+      const newData = { ...formData, [name]: type === 'checkbox' ? checked : value };
+      onFormDataChange(newData);
     }
   };
 
@@ -263,6 +270,18 @@ const FormModal = ({
               )}
             </div>
             {fieldError && <span className="error-text">{fieldError}</span>}
+          </div>
+        );
+
+      case 'custom':
+        return (
+          <div className="form-group" key={field.name}>
+            {field.component && field.component({
+              value: fieldValue,
+              onChange: (value) => handleInputChange({ target: { name: field.name, value } }),
+              error: fieldError,
+              ...field.props
+            })}
           </div>
         );
 

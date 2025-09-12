@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import DataTable from '../../components/admin/DataTable';
 import FormModal from '../../components/admin/FormModal';
+import SEOForm from '../../components/admin/SEOForm';
 import blogService from '../../services/blogService';
 import { getBlogImageUrl } from '../../utils/imageUtils';
 import { useNotification } from '../../context/NotificationContext';
@@ -16,6 +17,7 @@ const BlogManagement = () => {
   const [filterStatus, setFilterStatus] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [seoData, setSeoData] = useState({});
   const { showSuccess, showError } = useNotification();
 
   useEffect(() => {
@@ -299,6 +301,21 @@ const BlogManagement = () => {
         { value: 'published', label: 'Published' },
         { value: 'archived', label: 'Archived' }
       ]
+    },
+    {
+      name: 'seo',
+      label: 'SEO Settings',
+      type: 'custom',
+      component: ({ value, onChange }) => (
+        <SEOForm
+          data={value || {}}
+          onChange={onChange}
+          title={seoData.title}
+          description={seoData.description}
+          excerpt={seoData.excerpt}
+          featuredImage={seoData.featuredImage}
+        />
+      )
     }
   ];
 
@@ -387,6 +404,15 @@ const BlogManagement = () => {
           onClose={() => {
             setShowModal(false);
             setEditingBlog(null);
+            setSeoData({});
+          }}
+          onFormDataChange={(formData) => {
+            setSeoData({
+              title: formData.title,
+              description: formData.content,
+              excerpt: formData.excerpt,
+              featuredImage: formData.featuredImage
+            });
           }}
         />
       )}

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import blogService from '../../services/blogService';
+import SEOHead from '../../components/SEOHead';
 import './BlogDetails.css';
 
 const BlogDetails = () => {
@@ -88,9 +89,56 @@ const BlogDetails = () => {
     );
   }
 
+  // Generate structured data for the blog post
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": blog.meta_title || blog.title,
+    "description": blog.meta_description || blog.excerpt,
+    "image": blog.featured_image?.url || blog.featured_image || '/mindware-logo.png',
+    "author": {
+      "@type": "Person",
+      "name": blog.author?.name || "Mindware India"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Mindware India",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "/mindware-logo.png"
+      }
+    },
+    "datePublished": blog.published_at || blog.created_at,
+    "dateModified": blog.updated_at || blog.created_at,
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": window.location.href
+    },
+    "keywords": blog.meta_keywords || blog.tags?.join(', ') || '',
+    "articleSection": blog.category,
+    "wordCount": blog.content?.split(' ').length || 0,
+    "timeRequired": `PT${blog.reading_time || 5}M`
+  };
+
   return (
-    <div className="blog-details-container">
-      <div className="container">
+    <>
+      <SEOHead
+        title={blog.meta_title || blog.title}
+        description={blog.meta_description || blog.excerpt}
+        keywords={blog.meta_keywords || blog.tags?.join(', ')}
+        ogTitle={blog.og_title || blog.title}
+        ogDescription={blog.og_description || blog.excerpt}
+        ogImage={blog.og_image?.url || blog.featured_image?.url || blog.featured_image}
+        ogUrl={window.location.href}
+        twitterTitle={blog.twitter_title || blog.title}
+        twitterDescription={blog.twitter_description || blog.excerpt}
+        twitterImage={blog.twitter_image?.url || blog.og_image?.url || blog.featured_image?.url || blog.featured_image}
+        canonicalUrl={blog.canonical_url || window.location.href}
+        robots={blog.robots_meta}
+        structuredData={structuredData}
+      />
+      <div className="blog-details-container">
+        <div className="container">
         <div className="blog-details-layout">
           {/* Main Content */}
           <article className="blog-main-content">
@@ -323,6 +371,7 @@ const BlogDetails = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

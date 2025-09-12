@@ -127,6 +127,91 @@ const Job = sequelize.define('Job', {
       key: 'id'
     }
   },
+  // SEO Fields
+  meta_title: {
+    type: DataTypes.STRING(60),
+    allowNull: true,
+    validate: {
+      len: [0, 60]
+    }
+  },
+  meta_description: {
+    type: DataTypes.STRING(160),
+    allowNull: true,
+    validate: {
+      len: [0, 160]
+    }
+  },
+  meta_keywords: {
+    type: DataTypes.STRING(500),
+    allowNull: true,
+    validate: {
+      len: [0, 500]
+    }
+  },
+  // Open Graph Fields
+  og_title: {
+    type: DataTypes.STRING(100),
+    allowNull: true,
+    validate: {
+      len: [0, 100]
+    }
+  },
+  og_description: {
+    type: DataTypes.STRING(200),
+    allowNull: true,
+    validate: {
+      len: [0, 200]
+    }
+  },
+  og_image: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    defaultValue: {}
+  },
+  // Twitter Card Fields
+  twitter_title: {
+    type: DataTypes.STRING(70),
+    allowNull: true,
+    validate: {
+      len: [0, 70]
+    }
+  },
+  twitter_description: {
+    type: DataTypes.STRING(200),
+    allowNull: true,
+    validate: {
+      len: [0, 200]
+    }
+  },
+  twitter_image: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    defaultValue: {}
+  },
+  // Additional SEO Fields
+  canonical_url: {
+    type: DataTypes.STRING(500),
+    allowNull: true
+  },
+  robots_meta: {
+    type: DataTypes.STRING(100),
+    allowNull: true,
+    defaultValue: 'index, follow'
+  },
+  focus_keyword: {
+    type: DataTypes.STRING(100),
+    allowNull: true
+  },
+  seo_score: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    defaultValue: 0,
+    validate: {
+      min: 0,
+      max: 100
+    }
+  },
   metadata: {
     type: DataTypes.JSON,
     allowNull: true,
@@ -136,7 +221,45 @@ const Job = sequelize.define('Job', {
   tableName: 'jobs',
   timestamps: true,
   createdAt: 'created_at',
-  updatedAt: 'updated_at'
+  updatedAt: 'updated_at',
+  hooks: {
+    beforeCreate: (job) => {
+      // Auto-generate SEO fields if not provided
+      if (!job.meta_title && job.title) {
+        job.meta_title = job.title.length > 60 ? job.title.substring(0, 57) + '...' : job.title;
+      }
+      
+      if (!job.meta_description && job.short_description) {
+        job.meta_description = job.short_description.length > 160 ? job.short_description.substring(0, 157) + '...' : job.short_description;
+      }
+      
+      if (!job.og_title && job.title) {
+        job.og_title = job.title.length > 100 ? job.title.substring(0, 97) + '...' : job.title;
+      }
+      
+      if (!job.og_description && job.short_description) {
+        job.og_description = job.short_description.length > 200 ? job.short_description.substring(0, 197) + '...' : job.short_description;
+      }
+      
+      if (!job.twitter_title && job.title) {
+        job.twitter_title = job.title.length > 70 ? job.title.substring(0, 67) + '...' : job.title;
+      }
+      
+      if (!job.twitter_description && job.short_description) {
+        job.twitter_description = job.short_description.length > 200 ? job.short_description.substring(0, 197) + '...' : job.short_description;
+      }
+    },
+    beforeUpdate: (job) => {
+      // Auto-update SEO fields if title or description changed
+      if (job.changed('title') && !job.meta_title) {
+        job.meta_title = job.title.length > 60 ? job.title.substring(0, 57) + '...' : job.title;
+      }
+      
+      if (job.changed('short_description') && !job.meta_description) {
+        job.meta_description = job.short_description.length > 160 ? job.short_description.substring(0, 157) + '...' : job.short_description;
+      }
+    }
+  }
 });
 
 // Instance methods

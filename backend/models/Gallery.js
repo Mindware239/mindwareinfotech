@@ -86,6 +86,91 @@ const Gallery = sequelize.define('Gallery', {
       key: 'id'
     }
   },
+  // SEO Fields
+  meta_title: {
+    type: DataTypes.STRING(60),
+    allowNull: true,
+    validate: {
+      len: [0, 60]
+    }
+  },
+  meta_description: {
+    type: DataTypes.STRING(160),
+    allowNull: true,
+    validate: {
+      len: [0, 160]
+    }
+  },
+  meta_keywords: {
+    type: DataTypes.STRING(500),
+    allowNull: true,
+    validate: {
+      len: [0, 500]
+    }
+  },
+  // Open Graph Fields
+  og_title: {
+    type: DataTypes.STRING(100),
+    allowNull: true,
+    validate: {
+      len: [0, 100]
+    }
+  },
+  og_description: {
+    type: DataTypes.STRING(200),
+    allowNull: true,
+    validate: {
+      len: [0, 200]
+    }
+  },
+  og_image: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    defaultValue: {}
+  },
+  // Twitter Card Fields
+  twitter_title: {
+    type: DataTypes.STRING(70),
+    allowNull: true,
+    validate: {
+      len: [0, 70]
+    }
+  },
+  twitter_description: {
+    type: DataTypes.STRING(200),
+    allowNull: true,
+    validate: {
+      len: [0, 200]
+    }
+  },
+  twitter_image: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    defaultValue: {}
+  },
+  // Additional SEO Fields
+  canonical_url: {
+    type: DataTypes.STRING(500),
+    allowNull: true
+  },
+  robots_meta: {
+    type: DataTypes.STRING(100),
+    allowNull: true,
+    defaultValue: 'index, follow'
+  },
+  focus_keyword: {
+    type: DataTypes.STRING(100),
+    allowNull: true
+  },
+  seo_score: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    defaultValue: 0,
+    validate: {
+      min: 0,
+      max: 100
+    }
+  },
   metadata: {
     type: DataTypes.JSON,
     allowNull: true,
@@ -106,6 +191,31 @@ const Gallery = sequelize.define('Gallery', {
           gallery.images[0].isPrimary = true;
         }
       }
+
+      // Auto-generate SEO fields if not provided
+      if (!gallery.meta_title && gallery.title) {
+        gallery.meta_title = gallery.title.length > 60 ? gallery.title.substring(0, 57) + '...' : gallery.title;
+      }
+      
+      if (!gallery.meta_description && gallery.description) {
+        gallery.meta_description = gallery.description.length > 160 ? gallery.description.substring(0, 157) + '...' : gallery.description;
+      }
+      
+      if (!gallery.og_title && gallery.title) {
+        gallery.og_title = gallery.title.length > 100 ? gallery.title.substring(0, 97) + '...' : gallery.title;
+      }
+      
+      if (!gallery.og_description && gallery.description) {
+        gallery.og_description = gallery.description.length > 200 ? gallery.description.substring(0, 197) + '...' : gallery.description;
+      }
+      
+      if (!gallery.twitter_title && gallery.title) {
+        gallery.twitter_title = gallery.title.length > 70 ? gallery.title.substring(0, 67) + '...' : gallery.title;
+      }
+      
+      if (!gallery.twitter_description && gallery.description) {
+        gallery.twitter_description = gallery.description.length > 200 ? gallery.description.substring(0, 197) + '...' : gallery.description;
+      }
     },
     beforeUpdate: (gallery) => {
       if (gallery.changed('images')) {
@@ -113,6 +223,15 @@ const Gallery = sequelize.define('Gallery', {
           ...gallery.metadata,
           total_images: gallery.images.length
         };
+      }
+
+      // Auto-update SEO fields if title or description changed
+      if (gallery.changed('title') && !gallery.meta_title) {
+        gallery.meta_title = gallery.title.length > 60 ? gallery.title.substring(0, 57) + '...' : gallery.title;
+      }
+      
+      if (gallery.changed('description') && !gallery.meta_description) {
+        gallery.meta_description = gallery.description.length > 160 ? gallery.description.substring(0, 157) + '...' : gallery.description;
       }
     }
   }
