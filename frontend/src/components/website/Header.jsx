@@ -103,12 +103,12 @@ const Header = () => {
                 <div className="logo-image">
                   <img src="/mindware-logo.png" alt="Mindware India" className="logo-img" />
                 </div>
-                <div className="logo-text">
+                {/* <div className="logo-text">
                   <div className="logo-main">
                     MINDWARE<span className="logo-tm">™</span>
                   </div>
                   <div className="logo-tagline">Redefining Technology with Human Touch</div>
-                </div>
+                </div> */}
               </div>
             </Link>
 
@@ -255,8 +255,8 @@ const Header = () => {
             {/* CTA Button */}
             <div className="header-actions">
               <Link to="/contact" className="cta-button">
-                <span className="cta-icon">💬</span>
-                <span className="cta-text">Get Quote</span>
+                <span className="cta-icon">📞</span>
+                <span className="cta-text">Contact</span>
               </Link>
             </div>
 
