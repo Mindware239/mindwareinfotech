@@ -20,8 +20,8 @@
 .top-contact-bar {
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
   color: white;
-  padding: 6px 0;
-  font-size: 0.85rem;
+  padding: 4px 0;
+  font-size: 0.8rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -35,14 +35,14 @@
 .contact-info {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
 .contact-item {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 0;
+  gap: 4px;
+  padding: 2px 0;
   transition: all 0.3s ease;
 }
 
@@ -51,45 +51,45 @@
 }
 
 .contact-icon {
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: #60a5fa;
 }
 
 .contact-details {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
 }
 
 .contact-label {
   font-weight: 500;
   color: #94a3b8;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
 }
 
 .contact-value {
   font-weight: 600;
   color: white;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
 }
 
 .top-bar-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .email-link {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   color: white;
   text-decoration: none;
-  padding: 4px 0;
+  padding: 2px 0;
   transition: all 0.3s ease;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
 }
 
 .email-link:hover {
@@ -97,22 +97,22 @@
 }
 
 .email-icon {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   color: #60a5fa;
 }
 
 .social-links {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .social-link {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   color: #94a3b8;
   text-decoration: none;
   transition: all 0.3s ease;
@@ -127,7 +127,7 @@
 .professional-banner {
   background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
   color: white;
-  padding: 8px 0;
+  padding: 4px 0;
   text-align: center;
 }
 
@@ -135,19 +135,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16px;
+  gap: 12px;
   flex-wrap: wrap;
 }
 
 .banner-text h3 {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   font-weight: 600;
   margin: 0;
   color: white;
 }
 
 .banner-text p {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   margin: 0;
   opacity: 0.9;
 }
@@ -155,10 +155,10 @@
 .banner-button {
   background: rgba(255, 255, 255, 0.2);
   color: white;
-  padding: 6px 12px;
+  padding: 4px 8px;
   border-radius: 4px;
   text-decoration: none;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 600;
   transition: all 0.3s ease;
   border: 1px solid rgba(255, 255, 255, 0.3);
