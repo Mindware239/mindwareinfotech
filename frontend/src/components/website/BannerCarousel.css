@@ -1,9 +1,10 @@
 .banner-carousel {
   position: relative;
   height: 100vh;
-  min-height: 600px;
+  min-height: 700px;
   overflow: hidden;
   margin-top: 0;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
 }
 
 .carousel-container {
@@ -22,62 +23,94 @@
   align-items: center;
   justify-content: center;
   opacity: 0;
-  transform: translateX(100%);
-  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateY(50px) scale(0.95);
+  transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 0 0 40px 40px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
 }
 
 .carousel-slide.active {
   opacity: 1;
-  transform: translateX(0);
+  transform: translateY(0) scale(1);
 }
 
 .slide-content {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 60px;
+  gap: 80px;
   align-items: center;
-  max-width: 1200px;
+  max-width: 1400px;
   width: 100%;
-  padding: 0 40px;
+  padding: 0 60px;
   position: relative;
   z-index: 2;
 }
 
 .slide-text {
-  color: white;
+  color: #1e293b;
   max-width: 600px;
+  position: relative;
+}
+
+.slide-text::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  left: -20px;
+  right: -20px;
+  bottom: -20px;
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%);
+  border-radius: 24px;
+  z-index: -1;
 }
 
 .slide-title {
-  font-size: 3.5rem;
-  font-weight: 800;
+  font-size: 4rem;
+  font-weight: 900;
   line-height: 1.1;
-  margin-bottom: 20px;
-  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 50%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
   animation: slideInLeft 1s ease-out;
 }
 
+.slide-title::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(90deg, #0ea5e9, #3b82f6);
+  border-radius: 2px;
+}
+
 .slide-subtitle {
-  font-size: 1.8rem;
-  font-weight: 600;
-  color: #fbbf24;
-  margin-bottom: 25px;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #64748b;
+  margin-bottom: 32px;
+  letter-spacing: 0.5px;
   animation: slideInLeft 1s ease-out 0.2s both;
 }
 
 .slide-description {
   font-size: 1.2rem;
-  line-height: 1.6;
-  margin-bottom: 40px;
-  opacity: 0.95;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  line-height: 1.7;
+  margin-bottom: 48px;
+  color: #64748b;
+  font-weight: 500;
   animation: slideInLeft 1s ease-out 0.4s both;
 }
 
 .slide-buttons {
   display: flex;
-  gap: 20px;
+  gap: 24px;
   flex-wrap: wrap;
   animation: slideInLeft 1s ease-out 0.6s both;
 }
@@ -85,17 +118,18 @@
 .btn {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   padding: 16px 32px;
   border-radius: 50px;
   font-weight: 700;
   font-size: 1rem;
   text-decoration: none;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   border: none;
   cursor: pointer;
   position: relative;
   overflow: hidden;
+  backdrop-filter: blur(10px);
 }
 
 .btn::before {
@@ -105,8 +139,8 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.6s ease;
 }
 
 .btn:hover::before {
@@ -114,14 +148,16 @@
 }
 
 .btn-primary {
-  background: white;
-  color: #1e40af;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
+  color: white;
+  box-shadow: 0 8px 25px rgba(14, 165, 233, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .btn-primary:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 35px rgba(14, 165, 233, 0.4);
+  background: linear-gradient(135deg, #0284c7 0%, #1d4ed8 100%);
 }
 
 .btn-primary.red {
