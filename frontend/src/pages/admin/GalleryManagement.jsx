@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import DataTable from '../../components/admin/DataTable';
 import FormModal from '../../components/admin/FormModal';
+import SEOForm from '../../components/admin/SEOForm';
 import galleryService from '../../services/galleryService';
 import { getGalleryImageUrl, getImageUrl } from '../../utils/imageUtils';
 import './GalleryManagement.css';
@@ -15,6 +16,7 @@ const GalleryManagement = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [seoData, setSeoData] = useState({});
 
   const queryClient = useQueryClient();
 
@@ -381,6 +383,21 @@ const GalleryManagement = () => {
       name: 'is_public',
       label: 'Public Gallery',
       type: 'checkbox'
+    },
+    {
+      name: 'seo',
+      label: 'SEO Settings',
+      type: 'custom',
+      component: ({ value, onChange }) => (
+        <SEOForm
+          data={value || {}}
+          onChange={onChange}
+          title={seoData.title}
+          description={seoData.description}
+          excerpt={seoData.description}
+          featuredImage={seoData.images?.[0]}
+        />
+      )
     }
   ];
 
@@ -502,6 +519,14 @@ const GalleryManagement = () => {
                 onClose={() => {
                   setShowModal(false);
                   setEditingGallery(null);
+                  setSeoData({});
+                }}
+                onFormDataChange={(formData) => {
+                  setSeoData({
+                    title: formData.title,
+                    description: formData.description,
+                    images: formData.images
+                  });
                 }}
                 loading={createGalleryMutation.isPending || updateGalleryMutation.isPending}
               />

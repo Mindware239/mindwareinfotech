@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import courseService from '../../services/courseService';
+import SEOForm from './SEOForm';
 import { useNotification } from '../../context/NotificationContext';
 import './CourseManagement.css';
 
@@ -22,7 +23,8 @@ const CourseManagement = () => {
     language: 'English',
     requirements: [],
     learning_outcomes: [],
-    skills: []
+    skills: [],
+    seo: {}
   });
 
   useEffect(() => {
@@ -378,6 +380,19 @@ const CourseManagement = () => {
                     Free Course
                   </label>
                 </div>
+              </div>
+
+              {/* SEO Section */}
+              <div className="seo-section">
+                <h4>SEO Settings</h4>
+                <SEOForm
+                  data={formData.seo || {}}
+                  onChange={(seoData) => setFormData(prev => ({ ...prev, seo: seoData }))}
+                  title={formData.title}
+                  description={formData.short_description}
+                  excerpt={formData.short_description}
+                  featuredImage={formData.thumbnail}
+                />
               </div>
 
               <div className="form-actions">

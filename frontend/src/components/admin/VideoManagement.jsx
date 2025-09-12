@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import videoService from '../../services/videoService';
 import courseService from '../../services/courseService';
+import SEOForm from './SEOForm';
 import { getImageUrl } from '../../utils/imageUtils';
 import { useNotification } from '../../context/NotificationContext';
 import './VideoManagement.css';
@@ -28,6 +29,7 @@ const VideoManagement = () => {
     price: 0,
     currency: 'INR',
     preview_duration: 30,
+    seo: {},
     status: 'draft',
     tags: [],
     resources: [],
@@ -563,6 +565,19 @@ const VideoManagement = () => {
                   <span>Uploading... {uploadProgress}%</span>
                 </div>
               )}
+
+              {/* SEO Section */}
+              <div className="seo-section">
+                <h4>SEO Settings</h4>
+                <SEOForm
+                  data={formData.seo || {}}
+                  onChange={(seoData) => setFormData(prev => ({ ...prev, seo: seoData }))}
+                  title={formData.title}
+                  description={formData.description}
+                  excerpt={formData.description}
+                  featuredImage={formData.thumbnail}
+                />
+              </div>
 
               <div className="form-actions">
                 <button 
