@@ -127,6 +127,19 @@ const createGalleryItem = async (req, res, next) => {
       created_by: req.user ? req.user.id : 1 // Fallback for testing
     };
 
+    // Extract SEO fields from nested seo object
+    if (galleryData.seo && typeof galleryData.seo === 'object') {
+      const seoFields = galleryData.seo;
+      delete galleryData.seo; // Remove the nested seo object
+      
+      // Add SEO fields to the top level
+      Object.keys(seoFields).forEach(key => {
+        if (seoFields[key] !== null && seoFields[key] !== undefined && seoFields[key] !== '') {
+          galleryData[key] = seoFields[key];
+        }
+      });
+    }
+
     // Ensure required fields have default values
     if (!galleryData.status) {
       galleryData.status = 'active';
@@ -213,6 +226,19 @@ const updateGalleryItem = async (req, res, next) => {
     }
 
     const updateData = { ...req.body };
+
+    // Extract SEO fields from nested seo object
+    if (updateData.seo && typeof updateData.seo === 'object') {
+      const seoFields = updateData.seo;
+      delete updateData.seo; // Remove the nested seo object
+      
+      // Add SEO fields to the top level
+      Object.keys(seoFields).forEach(key => {
+        if (seoFields[key] !== null && seoFields[key] !== undefined && seoFields[key] !== '') {
+          updateData[key] = seoFields[key];
+        }
+      });
+    }
 
     // Handle file uploads
     if (req.files && req.files.images) {

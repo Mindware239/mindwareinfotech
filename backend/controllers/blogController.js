@@ -153,6 +153,19 @@ const createBlog = async (req, res, next) => {
       author_id: req.user?.id || 1 // Default admin user if no auth
     };
 
+    // Extract SEO fields from nested seo object
+    if (blogData.seo && typeof blogData.seo === 'object') {
+      const seoFields = blogData.seo;
+      delete blogData.seo; // Remove the nested seo object
+      
+      // Add SEO fields to the top level
+      Object.keys(seoFields).forEach(key => {
+        if (seoFields[key] !== null && seoFields[key] !== undefined && seoFields[key] !== '') {
+          blogData[key] = seoFields[key];
+        }
+      });
+    }
+
     // Handle file upload
     if (req.file) {
       blogData.featured_image = `/uploads/blogs/${req.file.filename}`;
@@ -215,6 +228,19 @@ const updateBlog = async (req, res, next) => {
     // }
 
     const updateData = { ...req.body };
+
+    // Extract SEO fields from nested seo object
+    if (updateData.seo && typeof updateData.seo === 'object') {
+      const seoFields = updateData.seo;
+      delete updateData.seo; // Remove the nested seo object
+      
+      // Add SEO fields to the top level
+      Object.keys(seoFields).forEach(key => {
+        if (seoFields[key] !== null && seoFields[key] !== undefined && seoFields[key] !== '') {
+          updateData[key] = seoFields[key];
+        }
+      });
+    }
 
     // Handle file upload
     if (req.file) {

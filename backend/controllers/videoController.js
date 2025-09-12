@@ -176,8 +176,39 @@ const createVideo = async (req, res, next) => {
       tags = [],
       resources = [],
       transcript,
-      subtitles = []
+      subtitles = [],
+      seo = {}
     } = req.body;
+
+    // Extract SEO fields from nested seo object
+    const videoData = {
+      title,
+      description,
+      video_url,
+      video_file,
+      thumbnail,
+      duration,
+      course_id,
+      chapter,
+      order,
+      is_free,
+      is_preview,
+      status,
+      tags,
+      resources,
+      transcript,
+      subtitles,
+      created_by: req.user?.id || 1
+    };
+
+    // Add SEO fields to the top level
+    if (seo && typeof seo === 'object') {
+      Object.keys(seo).forEach(key => {
+        if (seo[key] !== null && seo[key] !== undefined && seo[key] !== '') {
+          videoData[key] = seo[key];
+        }
+      });
+    }
 
     // Validation
     if (!title || !course_id || !chapter || !order) {
@@ -211,24 +242,12 @@ const createVideo = async (req, res, next) => {
       });
     }
 
-    const videoData = {
-      title,
-      description,
-      video_url: finalVideoUrl,
-      thumbnail: thumbnail || {},
-      duration: duration || 0,
-      course_id: parseInt(course_id),
-      chapter,
-      order: parseInt(order),
-      is_free,
-      is_preview,
-      status,
-      tags,
-      resources,
-      transcript,
-      subtitles,
-      created_by: req.user.id
-    };
+    // Update videoData with processed values
+    videoData.video_url = finalVideoUrl;
+    videoData.thumbnail = thumbnail || {};
+    videoData.duration = duration || 0;
+    videoData.course_id = parseInt(course_id);
+    videoData.order = parseInt(order);
 
     const video = await VideoLecture.create(videoData);
 
@@ -256,7 +275,22 @@ const updateVideo = async (req, res, next) => {
       });
     }
 
-    await video.update(req.body);
+    const updateData = { ...req.body };
+
+    // Extract SEO fields from nested seo object
+    if (updateData.seo && typeof updateData.seo === 'object') {
+      const seoFields = updateData.seo;
+      delete updateData.seo; // Remove the nested seo object
+      
+      // Add SEO fields to the top level
+      Object.keys(seoFields).forEach(key => {
+        if (seoFields[key] !== null && seoFields[key] !== undefined && seoFields[key] !== '') {
+          updateData[key] = seoFields[key];
+        }
+      });
+    }
+
+    await video.update(updateData);
 
     res.status(200).json({
       success: true,

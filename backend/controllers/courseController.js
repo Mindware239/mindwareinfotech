@@ -112,6 +112,19 @@ const createCourse = async (req, res, next) => {
       instructor_id: req.user ? req.user.id : 1 // Default to user 1 if no auth
     };
 
+    // Extract SEO fields from nested seo object
+    if (courseData.seo && typeof courseData.seo === 'object') {
+      const seoFields = courseData.seo;
+      delete courseData.seo; // Remove the nested seo object
+      
+      // Add SEO fields to the top level
+      Object.keys(seoFields).forEach(key => {
+        if (seoFields[key] !== null && seoFields[key] !== undefined && seoFields[key] !== '') {
+          courseData[key] = seoFields[key];
+        }
+      });
+    }
+
     console.log('Course data to create:', courseData);
 
     const course = await Course.create(courseData);
@@ -142,7 +155,22 @@ const updateCourse = async (req, res, next) => {
       });
     }
 
-    await course.update(req.body);
+    const updateData = { ...req.body };
+
+    // Extract SEO fields from nested seo object
+    if (updateData.seo && typeof updateData.seo === 'object') {
+      const seoFields = updateData.seo;
+      delete updateData.seo; // Remove the nested seo object
+      
+      // Add SEO fields to the top level
+      Object.keys(seoFields).forEach(key => {
+        if (seoFields[key] !== null && seoFields[key] !== undefined && seoFields[key] !== '') {
+          updateData[key] = seoFields[key];
+        }
+      });
+    }
+
+    await course.update(updateData);
 
     res.status(200).json({
       success: true,
