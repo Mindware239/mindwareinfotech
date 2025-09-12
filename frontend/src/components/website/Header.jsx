@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useQuery } from '@tanstack/react-query';
+import bannerService from '../../services/bannerService';
 import './Header.css';
 
 const Header = () => {
@@ -9,6 +11,13 @@ const Header = () => {
   const [activeMegaMenu, setActiveMegaMenu] = useState(null);
   const { user, logout } = useAuth();
   const location = useLocation();
+
+  // Fetch active banner
+  const { data: banner } = useQuery({
+    queryKey: ['banner', 'header'],
+    queryFn: () => bannerService.getBanners({ position: 'header', status: 'active', limit: 1 }),
+    select: (data) => data?.banners?.[0] || null
+  });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -92,6 +101,25 @@ const Header = () => {
           </div>
         </div>
       </div>
+
+      {/* Professional Banner */}
+      {banner && (
+        <div className="professional-banner">
+          <div className="container">
+            <div className="banner-content">
+              <div className="banner-text">
+                <h3>{banner.title}</h3>
+                <p>{banner.description}</p>
+              </div>
+              {banner.button_text && banner.button_url && (
+                <a href={banner.button_url} className="banner-button">
+                  {banner.button_text}
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main Header */}
       <div className="main-header">
@@ -252,13 +280,6 @@ const Header = () => {
               </ul>
             </nav>
 
-            {/* CTA Button */}
-            <div className="header-actions">
-              <Link to="/contact" className="cta-button">
-                <span className="cta-icon">📞</span>
-                <span className="cta-text">Contact</span>
-              </Link>
-            </div>
 
             {/* Mobile Menu Button */}
             <button
