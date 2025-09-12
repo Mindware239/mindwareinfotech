@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import DataTable from '../../components/admin/DataTable';
 import FormModal from '../../components/admin/FormModal';
 import testimonialService from '../../services/testimonialService';
+import { getTestimonialImageUrl } from '../../utils/imageUtils';
 import './TestimonialManagement.css';
 
 const TestimonialManagement = () => {
@@ -114,10 +115,10 @@ const TestimonialManagement = () => {
           <div className="client-avatar">
             {testimonial.client_image ? (
               <img 
-                src={testimonial.client_image} 
+                src={getTestimonialImageUrl(testimonial.client_image)} 
                 alt={testimonial.client_name}
                 onError={(e) => {
-                  e.target.src = '/images/avatars/default-avatar.jpg';
+                  e.target.src = '/images/avatars/default-avatar.svg';
                 }}
               />
             ) : (

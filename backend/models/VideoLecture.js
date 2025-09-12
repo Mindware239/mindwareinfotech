@@ -62,6 +62,27 @@ const VideoLecture = sequelize.define('VideoLecture', {
     type: DataTypes.BOOLEAN,
     defaultValue: false
   },
+  price: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: true,
+    defaultValue: 0,
+    validate: {
+      min: 0
+    }
+  },
+  currency: {
+    type: DataTypes.STRING(3),
+    defaultValue: 'INR'
+  },
+  access_level: {
+    type: DataTypes.ENUM('free', 'premium', 'preview'),
+    defaultValue: 'free'
+  },
+  preview_duration: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    comment: 'Preview duration in seconds (for premium videos)'
+  },
   status: {
     type: DataTypes.ENUM('draft', 'published', 'archived'),
     defaultValue: 'draft'
@@ -116,6 +137,37 @@ VideoLecture.prototype.incrementViews = async function() {
   return await this.save();
 };
 
+// Ensure JSON fields are properly parsed
+VideoLecture.addHook('afterFind', (instances) => {
+  if (Array.isArray(instances)) {
+    instances.forEach(instance => {
+      if (instance && instance.dataValues) {
+        // Parse JSON fields if they are strings
+        ['tags', 'resources', 'subtitles'].forEach(field => {
+          if (typeof instance.dataValues[field] === 'string') {
+            try {
+              instance.dataValues[field] = JSON.parse(instance.dataValues[field]);
+            } catch (e) {
+              instance.dataValues[field] = [];
+            }
+          }
+        });
+      }
+    });
+  } else if (instances && instances.dataValues) {
+    // Single instance
+    ['tags', 'resources', 'subtitles'].forEach(field => {
+      if (typeof instances.dataValues[field] === 'string') {
+        try {
+          instances.dataValues[field] = JSON.parse(instances.dataValues[field]);
+        } catch (e) {
+          instances.dataValues[field] = [];
+        }
+      }
+    });
+  }
+});
+
 VideoLecture.prototype.getFormattedDuration = function() {
   const hours = Math.floor(this.duration / 3600);
   const minutes = Math.floor((this.duration % 3600) / 60);
@@ -125,6 +177,21 @@ VideoLecture.prototype.getFormattedDuration = function() {
     return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   }
   return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+};
+
+// Define associations
+VideoLecture.associate = (models) => {
+  // VideoLecture belongs to Course
+  VideoLecture.belongsTo(models.Course, {
+    foreignKey: 'course_id',
+    as: 'course'
+  });
+
+  // VideoLecture has many VideoAccesses
+  VideoLecture.hasMany(models.VideoAccess, {
+    foreignKey: 'video_id',
+    as: 'videoAccesses'
+  });
 };
 
 module.exports = VideoLecture;

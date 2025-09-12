@@ -7,6 +7,7 @@ const galleryService = {
       const response = await api.get('/gallery', { params });
       return response.data;
     } catch (error) {
+      console.error('Error fetching gallery items:', error);
       throw error.response?.data || error;
     }
   },
@@ -17,6 +18,7 @@ const galleryService = {
       const response = await api.get(`/gallery/${id}`);
       return response.data;
     } catch (error) {
+      console.error('Error fetching gallery item:', error);
       throw error.response?.data || error;
     }
   },
@@ -24,33 +26,51 @@ const galleryService = {
   // Create gallery item
   createGalleryItem: async (galleryData) => {
     try {
+      console.log('GalleryService - Creating gallery item with data:', galleryData);
+      console.log('GalleryService - Data type:', typeof galleryData);
+      console.log('GalleryService - Data keys:', Object.keys(galleryData));
+      
       const formData = new FormData();
       
       // Add all form fields to FormData
       Object.keys(galleryData).forEach(key => {
         if (key === 'images' && Array.isArray(galleryData[key])) {
           // Handle multiple image uploads
+          console.log('GalleryService - Processing images array:', galleryData[key]);
           galleryData[key].forEach((image, index) => {
             if (image.file) {
+              console.log(`GalleryService - Adding image ${index}:`, image.file.name);
               formData.append(`images[${index}]`, image.file);
             }
           });
         } else if (galleryData[key] && typeof galleryData[key] === 'object' && galleryData[key].file) {
           // Handle single file uploads
+          console.log('GalleryService - Processing single file:', galleryData[key].file.name);
           formData.append(key, galleryData[key].file);
         } else if (galleryData[key] !== null && galleryData[key] !== undefined) {
           // Handle regular form fields
+          console.log(`GalleryService - Adding field ${key}:`, galleryData[key]);
           formData.append(key, galleryData[key]);
         }
       });
 
+      console.log('GalleryService - FormData entries:');
+      for (let [key, value] of formData.entries()) {
+        console.log(key, value);
+      }
+
+      console.log('GalleryService - Making API call to /gallery');
       const response = await api.post('/gallery', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
+      console.log('GalleryService - Gallery created successfully:', response.data);
       return response.data;
     } catch (error) {
+      console.error('GalleryService - Error creating gallery item:', error);
+      console.error('GalleryService - Error response:', error.response);
+      console.error('GalleryService - Error data:', error.response?.data);
       throw error.response?.data || error;
     }
   },

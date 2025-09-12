@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { CartProvider } from './context/CartContext';
+import { NotificationProvider } from './context/NotificationContext';
 
 // Layouts
 import WebsiteLayout from './layouts/WebsiteLayout';
@@ -21,14 +22,15 @@ import CareersPage from './pages/website/CareersPage';
 import ContactPage from './pages/website/ContactPage';
 import PortfolioPage from './pages/website/PortfolioPage';
 import BlogPage from './pages/website/BlogPage';
-import BlogPostPage from './pages/website/BlogPostPage';
+import BlogDetails from './pages/website/BlogDetails';
 import GalleryPage from './pages/website/GalleryPage';
 import FAQPage from './pages/website/FAQPage';
 import PrivacyPolicyPage from './pages/website/PrivacyPolicyPage';
 import TermsPage from './pages/website/TermsPage';
-import VideoLecturesPage from './pages/website/VideoLecturesPage';
+import VideoLectures from './pages/website/VideoLectures';
 import CourseDetailPage from './pages/website/CourseDetailPage';
 import CertificatePage from './pages/website/CertificatePage';
+import EnrollmentPage from './pages/website/SimpleEnrollmentPage';
 
 // Admin Pages
 import AdminDashboard from './pages/admin/Dashboard';
@@ -45,6 +47,7 @@ import FAQManagement from './pages/admin/FAQManagement';
 import BannerManagement from './pages/admin/BannerManagement';
 import VideoLectureManagement from './pages/admin/VideoLectureManagement';
 import CourseManagement from './pages/admin/CourseManagement';
+import CategoryManagement from './pages/admin/CategoryManagement';
 import UserManagement from './pages/admin/UserManagement';
 import SettingsPage from './pages/admin/SettingsPage';
 
@@ -71,7 +74,8 @@ function App() {
       <ThemeProvider>
         <AuthProvider>
           <CartProvider>
-            <Router>
+            <NotificationProvider>
+              <Router>
               <Routes>
                 {/* Website Routes */}
                 <Route path="/" element={<WebsiteLayout />}>
@@ -84,13 +88,15 @@ function App() {
                   <Route path="contact" element={<ContactPage />} />
                   <Route path="portfolio" element={<PortfolioPage />} />
                   <Route path="blog" element={<BlogPage />} />
-                  <Route path="blog/:slug" element={<BlogPostPage />} />
+                  <Route path="blog/:slug" element={<BlogDetails />} />
                   <Route path="gallery" element={<GalleryPage />} />
                   <Route path="faq" element={<FAQPage />} />
                   <Route path="privacy-policy" element={<PrivacyPolicyPage />} />
                   <Route path="terms" element={<TermsPage />} />
-                  <Route path="video-lectures" element={<VideoLecturesPage />} />
+                  <Route path="video-lectures" element={<VideoLectures />} />
                   <Route path="course/:id" element={<CourseDetailPage />} />
+                  <Route path="enroll/:courseId" element={<EnrollmentPage />} />
+                  <Route path="enroll" element={<EnrollmentPage />} />
                   <Route path="certificate/:id" element={<CertificatePage />} />
                 </Route>
 
@@ -110,11 +116,13 @@ function App() {
                   <Route path="banners" element={<BannerManagement />} />
                   <Route path="video-lectures" element={<VideoLectureManagement />} />
                   <Route path="courses" element={<CourseManagement />} />
+                  <Route path="courses/categories" element={<CategoryManagement />} />
                   <Route path="users" element={<UserManagement />} />
                   <Route path="settings" element={<SettingsPage />} />
                 </Route>
               </Routes>
-            </Router>
+              </Router>
+            </NotificationProvider>
           </CartProvider>
         </AuthProvider>
       </ThemeProvider>

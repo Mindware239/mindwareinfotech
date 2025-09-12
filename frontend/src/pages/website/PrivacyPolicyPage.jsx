@@ -6,12 +6,12 @@ const PrivacyPolicyPage = () => {
     <div className="privacy-policy-page">
       {/* Social Media Sidebar */}
       <div className="social-sidebar">
-        <a href="#" className="social-icon facebook">f</a>
-        <a href="#" className="social-icon twitter">X</a>
-        <a href="#" className="social-icon linkedin">in</a>
-        <a href="#" className="social-icon instagram">📷</a>
-        <a href="#" className="social-icon youtube">▶</a>
-        <a href="#" className="social-icon share">></a>
+        <a link="#" className="social-icon facebook">f</a>
+        <a link="#" className="social-icon twitter">X</a>
+        <a link="#" className="social-icon linkedin">in</a>
+        <a link="#" className="social-icon instagram">📷</a>
+        <a link="#" className="social-icon youtube">▶</a>
+        <a link="#" className="social-icon share">&gt;</a>
       </div>
 
       {/* Last Updated Bar */}

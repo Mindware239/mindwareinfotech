@@ -61,6 +61,9 @@ const getTestimonial = async (req, res, next) => {
 // @access  Private/Admin
 const createTestimonial = async (req, res, next) => {
   try {
+    console.log('Testimonial data received:', req.body);
+    console.log('Content-Type:', req.headers['content-type']);
+    
     const {
       client_name,
       client_designation,
@@ -70,12 +73,26 @@ const createTestimonial = async (req, res, next) => {
       client_image,
       success_metrics,
       testimonial_rating,
+      status, // Frontend sends 'status' but model expects 'testimonial_status'
       testimonial_status,
-      testimonial_order
+      testimonial_order,
+      display_order // Frontend might send 'display_order' instead of 'testimonial_order'
     } = req.body;
+
+    // Map frontend fields to backend fields
+    const mappedStatus = status || testimonial_status || '1';
+    const mappedOrder = display_order || testimonial_order || 1;
+
+    // Handle file upload
+    let imagePath = client_image;
+    if (req.file) {
+      imagePath = `/uploads/testimonials/${req.file.filename}`;
+    }
 
     // Validate required fields
     if (!client_name || !testimonial_text) {
+      console.log('Validation failed - client_name:', client_name, 'testimonial_text:', testimonial_text);
+      console.log('All body data:', JSON.stringify(req.body, null, 2));
       return res.status(400).json({
         success: false,
         message: 'Client name and testimonial text are required'
@@ -88,11 +105,11 @@ const createTestimonial = async (req, res, next) => {
       client_company,
       course,
       testimonial_text,
-      client_image,
-      success_metrics: success_metrics ? JSON.parse(success_metrics) : null,
+      client_image: imagePath,
+      success_metrics: success_metrics ? (typeof success_metrics === 'string' ? JSON.parse(success_metrics) : success_metrics) : null,
       testimonial_rating: testimonial_rating || 5,
-      testimonial_status: testimonial_status || '1',
-      testimonial_order: testimonial_order || 0
+      testimonial_status: mappedStatus,
+      testimonial_order: mappedOrder
     });
 
     res.status(201).json({

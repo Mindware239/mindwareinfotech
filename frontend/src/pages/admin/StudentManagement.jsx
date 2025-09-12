@@ -122,11 +122,11 @@ const StudentManagement = () => {
       render: (student) => (
         <div className="student-cell">
           <img 
-            src={student.avatar || '/images/avatars/default-avatar.jpg'} 
+            src={student.avatar || '/images/avatars/default-avatar.svg'} 
             alt={student.name}
             className="student-avatar"
             onError={(e) => {
-              e.target.src = '/images/avatars/default-avatar.jpg';
+              e.target.src = '/images/avatars/default-avatar.svg';
             }}
           />
           <div className="student-info">

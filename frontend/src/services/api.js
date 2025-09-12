@@ -29,16 +29,24 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
+    // Only handle 401 errors from actual API responses, not network errors
     if (error.response?.status === 401) {
       // Token expired or invalid
       localStorage.removeItem('token');
-      // Check if we're in admin area
-      if (window.location.pathname.startsWith('/admin')) {
-        window.location.href = '/admin';
-      } else {
-        window.location.href = '/login';
+      
+      // Prevent infinite redirects by checking current path
+      const currentPath = window.location.pathname;
+      
+      // Only redirect if not already on login page
+      if (!currentPath.includes('/login') && !currentPath.includes('/admin')) {
+        if (currentPath.startsWith('/admin')) {
+          window.location.href = '/admin/login';
+        } else {
+          window.location.href = '/login';
+        }
       }
     }
+    // Don't auto-logout for network errors or server unavailable
     return Promise.reject(error);
   }
 );

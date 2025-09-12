@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+const { sequelize } = require('../config/database');
 
 const Enrollment = sequelize.define('Enrollment', {
   id: {
@@ -235,10 +235,10 @@ const Enrollment = sequelize.define('Enrollment', {
       fields: ['status']
     },
     {
-      fields: ['courseInterest']
+      fields: ['course_interest']
     },
     {
-      fields: ['createdAt']
+      fields: ['created_at']
     }
   ]
 });
@@ -308,6 +308,21 @@ Enrollment.getMonthlyStats = async function(months = 12) {
     },
     group: [this.sequelize.fn('DATE_FORMAT', this.sequelize.col('createdAt'), '%Y-%m')],
     order: [[this.sequelize.fn('DATE_FORMAT', this.sequelize.col('createdAt'), '%Y-%m'), 'ASC']]
+  });
+};
+
+// Define associations
+Enrollment.associate = (models) => {
+  // Enrollment belongs to User
+  Enrollment.belongsTo(models.User, {
+    foreignKey: 'userId',
+    as: 'user'
+  });
+
+  // Enrollment belongs to Course
+  Enrollment.belongsTo(models.Course, {
+    foreignKey: 'courseId',
+    as: 'course'
   });
 };
 

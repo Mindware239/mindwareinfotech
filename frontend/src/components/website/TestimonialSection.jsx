@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import testimonialService from '../../services/testimonialService';
+import { getTestimonialImageUrl, handleTestimonialImageError } from '../../utils/imageUtils';
 import './TestimonialSection.css';
 
 const TestimonialSection = () => {
@@ -76,18 +77,21 @@ const TestimonialSection = () => {
               <div className="testimonial-profile">
                 {currentTestimonial.client_image ? (
                   <img
-                    src={currentTestimonial.client_image}
+                    src={getTestimonialImageUrl(currentTestimonial.client_image)}
                     alt={currentTestimonial.client_name}
                     className="profile-image"
+                    onError={handleTestimonialImageError}
                   />
-                ) : (
-                  <div className="profile-placeholder">
-                    {currentTestimonial.client_name.charAt(0).toUpperCase()}
-                  </div>
-                )}
+                ) : null}
+                <div 
+                  className="profile-placeholder"
+                  style={{ display: currentTestimonial.client_image ? 'none' : 'flex' }}
+                >
+                  {currentTestimonial.client_name?.charAt(0)?.toUpperCase() || 'U'}
+                </div>
                 <div className="profile-info">
-                  <h3>{currentTestimonial.client_name}</h3>
-                  <p className="designation">{currentTestimonial.client_designation}</p>
+                  <h3>{currentTestimonial.client_name || 'Anonymous'}</h3>
+                  <p className="designation">{currentTestimonial.client_designation || 'Student'}</p>
                   {currentTestimonial.client_company && (
                     <p className="company">{currentTestimonial.client_company}</p>
                   )}
@@ -95,7 +99,7 @@ const TestimonialSection = () => {
                     {[...Array(5)].map((_, i) => (
                       <span
                         key={i}
-                        className={`star ${i < currentTestimonial.testimonial_rating ? 'filled' : ''}`}
+                        className={`star ${i < (currentTestimonial.testimonial_rating || 0) ? 'filled' : ''}`}
                       >
                         ★
                       </span>
@@ -112,7 +116,7 @@ const TestimonialSection = () => {
                   </div>
                 )}
                 <blockquote>
-                  "{currentTestimonial.testimonial_text}"
+                  "{currentTestimonial.testimonial_text || 'No testimonial text available.'}"
                 </blockquote>
                 
                 {currentTestimonial.success_metrics && (
@@ -167,38 +171,7 @@ const TestimonialSection = () => {
         </div>
 
         {/* Statistics Section */}
-        <div className="stats-section">
-          <div className="stats-grid">
-            <div className="stat-card">
-              <div className="stat-icon">👥</div>
-              <div className="stat-content">
-                <div className="stat-number">500+</div>
-                <div className="stat-label">Students Trained</div>
-              </div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-icon">💼</div>
-              <div className="stat-content">
-                <div className="stat-number">85%</div>
-                <div className="stat-label">Placement Rate</div>
-              </div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-icon">🔧</div>
-              <div className="stat-content">
-                <div className="stat-number">200+</div>
-                <div className="stat-label">Projects Completed</div>
-              </div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-icon">⭐</div>
-              <div className="stat-content">
-                <div className="stat-number">4.8/5</div>
-                <div className="stat-label">Average Rating</div>
-              </div>
-            </div>
-          </div>
-        </div>
+        
       </div>
     </section>
   );

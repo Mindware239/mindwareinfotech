@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery Upload Test</title>
+</head>
+<body>
+    <h1>Gallery Upload Test</h1>
+    <form id="galleryForm" enctype="multipart/form-data">
+        <div>
+            <label for="title">Title:</label>
+            <input type="text" id="title" name="title" value="Test Gallery Item" required>
+        </div>
+        <div>
+            <label for="description">Description:</label>
+            <textarea id="description" name="description">Test description</textarea>
+        </div>
+        <div>
+            <label for="category">Category:</label>
+            <select id="category" name="category" required>
+                <option value="events">Events</option>
+                <option value="training" selected>Training</option>
+                <option value="workshops">Workshops</option>
+            </select>
+        </div>
+        <div>
+            <label for="images">Images:</label>
+            <input type="file" id="images" name="images" multiple accept="image/*" required>
+        </div>
+        <div>
+            <label for="status">Status:</label>
+            <select id="status" name="status">
+                <option value="active" selected>Active</option>
+                <option value="draft">Draft</option>
+            </select>
+        </div>
+        <button type="submit">Create Gallery Item</button>
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('galleryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+            const category = document.getElementById('category').value;
+            const status = document.getElementById('status').value;
+            const images = document.getElementById('images').files;
+            
+            formData.append('title', title);
+            formData.append('description', description);
+            formData.append('category', category);
+            formData.append('status', status);
+            
+            // Add images
+            for (let i = 0; i < images.length; i++) {
+                formData.append(`images[${i}]`, images[i]);
+            }
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/gallery', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                document.getElementById('result').innerHTML = '<pre>' + JSON.stringify(result, null, 2) + '</pre>';
+            } catch (error) {
+                document.getElementById('result').innerHTML = '<p style="color: red;">Error: ' + error.message + '</p>';
+            }
+        });
+    </script>
+</body>
+</html>

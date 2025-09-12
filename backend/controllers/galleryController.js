@@ -1,5 +1,41 @@
 const Gallery = require('../models/Gallery');
 const { Op } = require('sequelize');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+// Configure multer for gallery image uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadPath = path.join(__dirname, '../uploads/gallery');
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, 'gallery-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB limit per image
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png|gif|webp/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+    
+    if (mimetype && extname) {
+      return cb(null, true);
+    } else {
+      cb(new Error('Invalid file type. Only images are allowed.'));
+    }
+  }
+});
 
 // @desc    Get all gallery items
 // @route   GET /api/gallery
@@ -81,18 +117,83 @@ const getGalleryItem = async (req, res, next) => {
 // @access  Private/Admin
 const createGalleryItem = async (req, res, next) => {
   try {
+    console.log('Received gallery creation request');
+    console.log('Body:', req.body);
+    console.log('Files:', req.files);
+    console.log('User:', req.user);
+
     const galleryData = {
       ...req.body,
-      created_by: req.user.id
+      created_by: req.user ? req.user.id : 1 // Fallback for testing
     };
 
+    // Ensure required fields have default values
+    if (!galleryData.status) {
+      galleryData.status = 'active';
+    }
+    if (!galleryData.is_featured) {
+      galleryData.is_featured = false;
+    }
+    if (!galleryData.is_public) {
+      galleryData.is_public = true;
+    }
+
+    // Handle file uploads
+    if (req.files && req.files.images) {
+      console.log('Processing uploaded files:', req.files.images);
+      const images = [];
+      
+      // Handle single image upload
+      if (Array.isArray(req.files.images)) {
+        req.files.images.forEach((file, index) => {
+          console.log(`Processing file ${index}:`, file.originalname);
+          images.push({
+            filename: file.filename,
+            originalName: file.originalname,
+            path: file.path,
+            url: `/uploads/gallery/${file.filename}`,
+            size: file.size,
+            mimetype: file.mimetype,
+            isPrimary: index === 0 // First image is primary
+          });
+        });
+      } else {
+        // Single file upload
+        const file = req.files.images;
+        console.log('Processing single file:', file.originalname);
+        images.push({
+          filename: file.filename,
+          originalName: file.originalname,
+          path: file.path,
+          url: `/uploads/gallery/${file.filename}`,
+          size: file.size,
+          mimetype: file.mimetype,
+          isPrimary: true
+        });
+      }
+      
+      galleryData.images = images;
+      console.log('Processed images:', images);
+    } else {
+      console.log('No files uploaded');
+    }
+
+    // Parse tags if they're sent as a string
+    if (galleryData.tags && typeof galleryData.tags === 'string') {
+      galleryData.tags = galleryData.tags.split(',').map(tag => tag.trim()).filter(tag => tag);
+    }
+
+    console.log('Final gallery data:', galleryData);
+
     const galleryItem = await Gallery.create(galleryData);
+    console.log('Gallery item created:', galleryItem);
 
     res.status(201).json({
       success: true,
       data: galleryItem
     });
   } catch (error) {
+    console.error('Error creating gallery item:', error);
     next(error);
   }
 };
@@ -111,7 +212,49 @@ const updateGalleryItem = async (req, res, next) => {
       });
     }
 
-    await galleryItem.update(req.body);
+    const updateData = { ...req.body };
+
+    // Handle file uploads
+    if (req.files && req.files.images) {
+      const images = [];
+      
+      // Handle single image upload
+      if (Array.isArray(req.files.images)) {
+        req.files.images.forEach((file, index) => {
+          images.push({
+            filename: file.filename,
+            originalName: file.originalname,
+            path: file.path,
+            url: `/uploads/gallery/${file.filename}`,
+            size: file.size,
+            mimetype: file.mimetype,
+            isPrimary: index === 0 // First image is primary
+          });
+        });
+      } else {
+        // Single file upload
+        const file = req.files.images;
+        images.push({
+          filename: file.filename,
+          originalName: file.originalname,
+          path: file.path,
+          url: `/uploads/gallery/${file.filename}`,
+          size: file.size,
+          mimetype: file.mimetype,
+          isPrimary: true
+        });
+      }
+      
+      // If updating images, replace existing ones
+      updateData.images = images;
+    }
+
+    // Parse tags if they're sent as a string
+    if (updateData.tags && typeof updateData.tags === 'string') {
+      updateData.tags = updateData.tags.split(',').map(tag => tag.trim()).filter(tag => tag);
+    }
+
+    await galleryItem.update(updateData);
 
     res.status(200).json({
       success: true,
@@ -296,5 +439,6 @@ module.exports = {
   getFeaturedGalleryItems,
   getGalleryByCategory,
   searchGallery,
-  likeGalleryItem
+  likeGalleryItem,
+  upload
 };

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery Upload Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .form-group { margin: 10px 0; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, textarea, select { width: 100%; padding: 8px; margin-bottom: 10px; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        #result { margin-top: 20px; padding: 10px; background: #f8f9fa; border: 1px solid #dee2e6; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Gallery Upload Test</h1>
+    <p>This will test the gallery upload functionality directly to the backend API.</p>
+    
+    <form id="galleryForm" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="title">Title *:</label>
+            <input type="text" id="title" name="title" value="Test Gallery Item" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" rows="3">This is a test gallery item created via API</textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="category">Category *:</label>
+            <select id="category" name="category" required>
+                <option value="">Select Category</option>
+                <option value="events">Events</option>
+                <option value="training" selected>Training</option>
+                <option value="workshops">Workshops</option>
+                <option value="team-building">Team Building</option>
+                <option value="awards">Awards</option>
+                <option value="office">Office</option>
+                <option value="students">Students</option>
+                <option value="projects">Projects</option>
+                <option value="conferences">Conferences</option>
+                <option value="other">Other</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="subcategory">Subcategory:</label>
+            <input type="text" id="subcategory" name="subcategory" value="test">
+        </div>
+        
+        <div class="form-group">
+            <label for="images">Images *:</label>
+            <input type="file" id="images" name="images" multiple accept="image/*" required>
+            <small>Select one or more images to upload</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="tags">Tags:</label>
+            <input type="text" id="tags" name="tags" value="test, gallery, upload" placeholder="Enter tags separated by commas">
+        </div>
+        
+        <div class="form-group">
+            <label for="event_date">Event Date:</label>
+            <input type="datetime-local" id="event_date" name="event_date">
+        </div>
+        
+        <div class="form-group">
+            <label for="location">Location:</label>
+            <input type="text" id="location" name="location" value="Test Location">
+        </div>
+        
+        <div class="form-group">
+            <label for="status">Status:</label>
+            <select id="status" name="status">
+                <option value="draft">Draft</option>
+                <option value="active" selected>Active</option>
+                <option value="archived">Archived</option>
+            </select>
+        </div>
+        
+        <button type="submit">Create Gallery Item</button>
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('galleryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>Uploading...</p>';
+            
+            try {
+                const formData = new FormData();
+                
+                // Add form fields
+                const fields = ['title', 'description', 'category', 'subcategory', 'tags', 'event_date', 'location', 'status'];
+                fields.forEach(field => {
+                    const value = document.getElementById(field).value;
+                    if (value) {
+                        formData.append(field, value);
+                    }
+                });
+                
+                // Add images
+                const images = document.getElementById('images').files;
+                for (let i = 0; i < images.length; i++) {
+                    formData.append(`images[${i}]`, images[i]);
+                }
+                
+                console.log('Sending form data...');
+                
+                const response = await fetch('http://localhost:5000/api/gallery', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <h3>Success!</h3>
+                            <p>Gallery item created successfully!</p>
+                            <pre>${JSON.stringify(result, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <h3>Error!</h3>
+                            <p>Failed to create gallery item</p>
+                            <pre>${JSON.stringify(result, null, 2)}</pre>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h3>Network Error!</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

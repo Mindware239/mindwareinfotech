@@ -25,14 +25,27 @@ export const AuthProvider = ({ children }) => {
       const token = localStorage.getItem('token');
       if (token) {
         const userData = await authService.verifyToken(token);
-        setUser(userData.data.user);
-        setIsAdmin(userData.data.user.role === 'admin');
+        // Fix: Handle the correct response structure from backend
+        const user = userData.data?.user || userData.user;
+        if (user) {
+          setUser(user);
+          setIsAdmin(user.role === 'admin');
+        } else {
+          // If no user data, clear token
+          localStorage.removeItem('token');
+          setUser(null);
+          setIsAdmin(false);
+        }
       }
     } catch (error) {
       console.error('Auth check failed:', error);
-      localStorage.removeItem('token');
-      setUser(null);
-      setIsAdmin(false);
+      // Only clear token if it's a 401 error, not network errors
+      if (error.response?.status === 401) {
+        localStorage.removeItem('token');
+        setUser(null);
+        setIsAdmin(false);
+      }
+      // For network errors, keep the user logged in
     } finally {
       setLoading(false);
     }
@@ -42,13 +55,21 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       const response = await authService.login(email, password);
-      const { user, token } = response.data;
+      // Fix: Handle the correct response structure from backend
+      const user = response.data?.user || response.user;
+      const token = response.data?.token || response.token;
       
-      localStorage.setItem('token', token);
-      setUser(user);
-      setIsAdmin(user.role === 'admin');
-      
-      return { success: true, user };
+      if (user && token) {
+        localStorage.setItem('token', token);
+        setUser(user);
+        setIsAdmin(user.role === 'admin');
+        return { success: true, user };
+      } else {
+        return { 
+          success: false, 
+          error: 'Invalid response from server' 
+        };
+      }
     } catch (error) {
       console.error('Login failed:', error);
       return { 
@@ -64,13 +85,21 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       const response = await authService.register(userData);
-      const { user, token } = response.data;
+      // Fix: Handle the correct response structure from backend
+      const user = response.data?.user || response.user;
+      const token = response.data?.token || response.token;
       
-      localStorage.setItem('token', token);
-      setUser(user);
-      setIsAdmin(user.role === 'admin');
-      
-      return { success: true, user };
+      if (user && token) {
+        localStorage.setItem('token', token);
+        setUser(user);
+        setIsAdmin(user.role === 'admin');
+        return { success: true, user };
+      } else {
+        return { 
+          success: false, 
+          error: 'Invalid response from server' 
+        };
+      }
     } catch (error) {
       console.error('Registration failed:', error);
       return { 

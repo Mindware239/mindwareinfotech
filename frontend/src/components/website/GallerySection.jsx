@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import galleryService from '../../services/galleryService';
+import { getGalleryImageUrl } from '../../utils/imageUtils';
 import './GallerySection.css';
 
 const GallerySection = () => {
@@ -15,11 +16,23 @@ const GallerySection = () => {
   const fetchFeaturedGallery = async () => {
     try {
       setLoading(true);
+      setError(null);
+      console.log('GallerySection - Fetching featured gallery...');
       const response = await galleryService.getFeaturedGallery(8);
-      setGalleryItems(response.data || []);
+      console.log('GallerySection - Featured gallery response:', response);
+      console.log('GallerySection - Gallery items:', response.data || []);
+      
+      // Ensure we have valid data
+      if (response && response.data && Array.isArray(response.data)) {
+        setGalleryItems(response.data);
+      } else {
+        console.log('No valid gallery data received');
+        setGalleryItems([]);
+      }
     } catch (err) {
       setError('Failed to load gallery');
-      console.error('Error fetching gallery:', err);
+      console.error('GallerySection - Error fetching gallery:', err);
+      setGalleryItems([]);
     } finally {
       setLoading(false);
     }
@@ -80,25 +93,83 @@ const GallerySection = () => {
         </div>
 
         <div className="gallery-grid">
-          {galleryItems.map((item) => (
-            <div key={item._id} className="gallery-item">
-              <div className="gallery-item__image">
-                <img 
-                  src={item.images?.[0]?.url || '/images/gallery-placeholder.jpg'} 
-                  alt={item.title}
-                  onError={(e) => {
-                    e.target.src = '/images/gallery-placeholder.jpg';
-                  }}
-                />
+          {galleryItems.length === 0 ? (
+            <div className="no-gallery-items">
+              <p>No gallery items found. Loading sample data...</p>
+              <button onClick={() => window.open('http://localhost:5000/api/update-gallery-images', '_blank')} className="btn btn-primary">
+                Update Gallery Images
+              </button>
+            </div>
+          ) : (
+            galleryItems.map((item) => {
+              try {
+                console.log('Rendering gallery item:', item);
+                console.log('Item images:', item.images);
+                
+                // Parse images if it's a string
+                let images = item.images;
+                if (typeof images === 'string') {
+                  try {
+                    images = JSON.parse(images);
+                  } catch (e) {
+                    console.log('Failed to parse images string:', images);
+                    images = [];
+                  }
+                }
+                
+                // Ensure images is an array
+                if (!Array.isArray(images)) {
+                  images = [];
+                }
+                
+                const imageUrl = getGalleryImageUrl(images);
+                console.log('Constructed image URL:', imageUrl);
+              
+              return (
+                <div key={item.id || item._id} className="gallery-item">
+                  <div className="gallery-item__image">
+                    <img 
+                      src={imageUrl || '/images/gallery-placeholder.jpg'} 
+                      alt={item.title}
+                      onError={(e) => {
+                        console.log('Image failed to load:', e.target.src);
+                        console.log('Available image data:', item.images);
+                        e.target.src = '/images/gallery-placeholder.jpg';
+                      }}
+                      onLoad={(e) => {
+                        console.log('Image loaded successfully:', e.target.src);
+                      }}
+                    />
                 <div className="gallery-item__overlay">
                   <div className="gallery-item__actions">
-                    <button className="gallery-action-btn" title="View">
+                    <button 
+                      className="gallery-action-btn" 
+                      title="View"
+                      onClick={() => {
+                        console.log('View clicked for item:', item.title);
+                        // Add view functionality here
+                      }}
+                    >
                       <i className="fas fa-eye"></i>
                     </button>
-                    <button className="gallery-action-btn" title="Like">
+                    <button 
+                      className="gallery-action-btn" 
+                      title="Like"
+                      onClick={() => {
+                        console.log('Like clicked for item:', item.title);
+                        // Add like functionality here
+                      }}
+                    >
                       <i className="fas fa-heart"></i>
                     </button>
-                    <button className="gallery-action-btn" title="Share">
+                    <button 
+                      className="gallery-action-btn" 
+                      title="Share"
+                      onClick={() => {
+                        console.log('Share clicked for item:', item.title);
+                        // Add share functionality here
+                      }}
+                    >
                       <i className="fas fa-share"></i>
                     </button>
                   </div>
@@ -109,10 +180,10 @@ const GallerySection = () => {
                     Featured
                   </div>
                 )}
-                {item.images && item.images.length > 1 && (
+                {Array.isArray(images) && images.length > 1 && (
                   <div className="gallery-item__count">
                     <i className="fas fa-images"></i>
-                    {item.images.length}
+                    {images.length}
                   </div>
                 )}
               </div>
@@ -152,7 +223,20 @@ const GallerySection = () => {
                 </div>
               </div>
             </div>
-          ))}
+              );
+              } catch (error) {
+                console.error('Error rendering gallery item:', error);
+                return (
+                  <div key={item.id || item._id} className="gallery-item">
+                    <div className="gallery-item__content">
+                      <h3>Error loading item</h3>
+                      <p>Failed to load gallery item</p>
+                    </div>
+                  </div>
+                );
+              }
+            })
+          )}
         </div>
 
         <div className="gallery-cta">

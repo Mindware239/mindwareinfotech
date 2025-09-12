@@ -239,11 +239,11 @@
 }
 
 .carousel-nav.prev {
-  left: -25px;
+  left: 5px;
 }
 
 .carousel-nav.next {
-  right: -25px;
+  right: 5px;
 }
 
 /* Carousel Dots */
@@ -285,7 +285,7 @@
 }
 
 .stat-card {
-  background: white;
+  /* background: white; */
   padding: 30px;
   border-radius: 15px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);

@@ -21,14 +21,15 @@ import CareersPage from './pages/website/CareersPage';
 import ContactPage from './pages/website/ContactPage';
 import PortfolioPage from './pages/website/PortfolioPage';
 import BlogPage from './pages/website/BlogPage';
-import BlogPostPage from './pages/website/BlogPostPage';
+import BlogDetails from './pages/website/BlogDetails';
 import GalleryPage from './pages/website/GalleryPage';
 import FAQPage from './pages/website/FAQPage';
 import PrivacyPolicyPage from './pages/website/PrivacyPolicyPage';
 import TermsPage from './pages/website/TermsPage';
-import VideoLecturesPage from './pages/website/VideoLecturesPage';
+import VideoLectures from './pages/website/VideoLectures';
 import CourseDetailPage from './pages/website/CourseDetailPage';
 import CertificatePage from './pages/website/CertificatePage';
+import ImageTestPage from './pages/website/ImageTestPage';
 
 // Admin Pages
 import AdminDashboard from './pages/admin/Dashboard';
@@ -46,6 +47,7 @@ import VideoLectureManagement from './pages/admin/VideoLectureManagement';
 import CourseManagement from './pages/admin/CourseManagement';
 import UserManagement from './pages/admin/UserManagement';
 import SettingsPage from './pages/admin/SettingsPage';
+import NotificationTestPage from './pages/admin/NotificationTestPage';
 
 // Auth Components
 import ProtectedRoute from './components/admin/ProtectedRoute';
@@ -53,6 +55,7 @@ import ProtectedRoute from './components/admin/ProtectedRoute';
 // Styles
 import './styles/globals.css';
 import './styles/admin.css';
+import './styles/logo-inspired.css';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -83,14 +86,16 @@ function App() {
                   <Route path="contact" element={<ContactPage />} />
                   <Route path="portfolio" element={<PortfolioPage />} />
                   <Route path="blog" element={<BlogPage />} />
-                  <Route path="blog/:slug" element={<BlogPostPage />} />
+                  <Route path="blog/:slug" element={<BlogDetails />} />
                   <Route path="gallery" element={<GalleryPage />} />
                   <Route path="faq" element={<FAQPage />} />
                   <Route path="privacy-policy" element={<PrivacyPolicyPage />} />
                   <Route path="terms" element={<TermsPage />} />
-                  <Route path="video-lectures" element={<VideoLecturesPage />} />
+                  <Route path="video-lectures" element={<VideoLectures />} />
                   <Route path="course/:id" element={<CourseDetailPage />} />
                   <Route path="certificate/:id" element={<CertificatePage />} />
+                  <Route path="image-test" element={<ImageTestPage />} />
+                  <Route path="test-images" element={<ImageTestPage />} />
                 </Route>
 
                 {/* Admin Routes */}
@@ -110,6 +115,7 @@ function App() {
                   <Route path="courses" element={<ProtectedRoute><CourseManagement /></ProtectedRoute>} />
                   <Route path="users" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
                   <Route path="settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+                  <Route path="notifications" element={<ProtectedRoute><NotificationTestPage /></ProtectedRoute>} />
                 </Route>
               </Routes>
             </Router>

@@ -1,0 +1,305 @@
+/* INDIAN SOFTWARES Logo Inspired Styles */
+/* Additional cool effects and animations */
+
+/* Glowing text effect */
+.glow-text {
+  text-shadow: 0 0 10px var(--logo-green), 0 0 20px var(--logo-green), 0 0 30px var(--logo-green);
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    text-shadow: 0 0 10px var(--logo-green), 0 0 20px var(--logo-green), 0 0 30px var(--logo-green);
+  }
+  to {
+    text-shadow: 0 0 20px var(--logo-green), 0 0 30px var(--logo-green), 0 0 40px var(--logo-green);
+  }
+}
+
+/* Rainbow border animation */
+.rainbow-border {
+  position: relative;
+  background: linear-gradient(45deg, var(--logo-green), var(--logo-orange), var(--logo-red), var(--saffron));
+  background-size: 400% 400%;
+  animation: rainbow 3s ease infinite;
+  padding: 3px;
+  border-radius: 12px;
+}
+
+.rainbow-border::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  background: white;
+  border-radius: 9px;
+  z-index: -1;
+}
+
+@keyframes rainbow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Floating animation */
+.float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Pulse effect */
+.pulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* Gradient text */
+.gradient-text {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+}
+
+/* Cool button with multiple hover effects */
+.cool-btn {
+  position: relative;
+  overflow: hidden;
+  background: var(--gradient-primary);
+  border: none;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cool-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s;
+}
+
+.cool-btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s, height 0.3s;
+}
+
+.cool-btn:hover::before {
+  left: 100%;
+}
+
+.cool-btn:hover::after {
+  width: 300px;
+  height: 300px;
+}
+
+.cool-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(34, 197, 94, 0.4);
+  background: var(--gradient-accent);
+}
+
+/* Card with logo-inspired effects */
+.logo-card {
+  background: white;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.logo-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--gradient-primary);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.logo-card:hover::before {
+  transform: scaleX(1);
+}
+
+.logo-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 40px rgba(34, 197, 94, 0.2);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+/* Animated background */
+.animated-bg {
+  background: linear-gradient(-45deg, var(--logo-green-light), var(--primary-blue), var(--logo-orange-light), var(--saffron-light));
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Icon with logo colors */
+.logo-icon {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 2rem;
+  transition: all 0.3s ease;
+}
+
+.logo-icon:hover {
+  transform: scale(1.2) rotate(5deg);
+  filter: drop-shadow(0 0 10px rgba(34, 197, 94, 0.5));
+}
+
+/* Progress bar with logo colors */
+.logo-progress {
+  width: 100%;
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.logo-progress::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: var(--gradient-primary);
+  border-radius: 4px;
+  animation: progressFill 2s ease-in-out;
+}
+
+@keyframes progressFill {
+  from { width: 0%; }
+  to { width: var(--progress-width, 100%); }
+}
+
+/* Hover effect for links */
+.logo-link {
+  color: var(--logo-green);
+  text-decoration: none;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.logo-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--gradient-primary);
+  transition: width 0.3s ease;
+}
+
+.logo-link:hover::after {
+  width: 100%;
+}
+
+.logo-link:hover {
+  color: var(--logo-orange);
+  transform: translateY(-1px);
+}
+
+/* Special hover effect for buttons - saffron glow */
+.saffron-hover:hover {
+  background: var(--saffron) !important;
+  color: white !important;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.6) !important;
+  transform: translateY(-3px) scale(1.05) !important;
+}
+
+/* Logo-inspired input focus */
+.logo-input:focus {
+  border-color: var(--logo-green) !important;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1), 0 0 20px rgba(34, 197, 94, 0.2) !important;
+  outline: none !important;
+}
+
+/* Cool loading spinner with logo colors */
+.logo-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e5e7eb;
+  border-top: 4px solid var(--logo-green);
+  border-right: 4px solid var(--logo-orange);
+  border-bottom: 4px solid var(--logo-red);
+  border-left: 4px solid var(--saffron);
+  border-radius: 50%;
+  animation: logoSpin 1s linear infinite;
+}
+
+@keyframes logoSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Badge with logo colors */
+.logo-badge {
+  background: var(--gradient-primary);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+  animation: badgePulse 2s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .glow-text {
+    text-shadow: 0 0 5px var(--logo-green), 0 0 10px var(--logo-green);
+  }
+  
+  .cool-btn:hover {
+    transform: translateY(-2px);
+  }
+  
+  .logo-card:hover {
+    transform: translateY(-4px);
+  }
+}

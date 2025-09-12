@@ -111,4 +111,25 @@ User.prototype.getPublicProfile = function() {
   return userData;
 };
 
+// Define associations
+User.associate = (models) => {
+  // User has many Courses (as instructor)
+  User.hasMany(models.Course, {
+    foreignKey: 'instructor_id',
+    as: 'courses'
+  });
+
+  // User has many Enrollments
+  User.hasMany(models.Enrollment, {
+    foreignKey: 'userId',
+    as: 'enrollments'
+  });
+
+  // User has many VideoAccesses
+  User.hasMany(models.VideoAccess, {
+    foreignKey: 'user_id',
+    as: 'videoAccesses'
+  });
+};
+
 module.exports = User;

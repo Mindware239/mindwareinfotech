@@ -109,8 +109,9 @@
 }
 
 .logo-img {
-  height: 60px;
+  height: 70px;
   width: auto;
+  max-width: 200px;
   object-fit: contain;
   transition: all 0.3s ease;
 }
@@ -413,6 +414,11 @@
 }
 
 @media (max-width: 768px) {
+  .logo-img {
+    height: 55px;
+    max-width: 150px;
+  }
+
   .top-contact-bar .contact-info {
     flex-direction: row;
     gap: 8px;
@@ -441,6 +447,11 @@
 @media (max-width: 480px) {
   .container {
     padding: 0 15px;
+  }
+
+  .logo-img {
+    height: 45px;
+    max-width: 120px;
   }
   
   .top-contact-bar {

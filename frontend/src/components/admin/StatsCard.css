@@ -62,30 +62,30 @@
   justify-content: center;
   font-size: 2rem;
   color: white;
-  background: linear-gradient(135deg, var(--accent-color), var(--accent-color-dark));
+  background: var(--management-primary);
   flex-shrink: 0;
   position: relative;
   overflow: hidden;
 }
 
 .stats-card--primary .stats-card__icon {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--management-primary);
 }
 
 .stats-card--success .stats-card__icon {
-  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  background: var(--management-primary);
 }
 
 .stats-card--info .stats-card__icon {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  background: var(--management-primary);
 }
 
 .stats-card--warning .stats-card__icon {
-  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  background: var(--management-primary);
 }
 
 .stats-card--danger .stats-card__icon {
-  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+  background: var(--management-primary);
 }
 
 .stats-card__icon::before {

@@ -12,6 +12,9 @@ const {
   getRecentEnrollments,
   bulkUpdateEnrollments,
   bulkDeleteEnrollments,
+  checkEnrollment,
+  getMyEnrollments,
+  checkCourseAccess,
   upload
 } = require('../controllers/enrollmentController');
 const { protect, authorize } = require('../middleware/auth');
@@ -24,6 +27,11 @@ router.post('/', upload.fields([
   { name: 'addressProof', maxCount: 1 },
   { name: 'certificates', maxCount: 10 }
 ]), createEnrollment);
+
+// Student routes (protected but not admin-only)
+router.get('/my-courses', protect, getMyEnrollments);
+router.get('/check/:courseId', protect, checkEnrollment);
+router.get('/access/:courseId', protect, checkCourseAccess);
 
 // Protected routes (Admin only)
 router.use(protect);

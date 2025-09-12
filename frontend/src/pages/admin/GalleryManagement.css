@@ -528,6 +528,25 @@ input:checked + .toggle-slider:before {
   display: block;
 }
 
+.no-images {
+  text-align: center;
+  padding: 40px 20px;
+  color: #7f8c8d;
+  grid-column: 1 / -1;
+}
+
+.no-images i {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  display: block;
+  color: #bdc3c7;
+}
+
+.no-images p {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
 /* Error Message */
 .error-message {
   text-align: center;

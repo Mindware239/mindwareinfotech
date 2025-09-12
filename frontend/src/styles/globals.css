@@ -93,6 +93,34 @@ img {
 .mt-4 { margin-top: 1rem; }
 .mt-5 { margin-top: 1.25rem; }
 
+/* Color Variables - INDIAN SOFTWARES Logo Inspired */
+:root {
+  /* Primary Logo Colors */
+  --logo-green: #22c55e;
+  --logo-green-dark: #16a34a;
+  --logo-green-light: #4ade80;
+  --logo-orange: #f97316;
+  --logo-orange-dark: #ea580c;
+  --logo-orange-light: #fb923c;
+  --logo-red: #ef4444;
+  --logo-red-dark: #dc2626;
+  --logo-red-light: #f87171;
+  --saffron: #f59e0b;
+  --saffron-dark: #d97706;
+  --saffron-light: #fbbf24;
+  
+  /* Existing Theme Colors (kept) */
+  --primary-blue: #667eea;
+  --primary-purple: #764ba2;
+  --primary-pink: #ec4899;
+  --primary-magenta: #be185d;
+  
+  /* Management Colors - Single Clean Color */
+  --management-primary: #22c55e;
+  --management-primary-dark: #16a34a;
+  --management-primary-light: #4ade80;
+}
+
 /* Button Styles */
 .btn {
   display: inline-flex;
@@ -108,72 +136,107 @@ img {
   cursor: pointer;
   text-align: center;
   justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn:hover::before {
+  left: 100%;
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--management-primary);
   color: white;
+  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 25px rgba(34, 197, 94, 0.4);
+  background: var(--management-primary-dark);
 }
 
 .btn-outline {
   background: transparent;
-  color: #667eea;
-  border: 2px solid #667eea;
+  color: var(--logo-green);
+  border: 2px solid var(--logo-green);
 }
 
 .btn-outline:hover {
-  background: #667eea;
+  background: var(--management-primary);
   color: white;
+  border-color: transparent;
 }
 
 .btn-secondary {
-  background: #6c757d;
+  background: var(--management-primary);
   color: white;
+  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
 }
 
 .btn-secondary:hover {
-  background: #5a6268;
+  background: var(--management-primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(34, 197, 94, 0.4);
 }
 
 .btn-success {
-  background: #28a745;
+  background: var(--management-primary);
   color: white;
+  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
 }
 
 .btn-success:hover {
-  background: #218838;
+  background: var(--management-primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(34, 197, 94, 0.4);
 }
 
 .btn-danger {
-  background: #dc3545;
+  background: var(--logo-red);
   color: white;
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
 }
 
 .btn-danger:hover {
-  background: #c82333;
+  background: var(--logo-red-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
 }
 
 .btn-warning {
-  background: #ffc107;
-  color: #212529;
+  background: var(--saffron);
+  color: white;
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
 }
 
 .btn-warning:hover {
-  background: #e0a800;
+  background: var(--saffron-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
 }
 
 .btn-info {
-  background: #17a2b8;
+  background: var(--logo-orange);
   color: white;
+  box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
 }
 
 .btn-info:hover {
-  background: #138496;
+  background: var(--logo-orange-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(249, 115, 22, 0.4);
 }
 
 .btn-sm {
@@ -210,8 +273,8 @@ img {
 
 .form-control:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: var(--logo-green);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
 }
 
 .form-control:disabled {
@@ -230,7 +293,8 @@ img {
 
 .card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 25px rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.2);
 }
 
 .card-header {
@@ -261,7 +325,9 @@ img {
   width: 40px;
   height: 40px;
   border: 4px solid #e5e7eb;
-  border-top: 4px solid #667eea;
+  border-top: 4px solid var(--logo-green);
+  border-right: 4px solid var(--logo-orange);
+  border-bottom: 4px solid var(--logo-red);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }

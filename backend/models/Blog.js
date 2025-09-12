@@ -11,7 +11,7 @@ const Blog = sequelize.define('Blog', {
     type: DataTypes.STRING(200),
     allowNull: false,
     validate: {
-      len: [10, 200]
+      len: [3, 200]
     }
   },
   slug: {
@@ -23,7 +23,7 @@ const Blog = sequelize.define('Blog', {
     type: DataTypes.STRING(500),
     allowNull: false,
     validate: {
-      len: [20, 500]
+      len: [5, 500]
     }
   },
   content: {
@@ -165,6 +165,53 @@ Blog.prototype.toggleLike = async function() {
   this.likes += 1;
   return await this.save();
 };
+
+// Hooks for automatic field generation
+Blog.beforeCreate(async (blog) => {
+  // Generate slug from title
+  if (blog.title && !blog.slug) {
+    blog.slug = blog.title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim('-');
+  }
+  
+  // Generate excerpt from content if not provided
+  if (blog.content && !blog.excerpt) {
+    const plainText = blog.content.replace(/<[^>]*>/g, '');
+    blog.excerpt = plainText.substring(0, 200) + (plainText.length > 200 ? '...' : '');
+  }
+  
+  // Set published_at if status is published
+  if (blog.status === 'published' && !blog.published_at) {
+    blog.published_at = new Date();
+  }
+});
+
+Blog.beforeUpdate(async (blog) => {
+  // Generate slug from title if title changed
+  if (blog.changed('title') && blog.title) {
+    blog.slug = blog.title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim('-');
+  }
+  
+  // Generate excerpt from content if content changed and excerpt not provided
+  if (blog.changed('content') && blog.content && !blog.excerpt) {
+    const plainText = blog.content.replace(/<[^>]*>/g, '');
+    blog.excerpt = plainText.substring(0, 200) + (plainText.length > 200 ? '...' : '');
+  }
+  
+  // Set published_at if status changed to published
+  if (blog.changed('status') && blog.status === 'published' && !blog.published_at) {
+    blog.published_at = new Date();
+  }
+});
 
 // Define associations
 const User = require('./User');

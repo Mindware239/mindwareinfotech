@@ -130,8 +130,8 @@
 
 .admin-form .form-control:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: var(--logo-green);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
 }
 
 /* Admin Stats */
@@ -143,7 +143,7 @@
 }
 
 .stat-card {
-  background: white;
+  /* background: white; */
   padding: 25px;
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
@@ -158,7 +158,10 @@
 .stat-number {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #667eea;
+  background: var(--management-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin-bottom: 10px;
 }
 
@@ -196,7 +199,7 @@
 }
 
 .nav-link.active {
-  background: #667eea;
+  background: var(--management-primary);
   color: white;
 }
 

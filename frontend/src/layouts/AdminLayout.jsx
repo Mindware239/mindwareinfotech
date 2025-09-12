@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { NotificationProvider } from '../context/NotificationContext';
 import AdminSidebar from '../components/admin/AdminSidebar';
 import AdminHeader from '../components/admin/AdminHeader';
 import LoginPage from '../pages/admin/LoginPage';
@@ -36,32 +37,34 @@ const AdminLayout = () => {
 
   // If authenticated and admin, show admin layout
   return (
-    <div className="admin-layout">
-      <AdminSidebar 
-        isOpen={sidebarOpen} 
-        onClose={() => setSidebarOpen(false)} 
-      />
-      
-      <div className="admin-main">
-        <AdminHeader 
-          onMenuClick={() => setSidebarOpen(true)}
-          user={user}
+    <NotificationProvider>
+      <div className="admin-layout">
+        <AdminSidebar 
+          isOpen={sidebarOpen} 
+          onClose={() => setSidebarOpen(false)} 
         />
         
-        <main className="admin-content">
-          <div className="admin-content-inner">
-            <Outlet />
-          </div>
-        </main>
+        <div className="admin-main">
+          <AdminHeader 
+            onMenuClick={() => setSidebarOpen(true)}
+            user={user}
+          />
+          
+          <main className="admin-content">
+            <div className="admin-content-inner">
+              <Outlet />
+            </div>
+          </main>
+        </div>
+        
+        {sidebarOpen && (
+          <div 
+            className="admin-overlay"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
       </div>
-      
-      {sidebarOpen && (
-        <div 
-          className="admin-overlay"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-    </div>
+    </NotificationProvider>
   );
 };
 

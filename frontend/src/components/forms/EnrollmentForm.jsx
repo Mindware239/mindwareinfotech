@@ -2,58 +2,61 @@ import React, { useState, useRef } from 'react';
 import './EnrollmentForm.css';
 
 const EnrollmentForm = ({ onSubmit, onPreview, initialData = {}, isEdit = false }) => {
+  // Ensure initialData is not null or undefined
+  const safeInitialData = initialData || {};
+  
   const [formData, setFormData] = useState({
     // Personal Details
-    firstName: initialData.firstName || '',
-    lastName: initialData.lastName || '',
-    email: initialData.email || '',
-    phone: initialData.phone || '',
-    dateOfBirth: initialData.dateOfBirth || '',
-    gender: initialData.gender || '',
-    address: initialData.address || '',
-    city: initialData.city || '',
-    state: initialData.state || '',
-    pincode: initialData.pincode || '',
-    country: initialData.country || 'India',
+    firstName: safeInitialData.firstName || '',
+    lastName: safeInitialData.lastName || '',
+    email: safeInitialData.email || '',
+    phone: safeInitialData.phone || '',
+    dateOfBirth: safeInitialData.dateOfBirth || '',
+    gender: safeInitialData.gender || '',
+    address: safeInitialData.address || '',
+    city: safeInitialData.city || '',
+    state: safeInitialData.state || '',
+    pincode: safeInitialData.pincode || '',
+    country: safeInitialData.country || 'India',
     
     // Education Details
-    highestQualification: initialData.highestQualification || '',
-    institution: initialData.institution || '',
-    yearOfPassing: initialData.yearOfPassing || '',
-    percentage: initialData.percentage || '',
-    additionalQualifications: initialData.additionalQualifications || '',
+    highestQualification: safeInitialData.highestQualification || '',
+    institution: safeInitialData.institution || '',
+    yearOfPassing: safeInitialData.yearOfPassing || '',
+    percentage: safeInitialData.percentage || '',
+    additionalQualifications: safeInitialData.additionalQualifications || '',
     
     // Training Details
-    courseInterest: initialData.courseInterest || '',
-    preferredBatch: initialData.preferredBatch || '',
-    trainingMode: initialData.trainingMode || '',
-    experience: initialData.experience || '',
-    currentCompany: initialData.currentCompany || '',
-    currentDesignation: initialData.currentDesignation || '',
-    expectedStartDate: initialData.expectedStartDate || '',
+    courseInterest: safeInitialData.courseInterest || '',
+    preferredBatch: safeInitialData.preferredBatch || '',
+    trainingMode: safeInitialData.trainingMode || '',
+    experience: safeInitialData.experience || '',
+    currentCompany: safeInitialData.currentCompany || '',
+    currentDesignation: safeInitialData.currentDesignation || '',
+    expectedStartDate: safeInitialData.expectedStartDate || '',
     
     // Other Information
-    howDidYouHear: initialData.howDidYouHear || '',
-    motivation: initialData.motivation || '',
-    careerGoals: initialData.careerGoals || '',
-    specialRequirements: initialData.specialRequirements || '',
+    howDidYouHear: safeInitialData.howDidYouHear || '',
+    motivation: safeInitialData.motivation || '',
+    careerGoals: safeInitialData.careerGoals || '',
+    specialRequirements: safeInitialData.specialRequirements || '',
     
     // Document Upload
-    profilePhoto: initialData.profilePhoto || null,
-    resume: initialData.resume || null,
-    certificates: initialData.certificates || [],
-    idProof: initialData.idProof || null,
-    addressProof: initialData.addressProof || null,
+    profilePhoto: safeInitialData.profilePhoto || null,
+    resume: safeInitialData.resume || null,
+    certificates: safeInitialData.certificates || [],
+    idProof: safeInitialData.idProof || null,
+    addressProof: safeInitialData.addressProof || null,
     
     // Payment Details
-    paymentMode: initialData.paymentMode || '',
-    paymentAmount: initialData.paymentAmount || '',
-    paymentStatus: initialData.paymentStatus || 'pending',
-    paymentReference: initialData.paymentReference || '',
+    paymentMode: safeInitialData.paymentMode || '',
+    paymentAmount: safeInitialData.paymentAmount || '',
+    paymentStatus: safeInitialData.paymentStatus || 'pending',
+    paymentReference: safeInitialData.paymentReference || '',
     
     // Additional fields
-    status: initialData.status || 'pending',
-    notes: initialData.notes || ''
+    status: safeInitialData.status || 'pending',
+    notes: safeInitialData.notes || ''
   });
 
   const [currentStep, setCurrentStep] = useState(1);

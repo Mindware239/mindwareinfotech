@@ -1,12 +1,13 @@
 import api from './api';
 
 const paymentService = {
-  // Create payment
+  // Create payment order
   createPayment: async (paymentData) => {
     try {
-      const response = await api.post('/payments/create', paymentData);
+      const response = await api.post('/payments', paymentData);
       return response.data;
     } catch (error) {
+      console.error('Error creating payment:', error);
       throw error.response?.data || error;
     }
   },
@@ -17,47 +18,91 @@ const paymentService = {
       const response = await api.post('/payments/verify', paymentData);
       return response.data;
     } catch (error) {
+      console.error('Error verifying payment:', error);
       throw error.response?.data || error;
     }
   },
 
-  // Get my payments
+  // Get payment details
+  getPayment: async (paymentId) => {
+    try {
+      const response = await api.get(`/payments/${paymentId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching payment:', error);
+      throw error.response?.data || error;
+    }
+  },
+
+  // Get user's payments
   getMyPayments: async (params = {}) => {
     try {
-      const response = await api.get('/payments/my-payments', { params });
+      const queryParams = new URLSearchParams();
+      
+      if (params.page) queryParams.append('page', params.page);
+      if (params.limit) queryParams.append('limit', params.limit);
+      if (params.status) queryParams.append('status', params.status);
+      
+      const response = await api.get(`/payments/my?${queryParams.toString()}`);
       return response.data;
     } catch (error) {
+      console.error('Error fetching payments:', error);
       throw error.response?.data || error;
     }
   },
 
-  // Get single payment
-  getPayment: async (id) => {
+  // Process Razorpay payment (mock implementation)
+  processRazorpayPayment: async (paymentData) => {
     try {
-      const response = await api.get(`/payments/${id}`);
-      return response.data;
+      // This would integrate with Razorpay SDK
+      // For now, we'll simulate a successful payment
+      console.log('Processing Razorpay payment:', paymentData);
+      
+      // Simulate payment processing delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Mock successful payment response
+      return {
+        success: true,
+        data: {
+          payment_id: `pay_${Date.now()}`,
+          order_id: paymentData.order_id,
+          amount: paymentData.amount,
+          currency: paymentData.currency,
+          status: 'completed',
+          signature: 'mock_signature_' + Date.now()
+        }
+      };
     } catch (error) {
-      throw error.response?.data || error;
+      console.error('Error processing Razorpay payment:', error);
+      throw error;
     }
   },
 
-  // Get all payments (Admin only)
-  getPayments: async (params = {}) => {
+  // Process Stripe payment (mock implementation)
+  processStripePayment: async (paymentData) => {
     try {
-      const response = await api.get('/payments', { params });
-      return response.data;
+      // This would integrate with Stripe SDK
+      // For now, we'll simulate a successful payment
+      console.log('Processing Stripe payment:', paymentData);
+      
+      // Simulate payment processing delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Mock successful payment response
+      return {
+        success: true,
+        data: {
+          payment_intent_id: `pi_${Date.now()}`,
+          client_secret: 'mock_client_secret_' + Date.now(),
+          amount: paymentData.amount,
+          currency: paymentData.currency,
+          status: 'succeeded'
+        }
+      };
     } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
-
-  // Process refund (Admin only)
-  refundPayment: async (id, refundData) => {
-    try {
-      const response = await api.post(`/payments/${id}/refund`, refundData);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
+      console.error('Error processing Stripe payment:', error);
+      throw error;
     }
   }
 };

@@ -95,6 +95,12 @@ const AdminSidebar = ({ isOpen, onClose }) => {
         { title: 'Payment', path: '/admin/settings/payment' },
         { title: 'System', path: '/admin/settings/system' }
       ]
+    },
+    {
+      title: 'Notifications',
+      path: '/admin/notifications',
+      icon: 'fas fa-bell',
+      exact: true
     }
   ];
 

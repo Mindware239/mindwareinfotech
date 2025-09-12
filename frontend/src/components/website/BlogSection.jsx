@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import blogService from '../../services/blogService';
+import { getBlogImageUrl } from '../../utils/imageUtils';
 import './BlogSection.css';
 
 const BlogSection = () => {
@@ -8,11 +9,7 @@ const BlogSection = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetchFeaturedBlogs();
-  }, []);
-
-  const fetchFeaturedBlogs = async () => {
+  const fetchFeaturedBlogs = useCallback(async () => {
     try {
       setLoading(true);
       const response = await blogService.getFeaturedBlogs(3);
@@ -23,17 +20,21 @@ const BlogSection = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const formatDate = (dateString) => {
+  useEffect(() => {
+    fetchFeaturedBlogs();
+  }, [fetchFeaturedBlogs]);
+
+  const formatDate = useCallback((dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
     });
-  };
+  }, []);
 
-  const getCategoryColor = (category) => {
+  const getCategoryColor = useCallback((category) => {
     const colors = {
       'technology': '#667eea',
       'programming': '#f093fb',
@@ -46,7 +47,87 @@ const BlogSection = () => {
       'industry-insights': '#fad0c4'
     };
     return colors[category] || '#667eea';
-  };
+  }, []);
+
+  // Memoize blog cards to prevent unnecessary re-renders
+  const memoizedBlogs = useMemo(() => {
+    return blogs.map((blog) => (
+      <article key={blog.id || blog._id} className="blog-card">
+        <div className="blog-card__image">
+          <img 
+            src={getBlogImageUrl(blog.featured_image)} 
+            alt={blog.title}
+            onError={(e) => {
+              e.target.src = '/images/blog-placeholder.jpg';
+            }}
+          />
+          <div className="blog-card__category">
+            <span 
+              className="category-tag"
+              style={{ backgroundColor: getCategoryColor(blog.category) }}
+            >
+              {blog.category?.replace('-', ' ').toUpperCase()}
+            </span>
+          </div>
+          {blog.is_featured && (
+            <div className="blog-card__badge">
+              <i className="fas fa-star"></i>
+              Featured
+            </div>
+          )}
+        </div>
+
+        <div className="blog-card__content">
+          <div className="blog-card__meta">
+            <div className="blog-card__author">
+              <img 
+                src={blog.author?.avatar || '/images/avatars/default-avatar.svg'} 
+                alt={blog.author?.name}
+                className="author-avatar"
+              />
+              <span className="author-name">{blog.author?.name}</span>
+            </div>
+            <div className="blog-card__date">
+              <i className="fas fa-calendar-alt"></i>
+              {formatDate(blog.published_at || blog.created_at)}
+            </div>
+          </div>
+
+          <h3 className="blog-card__title">
+            <Link to={`/blog/${blog.slug}`}>{blog.title}</Link>
+          </h3>
+          
+          <p className="blog-card__excerpt">{blog.excerpt}</p>
+
+          <div className="blog-card__stats">
+            <div className="blog-stat">
+              <i className="fas fa-eye"></i>
+              <span>{blog.views || 0} views</span>
+            </div>
+            <div className="blog-stat">
+              <i className="fas fa-heart"></i>
+              <span>{blog.likes || 0} likes</span>
+            </div>
+            <div className="blog-stat">
+              <i className="fas fa-clock"></i>
+              <span>{blog.reading_time || 0} min read</span>
+            </div>
+          </div>
+
+          <div className="blog-card__tags">
+            {blog.tags && Array.isArray(blog.tags) && blog.tags.slice(0, 3).map((tag, index) => (
+              <span key={index} className="blog-tag">#{tag}</span>
+            ))}
+          </div>
+
+          <Link to={`/blog/${blog.slug}`} className="blog-card__link">
+            Read More
+            <i className="fas fa-arrow-right"></i>
+          </Link>
+        </div>
+      </article>
+    ));
+  }, [blogs, getCategoryColor, formatDate]);
 
   if (loading) {
     return (
@@ -96,82 +177,7 @@ const BlogSection = () => {
         </div>
 
         <div className="blogs-grid">
-          {blogs.map((blog) => (
-            <article key={blog._id} className="blog-card">
-              <div className="blog-card__image">
-                <img 
-                  src={blog.featuredImage?.url || '/images/blog-placeholder.jpg'} 
-                  alt={blog.title}
-                  onError={(e) => {
-                    e.target.src = '/images/blog-placeholder.jpg';
-                  }}
-                />
-                <div className="blog-card__category">
-                  <span 
-                    className="category-tag"
-                    style={{ backgroundColor: getCategoryColor(blog.category) }}
-                  >
-                    {blog.category.replace('-', ' ').toUpperCase()}
-                  </span>
-                </div>
-                {blog.isFeatured && (
-                  <div className="blog-card__badge">
-                    <i className="fas fa-star"></i>
-                    Featured
-                  </div>
-                )}
-              </div>
-
-              <div className="blog-card__content">
-                <div className="blog-card__meta">
-                  <div className="blog-card__author">
-                    <img 
-                      src={blog.author?.avatar || '/images/avatars/default-avatar.jpg'} 
-                      alt={blog.author?.name}
-                      className="author-avatar"
-                    />
-                    <span className="author-name">{blog.author?.name}</span>
-                  </div>
-                  <div className="blog-card__date">
-                    <i className="fas fa-calendar-alt"></i>
-                    {formatDate(blog.publishedAt || blog.createdAt)}
-                  </div>
-                </div>
-
-                <h3 className="blog-card__title">
-                  <Link to={`/blog/${blog.slug}`}>{blog.title}</Link>
-                </h3>
-                
-                <p className="blog-card__excerpt">{blog.excerpt}</p>
-
-                <div className="blog-card__stats">
-                  <div className="blog-stat">
-                    <i className="fas fa-eye"></i>
-                    <span>{blog.views} views</span>
-                  </div>
-                  <div className="blog-stat">
-                    <i className="fas fa-heart"></i>
-                    <span>{blog.likes} likes</span>
-                  </div>
-                  <div className="blog-stat">
-                    <i className="fas fa-clock"></i>
-                    <span>{blog.readingTime} min read</span>
-                  </div>
-                </div>
-
-                <div className="blog-card__tags">
-                  {blog.tags && Array.isArray(blog.tags) && blog.tags.slice(0, 3).map((tag, index) => (
-                    <span key={index} className="blog-tag">#{tag}</span>
-                  ))}
-                </div>
-
-                <Link to={`/blog/${blog.slug}`} className="blog-card__link">
-                  Read More
-                  <i className="fas fa-arrow-right"></i>
-                </Link>
-              </div>
-            </article>
-          ))}
+          {memoizedBlogs}
         </div>
 
         <div className="blog-cta">

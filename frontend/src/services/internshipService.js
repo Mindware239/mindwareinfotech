@@ -4,29 +4,42 @@ const internshipService = {
   // Get all internships
   getInternships: async (params = {}) => {
     try {
-      const response = await api.get('/internships', { params });
+      const queryParams = new URLSearchParams();
+      
+      if (params.page) queryParams.append('page', params.page);
+      if (params.limit) queryParams.append('limit', params.limit);
+      if (params.category) queryParams.append('category', params.category);
+      if (params.search) queryParams.append('search', params.search);
+      if (params.status) queryParams.append('status', params.status);
+      
+      const response = await api.get(`/internships?${queryParams.toString()}`);
       return response.data;
     } catch (error) {
+      console.error('Error fetching internships:', error);
       throw error.response?.data || error;
     }
   },
 
-  // Get single internship
-  getInternship: async (id) => {
+  // Get single internship by ID
+  getInternshipById: async (id) => {
     try {
       const response = await api.get(`/internships/${id}`);
       return response.data;
     } catch (error) {
+      console.error('Error fetching internship:', error);
       throw error.response?.data || error;
     }
   },
 
-  // Create internship
+  // Create new internship
   createInternship: async (internshipData) => {
     try {
+      console.log('Creating internship with data:', internshipData);
       const response = await api.post('/internships', internshipData);
+      console.log('Internship created successfully:', response.data);
       return response.data;
     } catch (error) {
+      console.error('Error creating internship:', error);
       throw error.response?.data || error;
     }
   },
@@ -37,6 +50,7 @@ const internshipService = {
       const response = await api.put(`/internships/${id}`, internshipData);
       return response.data;
     } catch (error) {
+      console.error('Error updating internship:', error);
       throw error.response?.data || error;
     }
   },
@@ -47,82 +61,7 @@ const internshipService = {
       const response = await api.delete(`/internships/${id}`);
       return response.data;
     } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
-
-  // Get internships by category
-  getInternshipsByCategory: async (category, params = {}) => {
-    try {
-      const response = await api.get(`/internships/category/${category}`, { params });
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
-
-  // Search internships
-  searchInternships: async (query, params = {}) => {
-    try {
-      const response = await api.get('/internships/search', { 
-        params: { q: query, ...params } 
-      });
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
-
-  // Apply to internship
-  applyToInternship: async (id, applicationData) => {
-    try {
-      const response = await api.post(`/internships/${id}/apply`, applicationData);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
-
-  // Get my applications
-  getMyApplications: async (params = {}) => {
-    try {
-      const response = await api.get('/internships/my/applications', { params });
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
-
-  // Get featured internships
-  getFeaturedInternships: async (limit = 6) => {
-    try {
-      const response = await api.get('/internships', { 
-        params: { featured: true, limit } 
-      });
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
-
-  // Get active internships
-  getActiveInternships: async (params = {}) => {
-    try {
-      const response = await api.get('/internships', { 
-        params: { status: 'active', ...params } 
-      });
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
-
-  // Get internship categories
-  getInternshipCategories: async () => {
-    try {
-      const response = await api.get('/internships/categories');
-      return response.data;
-    } catch (error) {
+      console.error('Error deleting internship:', error);
       throw error.response?.data || error;
     }
   }

@@ -1,88 +1,74 @@
 const express = require('express');
 const cors = require('cors');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
-const compression = require('compression');
-const morgan = require('morgan');
-require('dotenv').config();
-
-const { connectDB } = require('./config/database');
-const authRoutes = require('./routes/auth');
 
 const app = express();
+const PORT = 3001;
 
-// Security middleware
-app.use(helmet());
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-  credentials: true
-}));
+// Middleware
+app.use(cors());
+app.use(express.json());
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
+// Test route
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'Server is running!' });
 });
-app.use(limiter);
 
-// Body parsing middleware
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
-// Compression middleware
-app.use(compression());
-
-// Logging middleware
-if (process.env.NODE_ENV === 'development') {
-  app.use(morgan('dev'));
-}
-
-// Health check route
-app.get('/api/health', (req, res) => {
-  res.status(200).json({
+// Banners route
+app.get('/api/banners', (req, res) => {
+  res.json({
     success: true,
-    message: 'Server is running',
-    timestamp: new Date().toISOString()
+    count: 3,
+    pages: 1,
+    currentPage: 1,
+    data: [
+      {
+        banner_id: 1,
+        title: 'Welcome to Mindware Infotech',
+        subtitle: 'Complete Software Solutions & Training',
+        description: 'We provide comprehensive software development services and professional training programs.',
+        image_url: '/uploads/banners/banner-1757329778616-249422715.jpg',
+        button_text: 'Get Started',
+        button_url: 'https://mindwareinfotech.com',
+        banner_type: 'hero',
+        banner_position: 1,
+        is_active: true,
+        created_at: '2025-09-08T11:09:38.000Z',
+        updated_at: '2025-09-08T11:09:38.000Z'
+      },
+      {
+        banner_id: 2,
+        title: 'Professional Training Programs',
+        subtitle: 'Learn from Industry Experts',
+        description: 'Our comprehensive training programs cover the latest technologies.',
+        image_url: '/uploads/banners/training-banner.jpg',
+        button_text: 'View Courses',
+        button_url: 'https://mindwareinfotech.com/courses',
+        banner_type: 'service',
+        banner_position: 2,
+        is_active: true,
+        created_at: '2025-09-08T11:15:02.000Z',
+        updated_at: '2025-09-08T11:15:02.000Z'
+      },
+      {
+        banner_id: 3,
+        title: 'Internship Opportunities',
+        subtitle: 'Gain Real-World Experience',
+        description: 'Join our internship program and work on real projects.',
+        image_url: '/uploads/banners/internship-banner.jpg',
+        button_text: 'Apply Now',
+        button_url: 'https://mindwareinfotech.com/internships',
+        banner_type: 'about',
+        banner_position: 3,
+        is_active: true,
+        created_at: '2025-09-08T11:15:02.000Z',
+        updated_at: '2025-09-08T11:15:02.000Z'
+      }
+    ]
   });
 });
 
-// Routes
-app.use('/api/auth', authRoutes);
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({
-    success: false,
-    message: 'Something went wrong!',
-    error: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
-  });
+app.listen(PORT, () => {
+  console.log(`🚀 Simple server running on port ${PORT}`);
+  console.log(`📡 Test endpoint: http://localhost:${PORT}/api/test`);
+  console.log(`📋 Banners endpoint: http://localhost:${PORT}/api/banners`);
 });
-
-// 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({
-    success: false,
-    message: 'Route not found'
-  });
-});
-
-const PORT = process.env.PORT || 5000;
-
-const startServer = async () => {
-  try {
-    // Connect to database
-    await connectDB();
-    
-    // Start server
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
-      console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
-    });
-  } catch (error) {
-    console.error('❌ Failed to start server:', error);
-    process.exit(1);
-  }
-};
-
-startServer();

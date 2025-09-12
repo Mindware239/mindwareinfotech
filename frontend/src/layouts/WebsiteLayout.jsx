@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 import Preloader from '../components/common/Preloader';
 import Header from '../components/website/Header';
 import Footer from '../components/website/Footer';
+import Chatbot from '../components/website/Chatbot';
 
 const WebsiteLayout = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -25,6 +26,7 @@ const WebsiteLayout = () => {
           <Outlet />
         </main>
         <Footer />
+        <Chatbot />
       </div>
     </div>
   );

@@ -43,7 +43,7 @@ const Footer = () => {
           {/* Company Info */}
           <div className="footer-section">
             <div className="footer-logo">
-              <img src="/images/logo.png" alt="Mindware India" className="footer-logo-img" />
+              <img src="/indian_softwares.png" alt="Mindware India" className="footer-logo-img" />
               <div className="footer-logo-text">
                 <span className="footer-logo-main">MINDWARE</span>
                 <span className="footer-logo-sub">INDIA</span>

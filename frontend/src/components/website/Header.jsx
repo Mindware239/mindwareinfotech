@@ -164,6 +164,7 @@ const Header = () => {
                             <li><Link to="/mobile-training">Mobile App Development</Link></li>
                             <li><Link to="/data-science">Data Science & AI</Link></li>
                             <li><Link to="/cloud-training">Cloud Computing</Link></li>
+                            <li><Link to="/video-lectures">Video Lectures</Link></li>
                           </ul>
                         </div>
                         <div className="mega-menu-column">

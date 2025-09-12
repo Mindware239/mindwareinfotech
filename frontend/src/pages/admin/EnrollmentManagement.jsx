@@ -4,6 +4,7 @@ import DataTable from '../../components/admin/DataTable';
 import EnrollmentForm from '../../components/forms/EnrollmentForm';
 import EnrollmentPreview from '../../components/forms/EnrollmentPreview';
 import enrollmentService from '../../services/enrollmentService';
+import { useNotification } from '../../context/NotificationContext';
 import './EnrollmentManagement.css';
 
 const EnrollmentManagement = () => {
@@ -17,6 +18,7 @@ const EnrollmentManagement = () => {
   const [pageSize, setPageSize] = useState(10);
 
   const queryClient = useQueryClient();
+  const { showSuccess, showError } = useNotification();
 
   // Fetch enrollments
   const { data: enrollmentsData, isLoading, error } = useQuery({
@@ -36,6 +38,11 @@ const EnrollmentManagement = () => {
       queryClient.invalidateQueries(['enrollments']);
       setShowForm(false);
       setEditingEnrollment(null);
+      showSuccess('Enrollment created successfully!');
+    },
+    onError: (error) => {
+      console.error('Error creating enrollment:', error);
+      showError('Failed to create enrollment: ' + (error.message || 'Unknown error'));
     }
   });
 
@@ -46,6 +53,11 @@ const EnrollmentManagement = () => {
       queryClient.invalidateQueries(['enrollments']);
       setShowForm(false);
       setEditingEnrollment(null);
+      showSuccess('Enrollment updated successfully!');
+    },
+    onError: (error) => {
+      console.error('Error updating enrollment:', error);
+      showError('Failed to update enrollment: ' + (error.message || 'Unknown error'));
     }
   });
 
@@ -54,6 +66,11 @@ const EnrollmentManagement = () => {
     mutationFn: enrollmentService.deleteEnrollment,
     onSuccess: () => {
       queryClient.invalidateQueries(['enrollments']);
+      showSuccess('Enrollment deleted successfully!');
+    },
+    onError: (error) => {
+      console.error('Error deleting enrollment:', error);
+      showError('Failed to delete enrollment: ' + (error.message || 'Unknown error'));
     }
   });
 
@@ -118,7 +135,7 @@ const EnrollmentManagement = () => {
                 src={enrollment.profilePhoto.url} 
                 alt={enrollment.firstName}
                 onError={(e) => {
-                  e.target.src = '/images/avatars/default-avatar.jpg';
+                  e.target.src = '/images/avatars/default-avatar.svg';
                 }}
               />
             ) : (
@@ -362,7 +379,7 @@ const EnrollmentManagement = () => {
             <div className="modal-body">
               <EnrollmentForm
                 onSubmit={handleFormSubmit}
-                initialData={editingEnrollment}
+                initialData={editingEnrollment || {}}
                 isEdit={!!editingEnrollment}
               />
             </div>

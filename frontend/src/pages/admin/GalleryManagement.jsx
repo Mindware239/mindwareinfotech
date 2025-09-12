@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import DataTable from '../../components/admin/DataTable';
 import FormModal from '../../components/admin/FormModal';
 import galleryService from '../../services/galleryService';
+import { getGalleryImageUrl, getImageUrl } from '../../utils/imageUtils';
 import './GalleryManagement.css';
 
 const GalleryManagement = () => {
@@ -79,17 +80,33 @@ const GalleryManagement = () => {
 
   const handleFormSubmit = async (formData) => {
     try {
+      console.log('Submitting form data:', formData);
+      console.log('Form data keys:', Object.keys(formData));
+      console.log('Title value:', formData.title);
+      console.log('Category value:', formData.category);
+      
+      // Validate required fields
+      if (!formData.title || formData.title.trim() === '') {
+        alert('Title is required');
+        return;
+      }
+      
       if (editingGallery) {
+        console.log('Updating gallery item:', editingGallery.id);
         await updateGalleryMutation.mutateAsync({
           id: editingGallery.id,
           data: formData
         });
       } else {
+        console.log('Creating new gallery item');
         await createGalleryMutation.mutateAsync(formData);
       }
     } catch (error) {
       console.error('Error saving gallery item:', error);
-      alert('Failed to save gallery item');
+      console.error('Error response:', error.response);
+      console.error('Error data:', error.response?.data);
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to save gallery item';
+      alert(errorMessage);
     }
   };
 
@@ -110,13 +127,26 @@ const GalleryManagement = () => {
       key: 'preview',
       title: 'Preview',
       render: (gallery) => {
-        const images = gallery.images || [];
-        const firstImage = images[0];
+        // Parse images if it's a JSON string
+        let images = gallery.images;
+        if (typeof images === 'string') {
+          try {
+            images = JSON.parse(images);
+          } catch (e) {
+            images = [];
+          }
+        }
+        
+        if (!Array.isArray(images)) {
+          images = [];
+        }
+        
+        const imageUrl = getGalleryImageUrl(images);
         return (
           <div className="gallery-preview">
-            {firstImage ? (
+            {imageUrl ? (
               <img 
-                src={firstImage.url || firstImage} 
+                src={imageUrl} 
                 alt={gallery.title}
                 className="preview-image"
                 onError={(e) => {
@@ -188,7 +218,7 @@ const GalleryManagement = () => {
           </div>
           <div className="stat-item">
             <i className="fas fa-images"></i>
-            <span>{(gallery.images || []).length}</span>
+            <span>{Array.isArray(gallery.images) ? gallery.images.length : 0}</span>
           </div>
         </div>
       )
@@ -518,17 +548,40 @@ const GalleryManagement = () => {
                   )}
                 </div>
                 <div className="gallery-images">
-                  <h4>Images ({(viewingGallery.images || []).length})</h4>
+                  <h4>Images ({Array.isArray(viewingGallery.images) ? viewingGallery.images.length : 0})</h4>
                   <div className="images-grid">
-                    {(viewingGallery.images || []).map((image, index) => (
-                      <div key={index} className="image-item">
-                        <img 
-                          src={image.url || image} 
-                          alt={`${viewingGallery.title} - Image ${index + 1}`}
-                          className="gallery-image"
-                        />
-                      </div>
-                    ))}
+                    {(() => {
+                      let images = viewingGallery.images;
+                      if (typeof images === 'string') {
+                        try {
+                          images = JSON.parse(images);
+                        } catch (e) {
+                          images = [];
+                        }
+                      }
+                      
+                      if (!Array.isArray(images)) {
+                        images = [];
+                      }
+                      
+                      return images.length > 0 ? images.map((image, index) => (
+                        <div key={index} className="image-item">
+                          <img 
+                            src={getImageUrl(image.url || image)} 
+                            alt={`${viewingGallery.title} - Image ${index + 1}`}
+                            className="gallery-image"
+                            onError={(e) => {
+                              e.target.src = '/images/gallery-placeholder.jpg';
+                            }}
+                          />
+                        </div>
+                      )) : (
+                        <div className="no-images">
+                          <i className="fas fa-image"></i>
+                          <p>No images available</p>
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
               </div>

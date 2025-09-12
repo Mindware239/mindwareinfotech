@@ -3,6 +3,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import DataTable from '../../components/admin/DataTable';
 import FormModal from '../../components/admin/FormModal';
 import bannerService from '../../services/bannerService';
+import { getImageUrl } from '../../utils/imageUtils';
+import { useNotification } from '../../context/NotificationContext';
 import './BannerManagement.css';
 
 const BannerManagement = () => {
@@ -16,6 +18,7 @@ const BannerManagement = () => {
   const [pageSize, setPageSize] = useState(10);
 
   const queryClient = useQueryClient();
+  const { showSuccess, showError } = useNotification();
 
   // Fetch banners
   const { data: bannersData, isLoading, error } = useQuery({
@@ -25,8 +28,17 @@ const BannerManagement = () => {
       limit: pageSize,
       search: searchTerm,
       type: typeFilter !== 'all' ? typeFilter : undefined,
-      status: statusFilter !== 'all' ? statusFilter : undefined
-    })
+      status: statusFilter !== 'all' ? statusFilter : undefined,
+      is_active: undefined // Show all banners regardless of status
+    }),
+    onSuccess: (data) => {
+      console.log('Banners fetched successfully:', data);
+      console.log('Banners data structure:', data?.data);
+      console.log('Total banners:', data?.data?.length || 0);
+    },
+    onError: (error) => {
+      console.error('Error fetching banners:', error);
+    }
   });
 
   // Create banner mutation
@@ -36,6 +48,11 @@ const BannerManagement = () => {
       queryClient.invalidateQueries(['banners']);
       setShowModal(false);
       setEditingBanner(null);
+      showSuccess('Banner created successfully!');
+    },
+    onError: (error) => {
+      console.error('Error creating banner:', error);
+      showError('Failed to create banner: ' + (error.message || 'Unknown error'));
     }
   });
 
@@ -46,6 +63,11 @@ const BannerManagement = () => {
       queryClient.invalidateQueries(['banners']);
       setShowModal(false);
       setEditingBanner(null);
+      showSuccess('Banner updated successfully!');
+    },
+    onError: (error) => {
+      console.error('Error updating banner:', error);
+      showError('Failed to update banner: ' + (error.message || 'Unknown error'));
     }
   });
 
@@ -54,6 +76,11 @@ const BannerManagement = () => {
     mutationFn: bannerService.deleteBanner,
     onSuccess: () => {
       queryClient.invalidateQueries(['banners']);
+      showSuccess('Banner deleted successfully!');
+    },
+    onError: (error) => {
+      console.error('Error deleting banner:', error);
+      showError('Failed to delete banner: ' + (error.message || 'Unknown error'));
     }
   });
 
@@ -112,7 +139,7 @@ const BannerManagement = () => {
       render: (banner) => (
         <div className="banner-preview">
           <img 
-            src={banner.image_url} 
+            src={getImageUrl(banner.image_url)} 
             alt={banner.title}
             className="preview-image"
             onError={(e) => {
@@ -270,7 +297,7 @@ const BannerManagement = () => {
       rows: 3
     },
     {
-      name: 'image_url',
+      name: 'image',
       label: 'Banner Image',
       type: 'file',
       accept: 'image/*',
@@ -400,13 +427,28 @@ const BannerManagement = () => {
                   Try Again
                 </button>
               </div>
+            ) : !bannersData?.data || bannersData.data.length === 0 ? (
+              <div className="no-data-message">
+                <div className="no-data-icon">
+                  <i className="fas fa-image"></i>
+                </div>
+                <h3>No Banners Found</h3>
+                <p>You haven't created any banners yet. Click "Add New Banner" to get started!</p>
+                <button 
+                  className="btn btn-primary"
+                  onClick={handleCreateBanner}
+                >
+                  <i className="fas fa-plus"></i>
+                  Create Your First Banner
+                </button>
+              </div>
             ) : (
               <DataTable
                 columns={columns}
-                data={bannersData?.data || []}
+                data={bannersData.data}
                 loading={isLoading}
                 currentPage={currentPage}
-                totalPages={bannersData?.pages || 0}
+                totalPages={bannersData.pages || 0}
                 onPageChange={setCurrentPage}
               />
             )}
@@ -464,9 +506,12 @@ const BannerManagement = () => {
               <div className="banner-view">
                 <div className="banner-preview-large">
                   <img 
-                    src={viewingBanner.image_url} 
+                    src={getImageUrl(viewingBanner.image_url)} 
                     alt={viewingBanner.title}
                     className="banner-image"
+                    onError={(e) => {
+                      e.target.src = '/images/banner-placeholder.jpg';
+                    }}
                   />
                 </div>
                 <div className="banner-details">

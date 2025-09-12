@@ -3,6 +3,7 @@ const { Op } = require('sequelize');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const notificationService = require('../services/notificationService');
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -182,6 +183,27 @@ const createEnrollment = async (req, res, next) => {
     enrollmentData.paymentStatus = enrollmentData.paymentStatus || 'pending';
 
     const enrollment = await Enrollment.create(enrollmentData);
+
+    // Send notifications after successful enrollment
+    try {
+      const studentData = {
+        name: `${enrollment.firstName} ${enrollment.lastName}`,
+        email: enrollment.email,
+        phone: enrollment.phone,
+        courseName: enrollment.courseInterest
+      };
+
+      // Send notifications (WhatsApp + Email)
+      const notificationResults = await notificationService.sendEnrollmentConfirmation(
+        studentData, 
+        ['whatsapp', 'email']
+      );
+
+      console.log('Notification results:', notificationResults);
+    } catch (notificationError) {
+      console.error('Notification failed:', notificationError);
+      // Don't fail the enrollment if notifications fail
+    }
 
     res.status(201).json({
       success: true,
@@ -524,6 +546,111 @@ const bulkDeleteEnrollments = async (req, res, next) => {
   }
 };
 
+// @desc    Check if user is enrolled in a course
+// @route   GET /api/enrollments/check/:courseId
+// @access  Private
+const checkEnrollment = async (req, res, next) => {
+  try {
+    const { courseId } = req.params;
+    const userId = req.user.id;
+
+    const enrollment = await Enrollment.findOne({
+      where: {
+        userId: userId,
+        courseId: courseId,
+        status: 'approved'
+      }
+    });
+
+    res.status(200).json({
+      success: true,
+      data: {
+        isEnrolled: !!enrollment,
+        enrollment: enrollment || null
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Get user's enrolled courses
+// @route   GET /api/enrollments/my-courses
+// @access  Private
+const getMyEnrollments = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const { page = 1, limit = 10 } = req.query;
+
+    const offset = (page - 1) * limit;
+
+    const { count, rows: enrollments } = await Enrollment.findAndCountAll({
+      where: {
+        userId: userId,
+        status: 'approved'
+      },
+      include: [
+        {
+          model: require('../models/Course'),
+          as: 'course',
+          attributes: ['id', 'title', 'description', 'category', 'level', 'duration', 'price', 'currency']
+        }
+      ],
+      order: [['createdAt', 'DESC']],
+      limit: parseInt(limit),
+      offset: parseInt(offset)
+    });
+
+    res.status(200).json({
+      success: true,
+      count,
+      pages: Math.ceil(count / limit),
+      currentPage: parseInt(page),
+      data: enrollments
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Check if user can access course content
+// @route   GET /api/enrollments/access/:courseId
+// @access  Private
+const checkCourseAccess = async (req, res, next) => {
+  try {
+    const { courseId } = req.params;
+    const userId = req.user.id;
+
+    const enrollment = await Enrollment.findOne({
+      where: {
+        userId: userId,
+        courseId: courseId,
+        status: 'approved'
+      },
+      include: [
+        {
+          model: require('../models/Course'),
+          as: 'course',
+          attributes: ['id', 'title', 'access_level', 'price']
+        }
+      ]
+    });
+
+    const hasAccess = !!enrollment;
+    
+    res.status(200).json({
+      success: true,
+      data: {
+        hasAccess,
+        enrollment: enrollment || null,
+        course: enrollment?.course || null
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getEnrollments,
   getEnrollment,
@@ -536,5 +663,8 @@ module.exports = {
   getRecentEnrollments,
   bulkUpdateEnrollments,
   bulkDeleteEnrollments,
+  checkEnrollment,
+  getMyEnrollments,
+  checkCourseAccess,
   upload
 };

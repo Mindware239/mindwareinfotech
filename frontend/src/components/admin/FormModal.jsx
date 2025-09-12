@@ -75,6 +75,20 @@ const FormModal = ({
     }));
   };
 
+  const removeFileFromArray = (fieldName, index) => {
+    setFormData(prev => {
+      const currentFiles = prev[fieldName];
+      if (Array.isArray(currentFiles)) {
+        const updatedFiles = currentFiles.filter((_, i) => i !== index);
+        return {
+          ...prev,
+          [fieldName]: updatedFiles.length > 0 ? updatedFiles : null
+        };
+      }
+      return prev;
+    });
+  };
+
   const validateForm = () => {
     const newErrors = {};
     
@@ -99,8 +113,15 @@ const FormModal = ({
   const handleSubmit = (e) => {
     e.preventDefault();
     
+    console.log('FormModal - Form submitted');
+    console.log('FormModal - Form data:', formData);
+    console.log('FormModal - Fields:', fields);
+    
     if (validateForm()) {
+      console.log('FormModal - Validation passed, calling onSubmit');
       onSubmit(formData);
+    } else {
+      console.log('FormModal - Validation failed');
     }
   };
 

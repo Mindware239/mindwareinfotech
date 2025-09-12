@@ -104,6 +104,7 @@ const VideoSection = () => {
                   onError={(e) => {
                     e.target.src = '/images/video-placeholder.jpg';
                   }}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
                 <div className="video-card__overlay">
                   <div className="video-card__play-btn">

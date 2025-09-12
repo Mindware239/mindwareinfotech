@@ -145,7 +145,7 @@ const RecentActivity = () => {
                 src={activity.avatar} 
                 alt={activity.user}
                 onError={(e) => {
-                  e.target.src = '/images/avatars/default-avatar.jpg';
+                  e.target.src = '/images/avatars/default-avatar.svg';
                 }}
               />
               <div 

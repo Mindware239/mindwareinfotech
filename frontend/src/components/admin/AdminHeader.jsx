@@ -130,10 +130,10 @@ const AdminHeader = ({ onMenuClick, user }) => {
           >
             <div className="user-avatar">
               <img 
-                src={user?.avatar || '/images/avatars/default-avatar.jpg'} 
+                src={user?.avatar || '/images/avatars/default-avatar.svg'} 
                 alt={user?.name}
                 onError={(e) => {
-                  e.target.src = '/images/avatars/default-avatar.jpg';
+                  e.target.src = '/images/avatars/default-avatar.svg';
                 }}
               />
             </div>
@@ -149,10 +149,10 @@ const AdminHeader = ({ onMenuClick, user }) => {
               <div className="user-dropdown-header">
                 <div className="user-avatar-large">
                   <img 
-                    src={user?.avatar || '/images/avatars/default-avatar.jpg'} 
+                    src={user?.avatar || '/images/avatars/default-avatar.svg'} 
                     alt={user?.name}
                     onError={(e) => {
-                      e.target.src = '/images/avatars/default-avatar.jpg';
+                      e.target.src = '/images/avatars/default-avatar.svg';
                     }}
                   />
                 </div>

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import DataTable from '../../components/admin/DataTable';
 import FormModal from '../../components/admin/FormModal';
 import blogService from '../../services/blogService';
+import { getBlogImageUrl } from '../../utils/imageUtils';
+import { useNotification } from '../../context/NotificationContext';
 import './BlogManagement.css';
 
 const BlogManagement = () => {
@@ -14,6 +16,7 @@ const BlogManagement = () => {
   const [filterStatus, setFilterStatus] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const { showSuccess, showError } = useNotification();
 
   useEffect(() => {
     fetchBlogs();
@@ -53,11 +56,15 @@ const BlogManagement = () => {
   const handleDeleteBlog = async (blogId) => {
     if (window.confirm('Are you sure you want to delete this blog post?')) {
       try {
+        if (!blogId) {
+          throw new Error('Blog ID is missing');
+        }
         await blogService.deleteBlog(blogId);
+        showSuccess('Blog post deleted successfully!');
         fetchBlogs();
       } catch (err) {
         console.error('Error deleting blog:', err);
-        alert('Failed to delete blog post');
+        showError('Failed to delete blog post: ' + err.message);
       }
     }
   };
@@ -65,26 +72,36 @@ const BlogManagement = () => {
   const handleSaveBlog = async (blogData) => {
     try {
       if (editingBlog) {
-        await blogService.updateBlog(editingBlog._id, blogData);
+        const blogId = editingBlog.id || editingBlog._id;
+        if (!blogId) {
+          throw new Error('Blog ID is missing');
+        }
+        await blogService.updateBlog(blogId, blogData);
+        showSuccess('Blog post updated successfully!');
       } else {
         await blogService.createBlog(blogData);
+        showSuccess('Blog post created successfully!');
       }
       setShowModal(false);
       setEditingBlog(null);
       fetchBlogs();
     } catch (err) {
       console.error('Error saving blog:', err);
-      alert('Failed to save blog post');
+      showError('Failed to save blog post: ' + err.message);
     }
   };
 
   const handleStatusChange = async (blogId, newStatus) => {
     try {
+      if (!blogId) {
+        throw new Error('Blog ID is missing');
+      }
       await blogService.updateBlog(blogId, { status: newStatus });
+      showSuccess('Blog status updated successfully!');
       fetchBlogs();
     } catch (err) {
       console.error('Error updating blog status:', err);
-      alert('Failed to update blog status');
+      showError('Failed to update blog status: ' + err.message);
     }
   };
 
@@ -92,22 +109,25 @@ const BlogManagement = () => {
     {
       key: 'title',
       label: 'Title',
-      render: (blog) => (
-        <div className="blog-title-cell">
-          <img 
-            src={blog.featuredImage?.url || '/images/blog-placeholder.jpg'} 
-            alt={blog.title}
-            className="blog-thumbnail"
-            onError={(e) => {
-              e.target.src = '/images/blog-placeholder.jpg';
-            }}
-          />
-          <div className="blog-title-content">
-            <h4>{blog.title}</h4>
-            <p>{blog.excerpt}</p>
+      render: (blog) => {
+        const imageUrl = getBlogImageUrl(blog.featured_image);
+        return (
+          <div className="blog-title-cell">
+            <img 
+              src={imageUrl} 
+              alt={blog.title}
+              className="blog-thumbnail"
+              onError={(e) => {
+                e.target.src = '/images/blog-placeholder.jpg';
+              }}
+            />
+            <div className="blog-title-content">
+              <h4>{blog.title}</h4>
+              <p>{blog.excerpt}</p>
+            </div>
           </div>
-        </div>
-      )
+        );
+      }
     },
     {
       key: 'category',
@@ -127,11 +147,11 @@ const BlogManagement = () => {
       render: (blog) => (
         <div className="author-cell">
           <img 
-            src={blog.author?.avatar || '/images/avatars/default-avatar.jpg'} 
+            src={blog.author?.avatar || '/images/avatars/default-avatar.svg'} 
             alt={blog.author?.name}
             className="author-avatar"
             onError={(e) => {
-              e.target.src = '/images/avatars/default-avatar.jpg';
+              e.target.src = '/images/avatars/default-avatar.svg';
             }}
           />
           <span>{blog.author?.name}</span>
@@ -144,7 +164,7 @@ const BlogManagement = () => {
       render: (blog) => (
         <select 
           value={blog.status}
-          onChange={(e) => handleStatusChange(blog._id, e.target.value)}
+          onChange={(e) => handleStatusChange(blog.id || blog._id, e.target.value)}
           className={`status-select status-${blog.status}`}
         >
           <option value="draft">Draft</option>
@@ -172,7 +192,13 @@ const BlogManagement = () => {
     {
       key: 'createdAt',
       label: 'Created',
-      render: (blog) => new Date(blog.createdAt).toLocaleDateString()
+      render: (blog) => {
+        try {
+          return new Date(blog.created_at || blog.createdAt).toLocaleDateString();
+        } catch (e) {
+          return 'Invalid Date';
+        }
+      }
     },
     {
       key: 'actions',
@@ -188,7 +214,7 @@ const BlogManagement = () => {
           </button>
           <button 
             className="btn btn-sm btn-danger"
-            onClick={() => handleDeleteBlog(blog._id)}
+            onClick={() => handleDeleteBlog(blog.id || blog._id)}
             title="Delete"
           >
             <i className="fas fa-trash"></i>
@@ -205,6 +231,13 @@ const BlogManagement = () => {
       type: 'text',
       required: true,
       placeholder: 'Enter blog title'
+    },
+    {
+      name: 'slug',
+      label: 'Slug',
+      type: 'text',
+      required: false,
+      placeholder: 'Auto-generated from title (or enter custom)'
     },
     {
       name: 'excerpt',
@@ -350,7 +383,7 @@ const BlogManagement = () => {
           title={editingBlog ? 'Edit Blog Post' : 'Create New Blog Post'}
           fields={blogFormFields}
           initialData={editingBlog}
-          onSave={handleSaveBlog}
+          onSubmit={handleSaveBlog}
           onClose={() => {
             setShowModal(false);
             setEditingBlog(null);

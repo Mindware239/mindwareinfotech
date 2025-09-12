@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import blogService from '../../services/blogService';
+import { getBlogImageUrl } from '../../utils/imageUtils';
 import './BlogPage.css';
 
 const BlogPage = () => {
@@ -112,7 +113,7 @@ const BlogPage = () => {
                   <article key={blog.id} className="blog-card">
                     <div className="blog-image">
                       <img 
-                        src={blog.featured_image?.url || '/images/blog-placeholder.jpg'} 
+                        src={getBlogImageUrl(blog.featured_image)} 
                         alt={blog.title}
                         onError={(e) => {
                           e.target.src = '/images/blog-placeholder.jpg';

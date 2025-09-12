@@ -196,4 +196,25 @@ Course.prototype.completeStudent = async function() {
   return await this.save();
 };
 
+// Define associations
+Course.associate = (models) => {
+  // Course belongs to User (instructor)
+  Course.belongsTo(models.User, {
+    foreignKey: 'instructor_id',
+    as: 'instructor'
+  });
+
+  // Course has many Enrollments
+  Course.hasMany(models.Enrollment, {
+    foreignKey: 'courseId',
+    as: 'enrollments'
+  });
+
+  // Course has many VideoLectures
+  Course.hasMany(models.VideoLecture, {
+    foreignKey: 'course_id',
+    as: 'videoLectures'
+  });
+};
+
 module.exports = Course;
