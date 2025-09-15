@@ -1,154 +1,100 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import EnrollmentForm from '../../components/forms/EnrollmentForm';
-import EnrollmentPreview from '../../components/forms/EnrollmentPreview';
-import { useNotification } from '../../context/NotificationContext';
-import enrollmentService from '../../services/enrollmentService';
+import courseService from '../../services/courseService';
 import './EnrollmentPage.css';
 
 const EnrollmentPage = () => {
-  const { courseId } = useParams();
-  const navigate = useNavigate();
-  const { showSuccess, showError } = useNotification();
-  
-  const [course, setCourse] = useState(null);
+  const [selectedCourse, setSelectedCourse] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [currentStep, setCurrentStep] = useState('form'); // 'form', 'preview', 'success'
-  const [formData, setFormData] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    dateOfBirth: '',
+    gender: '',
+    address: '',
+    city: '',
+    state: '',
+    pincode: '',
+    country: 'India',
+    highestQualification: '',
+    institution: '',
+    yearOfPassing: '',
+    percentage: '',
+    additionalQualifications: '',
+    courseInterest: '',
+    preferredBatch: '',
+    trainingMode: 'online',
+    experience: '',
+    currentCompany: '',
+    currentDesignation: '',
+    expectedStartDate: '',
+    howDidYouHear: '',
+    motivation: '',
+    careerGoals: '',
+    specialRequirements: '',
+    paymentMode: 'online'
+  });
 
   useEffect(() => {
-    fetchCourseDetails();
-  }, [courseId]);
-
-  const fetchCourseDetails = async () => {
-    try {
-      setLoading(true);
-      
-      // Simulate a short loading time
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      if (courseId) {
-        // Try to fetch course details from API
-        try {
-          const response = await fetch(`http://localhost:5000/api/courses/${courseId}`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          });
-          
-          if (response.ok) {
-            const courseData = await response.json();
-            setCourse(courseData.data);
-          } else {
-            // Fallback to mock data if API fails
-            setCourse({
-              id: courseId,
-              title: 'Web Development Course',
-              description: 'Learn full-stack web development with modern technologies',
-              price: 15000,
-              currency: 'INR',
-              duration: '6 months',
-              level: 'Beginner to Advanced'
-            });
-          }
-        } catch (apiError) {
-          console.log('API not available, using mock data:', apiError.message);
-          // Fallback to mock data if API is not available
-          setCourse({
-            id: courseId,
-            title: 'Web Development Course',
-            description: 'Learn full-stack web development with modern technologies',
-            price: 15000,
-            currency: 'INR',
-            duration: '6 months',
-            level: 'Beginner to Advanced'
-          });
-        }
-      } else {
-        // General enrollment without specific course
-        setCourse({
-          id: null,
-          title: 'General Course Enrollment',
-          description: 'Enroll in our training programs and courses',
-          price: 0,
-          currency: 'INR',
-          duration: 'Flexible',
-          level: 'All Levels'
-        });
-      }
-    } catch (error) {
-      console.error('Error loading course details:', error);
-      // Set fallback course data even on error
-      setCourse({
-        id: courseId || null,
-        title: courseId ? 'Web Development Course' : 'General Course Enrollment',
-        description: courseId ? 'Learn full-stack web development with modern technologies' : 'Enroll in our training programs and courses',
-        price: courseId ? 15000 : 0,
-        currency: 'INR',
-        duration: courseId ? '6 months' : 'Flexible',
-        level: courseId ? 'Beginner to Advanced' : 'All Levels'
-      });
-    } finally {
-      setLoading(false);
+    // Get selected course from localStorage
+    const courseData = localStorage.getItem('selectedCourse');
+    if (courseData) {
+      const course = JSON.parse(courseData);
+      setSelectedCourse(course);
+      setFormData(prev => ({
+        ...prev,
+        courseInterest: course.title,
+        paymentAmount: course.price
+      }));
     }
+    setLoading(false);
+  }, []);
+
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
   };
 
-  const handleFormSubmit = (data) => {
-    setFormData(data);
-    setCurrentStep('preview');
-  };
-
-  const handlePreviewSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
     try {
-      setIsSubmitting(true);
-      
-      // Create FormData for file uploads
-      const formDataToSend = new FormData();
-      
-      // Add all form fields
-      Object.keys(formData).forEach(key => {
-        if (key === 'certificates' && Array.isArray(formData[key])) {
-          formData[key].forEach((file, index) => {
-            formDataToSend.append(`certificates`, file);
-          });
-        } else if (formData[key] instanceof File) {
-          formDataToSend.append(key, formData[key]);
-        } else if (formData[key] !== null && formData[key] !== undefined) {
-          formDataToSend.append(key, formData[key]);
-        }
+      const enrollmentData = {
+        ...formData,
+        courseId: selectedCourse?.id,
+        paymentAmount: selectedCourse?.price,
+        paymentStatus: 'pending'
+      };
+
+      const response = await fetch('/api/enrollments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(enrollmentData)
       });
 
-      // Add course ID
-      if (courseId) {
-        formDataToSend.append('courseId', courseId);
-      }
+      if (!response.ok) throw new Error('Failed to submit enrollment');
 
-      // Submit enrollment
-      const response = await enrollmentService.createEnrollment(formDataToSend);
+      const result = await response.json();
       
-      if (response.success) {
-        setCurrentStep('success');
-        showSuccess('Enrollment submitted successfully! We will contact you soon.');
-      } else {
-        showError(response.message || 'Failed to submit enrollment');
-      }
+      // Clear localStorage
+      localStorage.removeItem('selectedCourse');
+      
+      // Show success message
+      alert('Enrollment submitted successfully! We will contact you soon.');
+      
+      // Redirect to home page
+      window.location.href = '/';
+      
     } catch (error) {
-      console.error('Enrollment error:', error);
-      showError('Failed to submit enrollment. Please try again.');
-    } finally {
-      setIsSubmitting(false);
+      console.error('Error submitting enrollment:', error);
+      alert('Failed to submit enrollment. Please try again.');
     }
-  };
-
-  const handleEditForm = () => {
-    setCurrentStep('form');
-  };
-
-  const handleNewEnrollment = () => {
-    setCurrentStep('form');
-    setFormData({});
   };
 
   if (loading) {
@@ -156,77 +102,408 @@ const EnrollmentPage = () => {
       <div className="enrollment-page">
         <div className="loading-container">
           <div className="loading-spinner"></div>
-          <p>Loading course details...</p>
+          <p>Loading enrollment form...</p>
         </div>
       </div>
     );
   }
+
+  if (!selectedCourse) {
+    return (
+      <div className="enrollment-page">
+        <div className="error-container">
+          <i className="fas fa-exclamation-triangle"></i>
+          <h2>No Course Selected</h2>
+          <p>Please select a course first before enrolling.</p>
+          <button onClick={() => window.location.href = '/web-training'}>
+            Browse Courses
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const pricing = selectedCourse.hasDiscount ? {
+    originalPrice: selectedCourse.originalPrice,
+    currentPrice: selectedCourse.price,
+    discountPercentage: selectedCourse.discountPercentage,
+    hasDiscount: true
+  } : {
+    originalPrice: selectedCourse.price,
+    currentPrice: selectedCourse.price,
+    discountPercentage: 0,
+    hasDiscount: false
+  };
 
   return (
     <div className="enrollment-page">
       <div className="container">
         <div className="enrollment-header">
           <h1>Course Enrollment</h1>
-          {course && (
-            <div className="course-info">
-              <h2>{course.title}</h2>
-              <p>{course.description}</p>
-              <div className="course-details">
-                <span className="price">₹{course.price} {course.currency}</span>
-                <span className="duration">{course.duration}</span>
-                <span className="level">{course.level}</span>
-              </div>
-            </div>
-          )}
+          <p>Complete your enrollment for the selected course</p>
         </div>
 
         <div className="enrollment-content">
-          {currentStep === 'form' && (
+          {/* Course Summary */}
+          <div className="course-summary">
+            <h3>Selected Course</h3>
+            <div className="course-card">
+              <h4>{selectedCourse.title}</h4>
+              <div className="course-pricing">
+                {pricing.hasDiscount && (
+                  <span className="original-price">
+                    {courseService.formatPrice(pricing.originalPrice, selectedCourse.currency)}
+                  </span>
+                )}
+                <span className="current-price">
+                  {courseService.formatPrice(pricing.currentPrice, selectedCourse.currency)}
+                </span>
+                {pricing.hasDiscount && (
+                  <span className="discount-badge">
+                    {pricing.discountPercentage}% OFF
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Enrollment Form */}
+          <form className="enrollment-form" onSubmit={handleSubmit}>
             <div className="form-section">
-              <h3>Fill in your details to enroll</h3>
-              <EnrollmentForm
-                onSubmit={handleFormSubmit}
-                initialData={formData}
-              />
-            </div>
-          )}
-
-          {currentStep === 'preview' && (
-            <div className="preview-section">
-              <h3>Review your enrollment details</h3>
-              <EnrollmentPreview
-                data={formData}
-                course={course}
-                onEdit={handleEditForm}
-                onSubmit={handlePreviewSubmit}
-                isSubmitting={isSubmitting}
-              />
-            </div>
-          )}
-
-          {currentStep === 'success' && (
-            <div className="success-section">
-              <div className="success-icon">
-                <i className="fas fa-check-circle"></i>
+              <h3>Personal Information</h3>
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="firstName">First Name *</label>
+                  <input
+                    type="text"
+                    id="firstName"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="lastName">Last Name *</label>
+                  <input
+                    type="text"
+                    id="lastName"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
               </div>
-              <h3>Enrollment Submitted Successfully!</h3>
-              <p>Thank you for your interest in our course. Our team will review your application and contact you within 24-48 hours.</p>
-              <div className="success-actions">
-                <button 
-                  className="btn btn-primary"
-                  onClick={() => navigate('/')}
-                >
-                  Go to Home
-                </button>
-                <button 
-                  className="btn btn-secondary"
-                  onClick={handleNewEnrollment}
-                >
-                  Enroll in Another Course
-                </button>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="email">Email Address *</label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="phone">Phone Number *</label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="dateOfBirth">Date of Birth *</label>
+                  <input
+                    type="date"
+                    id="dateOfBirth"
+                    name="dateOfBirth"
+                    value={formData.dateOfBirth}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="gender">Gender *</label>
+                  <select
+                    id="gender"
+                    name="gender"
+                    value={formData.gender}
+                    onChange={handleInputChange}
+                    required
+                  >
+                    <option value="">Select Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="address">Address</label>
+                <textarea
+                  id="address"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleInputChange}
+                  rows="3"
+                />
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="city">City</label>
+                  <input
+                    type="text"
+                    id="city"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="state">State</label>
+                  <input
+                    type="text"
+                    id="state"
+                    name="state"
+                    value={formData.state}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="pincode">Pincode</label>
+                  <input
+                    type="text"
+                    id="pincode"
+                    name="pincode"
+                    value={formData.pincode}
+                    onChange={handleInputChange}
+                  />
+                </div>
               </div>
             </div>
-          )}
+
+            <div className="form-section">
+              <h3>Educational Background</h3>
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="highestQualification">Highest Qualification *</label>
+                  <select
+                    id="highestQualification"
+                    name="highestQualification"
+                    value={formData.highestQualification}
+                    onChange={handleInputChange}
+                    required
+                  >
+                    <option value="">Select Qualification</option>
+                    <option value="10th">10th</option>
+                    <option value="12th">12th</option>
+                    <option value="diploma">Diploma</option>
+                    <option value="bachelor">Bachelor's Degree</option>
+                    <option value="master">Master's Degree</option>
+                    <option value="phd">PhD</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label htmlFor="institution">Institution *</label>
+                  <input
+                    type="text"
+                    id="institution"
+                    name="institution"
+                    value={formData.institution}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="yearOfPassing">Year of Passing *</label>
+                  <input
+                    type="number"
+                    id="yearOfPassing"
+                    name="yearOfPassing"
+                    value={formData.yearOfPassing}
+                    onChange={handleInputChange}
+                    min="1950"
+                    max="2030"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="percentage">Percentage/CGPA</label>
+                  <input
+                    type="text"
+                    id="percentage"
+                    name="percentage"
+                    value={formData.percentage}
+                    onChange={handleInputChange}
+                    placeholder="e.g., 85% or 8.5"
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="additionalQualifications">Additional Qualifications</label>
+                <textarea
+                  id="additionalQualifications"
+                  name="additionalQualifications"
+                  value={formData.additionalQualifications}
+                  onChange={handleInputChange}
+                  rows="3"
+                  placeholder="Any certifications, courses, or additional qualifications"
+                />
+              </div>
+            </div>
+
+            <div className="form-section">
+              <h3>Training Preferences</h3>
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="preferredBatch">Preferred Batch</label>
+                  <select
+                    id="preferredBatch"
+                    name="preferredBatch"
+                    value={formData.preferredBatch}
+                    onChange={handleInputChange}
+                  >
+                    <option value="">Select Batch</option>
+                    <option value="morning">Morning (9 AM - 12 PM)</option>
+                    <option value="afternoon">Afternoon (1 PM - 4 PM)</option>
+                    <option value="evening">Evening (6 PM - 9 PM)</option>
+                    <option value="weekend">Weekend</option>
+                    <option value="flexible">Flexible</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label htmlFor="trainingMode">Training Mode *</label>
+                  <select
+                    id="trainingMode"
+                    name="trainingMode"
+                    value={formData.trainingMode}
+                    onChange={handleInputChange}
+                    required
+                  >
+                    <option value="online">Online</option>
+                    <option value="offline">Offline</option>
+                    <option value="hybrid">Hybrid</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="experience">Work Experience</label>
+                  <select
+                    id="experience"
+                    name="experience"
+                    value={formData.experience}
+                    onChange={handleInputChange}
+                  >
+                    <option value="">Select Experience</option>
+                    <option value="fresher">Fresher</option>
+                    <option value="1-2">1-2 years</option>
+                    <option value="3-5">3-5 years</option>
+                    <option value="6-10">6-10 years</option>
+                    <option value="10+">10+ years</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label htmlFor="expectedStartDate">Expected Start Date</label>
+                  <input
+                    type="date"
+                    id="expectedStartDate"
+                    name="expectedStartDate"
+                    value={formData.expectedStartDate}
+                    onChange={handleInputChange}
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="motivation">Why do you want to join this course? *</label>
+                <textarea
+                  id="motivation"
+                  name="motivation"
+                  value={formData.motivation}
+                  onChange={handleInputChange}
+                  rows="4"
+                  required
+                  placeholder="Tell us about your motivation and goals"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="careerGoals">Career Goals</label>
+                <textarea
+                  id="careerGoals"
+                  name="careerGoals"
+                  value={formData.careerGoals}
+                  onChange={handleInputChange}
+                  rows="3"
+                  placeholder="What are your career aspirations?"
+                />
+              </div>
+            </div>
+
+            <div className="form-section">
+              <h3>Payment Information</h3>
+              <div className="payment-summary">
+                <div className="payment-item">
+                  <span>Course Fee:</span>
+                  <span>{courseService.formatPrice(selectedCourse.price, selectedCourse.currency)}</span>
+                </div>
+                {pricing.hasDiscount && (
+                  <div className="payment-item discount">
+                    <span>Discount ({pricing.discountPercentage}%):</span>
+                    <span>-{courseService.formatPrice(pricing.originalPrice - pricing.currentPrice, selectedCourse.currency)}</span>
+                  </div>
+                )}
+                <div className="payment-item total">
+                  <span>Total Amount:</span>
+                  <span>{courseService.formatPrice(selectedCourse.price, selectedCourse.currency)}</span>
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="paymentMode">Payment Mode *</label>
+                <select
+                  id="paymentMode"
+                  name="paymentMode"
+                  value={formData.paymentMode}
+                  onChange={handleInputChange}
+                  required
+                >
+                  <option value="online">Online Payment</option>
+                  <option value="bank-transfer">Bank Transfer</option>
+                  <option value="installment">Installment</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="form-actions">
+              <button type="button" className="btn-secondary" onClick={() => window.history.back()}>
+                Cancel
+              </button>
+              <button type="submit" className="btn-primary">
+                Submit Enrollment
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

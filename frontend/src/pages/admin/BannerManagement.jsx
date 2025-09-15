@@ -245,6 +245,7 @@ const BannerManagement = () => {
     {
       key: 'actions',
       title: 'Actions',
+      width: '150px',
       render: (banner) => (
         <div className="action-buttons">
           <button

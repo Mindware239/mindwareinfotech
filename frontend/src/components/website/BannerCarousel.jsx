@@ -1,12 +1,46 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import bannerService from '../../services/bannerService';
 import './BannerCarousel.css';
 
 const BannerCarousel = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
-  const slides = [
+  // Fetch banners from database
+  const { data: bannersData, isLoading } = useQuery({
+    queryKey: ['banners', 'hero'],
+    queryFn: () => bannerService.getBanners({ status: 'active', limit: 10 }),
+    select: (data) => data?.banners || data?.data || []
+  });
+
+  // Convert database banners to slide format
+  const slides = bannersData?.map((banner, index) => ({
+    id: banner.banner_id,
+    title: banner.title,
+    subtitle: banner.subtitle || "Transform your ideas into powerful solutions",
+    description: banner.description,
+    button1: { 
+      text: banner.button_text || "Learn More", 
+      link: banner.button_url || "/services", 
+      color: index % 3 === 0 ? "red" : index % 3 === 1 ? "purple" : "blue" 
+    },
+    button2: { 
+      text: "Contact Us", 
+      link: "/contact", 
+      color: index % 3 === 0 ? "orange" : index % 3 === 1 ? "blue" : "green" 
+    },
+    background: index % 3 === 0 
+      ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+      : index % 3 === 1 
+      ? "linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%)"
+      : "linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%)",
+    image: banner.image_url ? `http://localhost:5000${banner.image_url}` : "/images/software-development.jpg"
+  })) || [];
+
+  // Fallback slides if no banners from database
+  const fallbackSlides = [
     {
       id: 1,
       title: "Join Our Growing Team",
@@ -39,16 +73,18 @@ const BannerCarousel = () => {
     }
   ];
 
+  const finalSlides = slides.length > 0 ? slides : fallbackSlides;
+
   // Auto-play functionality
   useEffect(() => {
-    if (!isAutoPlaying) return;
+    if (!isAutoPlaying || finalSlides.length === 0) return;
 
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
+      setCurrentSlide((prev) => (prev + 1) % finalSlides.length);
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [isAutoPlaying, slides.length]);
+  }, [isAutoPlaying, finalSlides.length]);
 
   const goToSlide = (index) => {
     setCurrentSlide(index);
@@ -58,18 +94,33 @@ const BannerCarousel = () => {
   };
 
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % slides.length);
+    setCurrentSlide((prev) => (prev + 1) % finalSlides.length);
     setIsAutoPlaying(false);
     setTimeout(() => setIsAutoPlaying(true), 10000);
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+    setCurrentSlide((prev) => (prev - 1 + finalSlides.length) % finalSlides.length);
     setIsAutoPlaying(false);
     setTimeout(() => setIsAutoPlaying(true), 10000);
   };
 
-  const currentSlideData = slides[currentSlide];
+  const currentSlideData = finalSlides[currentSlide];
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <section className="banner-carousel">
+        <div className="carousel-container">
+          <div className="loading-slide">
+            <div className="loading-content">
+              <h1>Loading...</h1>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="banner-carousel">
@@ -77,7 +128,6 @@ const BannerCarousel = () => {
         {/* Main Slide */}
         <div 
           className="carousel-slide active"
-          style={{ background: currentSlideData.background }}
         >
           <div className="slide-content">
             <div className="slide-text">
@@ -102,28 +152,64 @@ const BannerCarousel = () => {
             </div>
             
             <div className="slide-image">
-              <div className="image-placeholder">
-                <div className="floating-elements">
-                  <div className="element element-1">
-                    <i className="fas fa-briefcase"></i>
-                  </div>
-                  <div className="element element-2">
-                    <i className="fas fa-laptop"></i>
-                  </div>
-                  <div className="element element-3">
-                    <i className="fas fa-rocket"></i>
-                  </div>
-                  <div className="element element-4">
-                    <i className="fas fa-star"></i>
-                  </div>
-                  <div className="element element-5">
-                    <i className="fas fa-bullseye"></i>
-                  </div>
-                  <div className="element element-6">
-                    <i className="fas fa-lightbulb"></i>
+              {currentSlideData.image ? (
+                <div className="banner-image-container">
+                  <img 
+                    src={currentSlideData.image} 
+                    alt={currentSlideData.title}
+                    className="banner-image"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'flex';
+                    }}
+                  />
+                  <div className="image-fallback" style={{ display: 'none' }}>
+                    <div className="floating-elements">
+                      <div className="element element-1">
+                        <i className="fas fa-briefcase"></i>
+                      </div>
+                      <div className="element element-2">
+                        <i className="fas fa-laptop"></i>
+                      </div>
+                      <div className="element element-3">
+                        <i className="fas fa-rocket"></i>
+                      </div>
+                      <div className="element element-4">
+                        <i className="fas fa-star"></i>
+                      </div>
+                      <div className="element element-5">
+                        <i className="fas fa-bullseye"></i>
+                      </div>
+                      <div className="element element-6">
+                        <i className="fas fa-lightbulb"></i>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              ) : (
+                <div className="image-placeholder">
+                  <div className="floating-elements">
+                    <div className="element element-1">
+                      <i className="fas fa-briefcase"></i>
+                    </div>
+                    <div className="element element-2">
+                      <i className="fas fa-laptop"></i>
+                    </div>
+                    <div className="element element-3">
+                      <i className="fas fa-rocket"></i>
+                    </div>
+                    <div className="element element-4">
+                      <i className="fas fa-star"></i>
+                    </div>
+                    <div className="element element-5">
+                      <i className="fas fa-bullseye"></i>
+                    </div>
+                    <div className="element element-6">
+                      <i className="fas fa-lightbulb"></i>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -147,7 +233,7 @@ const BannerCarousel = () => {
 
         {/* Dots Indicator */}
         <div className="carousel-dots">
-          {slides.map((_, index) => (
+          {finalSlides.map((_, index) => (
             <button
               key={index}
               className={`dot ${index === currentSlide ? 'active' : ''}`}
@@ -162,7 +248,7 @@ const BannerCarousel = () => {
           <div 
             className="progress-bar"
             style={{ 
-              width: `${((currentSlide + 1) / slides.length) * 100}%`,
+              width: `${((currentSlide + 1) / finalSlides.length) * 100}%`,
               animation: isAutoPlaying ? 'progress 5s linear' : 'none'
             }}
           />

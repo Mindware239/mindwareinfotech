@@ -36,7 +36,7 @@
 .social-icon.linkedin { background: #0077b5; }
 .social-icon.instagram { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
 .social-icon.youtube { background: #ff0000; }
-.social-icon.share { background: #10b981; }
+.social-icon.share { background: #3b82f6; }
 
 .social-icon:hover {
   transform: scale(1.1);
@@ -255,12 +255,12 @@
 }
 
 .contact-item {
-  font-size: 1.1rem;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 15px 25px;
-  border-radius: 25px;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 0.8rem;
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  backdrop-filter: none;
+  border: none;
 }
 
 .contact-item strong {

@@ -1,4 +1,6 @@
 const Enrollment = require('../models/Enrollment');
+const Course = require('../models/Course');
+const User = require('../models/User');
 const { Op } = require('sequelize');
 const multer = require('multer');
 const path = require('path');
@@ -73,14 +75,26 @@ const getEnrollments = async (req, res, next) => {
 
     // Add course filter
     if (course) {
-      whereClause.courseInterest = course;
+      whereClause.courseId = course;
     }
 
     const { count, rows: enrollments } = await Enrollment.findAndCountAll({
       where: whereClause,
       order: [[sort, order.toUpperCase()]],
       limit: parseInt(limit),
-      offset: parseInt(offset)
+      offset: parseInt(offset),
+      include: [
+        {
+          model: Course,
+          as: 'course',
+          attributes: ['id', 'title', 'category', 'price', 'currency']
+        },
+        {
+          model: User,
+          as: 'user',
+          attributes: ['id', 'firstName', 'lastName', 'email']
+        }
+      ]
     });
 
     res.status(200).json({

@@ -149,8 +149,8 @@ const Dashboard = () => {
                 datasets: [{
                   label: 'Revenue (₹)',
                   data: [120000, 150000, 180000, 160000, 200000, 220000],
-                  backgroundColor: '#43e97b',
-                  borderColor: '#27ae60',
+                  backgroundColor: '#3b82f6',
+                  borderColor: '#2563eb',
                   borderWidth: 1
                 }]
               }}

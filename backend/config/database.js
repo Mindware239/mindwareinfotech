@@ -30,30 +30,8 @@ const connectDB = async () => {
     await sequelize.authenticate();
     console.log('📊 MySQL Connected: Database connection established successfully');
     
-    // Load all models
-    const User = require('../models/User');
-    const Course = require('../models/Course');
-    const Enrollment = require('../models/Enrollment');
-    const VideoLecture = require('../models/VideoLecture');
-    const VideoAccess = require('../models/VideoAccess');
-    const Payment = require('../models/Payment');
-    
-    // Set up associations
-    const models = {
-      User,
-      Course,
-      Enrollment,
-      VideoLecture,
-      VideoAccess,
-      Payment
-    };
-    
-    // Call associate function for each model
-    Object.keys(models).forEach(modelName => {
-      if (models[modelName].associate) {
-        models[modelName].associate(models);
-      }
-    });
+    // Load all models and set up associations
+    require('../models'); // This will load all models and set up associations
     
     console.log('🔗 Model associations established');
     

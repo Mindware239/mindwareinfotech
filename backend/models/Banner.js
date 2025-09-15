@@ -37,9 +37,9 @@ const Banner = sequelize.define('Banner', {
     defaultValue: 'hero'
   },
   banner_position: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING(50),
     allowNull: true,
-    defaultValue: 0
+    defaultValue: 'hero'
   },
   is_active: {
     type: DataTypes.BOOLEAN,

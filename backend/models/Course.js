@@ -36,6 +36,14 @@ const Course = sequelize.define('Course', {
       key: 'id'
     }
   },
+  category_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'course_categories',
+      key: 'id'
+    }
+  },
   category: {
     type: DataTypes.ENUM(
       'web-development',
@@ -49,7 +57,7 @@ const Course = sequelize.define('Course', {
       'cybersecurity',
       'other'
     ),
-    allowNull: false
+    allowNull: true // Keep for backward compatibility
   },
   level: {
     type: DataTypes.ENUM('beginner', 'intermediate', 'advanced', 'expert'),
@@ -67,6 +75,22 @@ const Course = sequelize.define('Course', {
       min: 0
     }
   },
+  original_price: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: true,
+    validate: {
+      min: 0
+    }
+  },
+  discount_percentage: {
+    type: DataTypes.DECIMAL(5, 2),
+    allowNull: true,
+    defaultValue: 0,
+    validate: {
+      min: 0,
+      max: 100
+    }
+  },
   currency: {
     type: DataTypes.STRING(3),
     defaultValue: 'INR'
@@ -74,6 +98,27 @@ const Course = sequelize.define('Course', {
   is_free: {
     type: DataTypes.BOOLEAN,
     defaultValue: false
+  },
+  enrollment_fee: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: true,
+    defaultValue: 0,
+    validate: {
+      min: 0
+    }
+  },
+  installment_available: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  installment_count: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    defaultValue: 1,
+    validate: {
+      min: 1,
+      max: 12
+    }
   },
   thumbnail: {
     type: DataTypes.JSON,
@@ -324,6 +369,12 @@ Course.associate = (models) => {
     as: 'instructor'
   });
 
+  // Course belongs to CourseCategory
+  Course.belongsTo(models.CourseCategory, {
+    foreignKey: 'category_id',
+    as: 'courseCategory'
+  });
+
   // Course has many Enrollments
   Course.hasMany(models.Enrollment, {
     foreignKey: 'courseId',
@@ -334,6 +385,12 @@ Course.associate = (models) => {
   Course.hasMany(models.VideoLecture, {
     foreignKey: 'course_id',
     as: 'videoLectures'
+  });
+
+  // Course has many Certificates
+  Course.hasMany(models.Certificate, {
+    foreignKey: 'course_id',
+    as: 'certificates'
   });
 };
 

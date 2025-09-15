@@ -205,7 +205,7 @@
 
 .form-group input:valid:not(:placeholder-shown),
 .form-group textarea:valid:not(:placeholder-shown) {
-  border-color: #10b981;
+  border-color: #3b82f6;
 }
 
 /* Loading state */

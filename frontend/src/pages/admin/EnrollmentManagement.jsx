@@ -111,6 +111,11 @@ const EnrollmentManagement = () => {
     }
   };
 
+  const handlePreview = (formData) => {
+    setPreviewData(formData);
+    setShowPreview(true);
+  };
+
   const handleStatusChange = async (id, newStatus) => {
     try {
       await updateEnrollmentMutation.mutateAsync({
@@ -379,6 +384,7 @@ const EnrollmentManagement = () => {
             <div className="modal-body">
               <EnrollmentForm
                 onSubmit={handleFormSubmit}
+                onPreview={handlePreview}
                 initialData={editingEnrollment || {}}
                 isEdit={!!editingEnrollment}
               />

@@ -1,74 +1,57 @@
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const morgan = require('morgan');
+require('dotenv').config();
+
+const { connectDB } = require('./config/database');
+
+// Import models to set up associations
+const CourseCategory = require('./models/CourseCategory');
+const Course = require('./models/Course');
 
 const app = express();
-const PORT = 3001;
 
-// Middleware
+// Security middleware
+app.use(helmet());
 app.use(cors());
-app.use(express.json());
+app.use(morgan('combined'));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Import routes
+const courseCategoryRoutes = require('./routes/courseCategories');
+
+// Routes
+app.use('/api/course-categories', courseCategoryRoutes);
+app.use('/api/admin/course-categories', courseCategoryRoutes);
 
 // Test route
 app.get('/api/test', (req, res) => {
-  res.json({ message: 'Server is running!' });
+  res.json({ message: 'Server is working!', timestamp: new Date().toISOString() });
 });
 
-// Banners route
-app.get('/api/banners', (req, res) => {
-  res.json({
-    success: true,
-    count: 3,
-    pages: 1,
-    currentPage: 1,
-    data: [
-      {
-        banner_id: 1,
-        title: 'Welcome to Mindware Infotech',
-        subtitle: 'Complete Software Solutions & Training',
-        description: 'We provide comprehensive software development services and professional training programs.',
-        image_url: '/uploads/banners/banner-1757329778616-249422715.jpg',
-        button_text: 'Get Started',
-        button_url: 'https://mindwareinfotech.com',
-        banner_type: 'hero',
-        banner_position: 1,
-        is_active: true,
-        created_at: '2025-09-08T11:09:38.000Z',
-        updated_at: '2025-09-08T11:09:38.000Z'
-      },
-      {
-        banner_id: 2,
-        title: 'Professional Training Programs',
-        subtitle: 'Learn from Industry Experts',
-        description: 'Our comprehensive training programs cover the latest technologies.',
-        image_url: '/uploads/banners/training-banner.jpg',
-        button_text: 'View Courses',
-        button_url: 'https://mindwareinfotech.com/courses',
-        banner_type: 'service',
-        banner_position: 2,
-        is_active: true,
-        created_at: '2025-09-08T11:15:02.000Z',
-        updated_at: '2025-09-08T11:15:02.000Z'
-      },
-      {
-        banner_id: 3,
-        title: 'Internship Opportunities',
-        subtitle: 'Gain Real-World Experience',
-        description: 'Join our internship program and work on real projects.',
-        image_url: '/uploads/banners/internship-banner.jpg',
-        button_text: 'Apply Now',
-        button_url: 'https://mindwareinfotech.com/internships',
-        banner_type: 'about',
-        banner_position: 3,
-        is_active: true,
-        created_at: '2025-09-08T11:15:02.000Z',
-        updated_at: '2025-09-08T11:15:02.000Z'
-      }
-    ]
-  });
+// Error handling
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  res.status(500).json({ error: 'Internal server error' });
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Simple server running on port ${PORT}`);
-  console.log(`📡 Test endpoint: http://localhost:${PORT}/api/test`);
-  console.log(`📋 Banners endpoint: http://localhost:${PORT}/api/banners`);
-});
+// Connect to database and start server
+const startServer = async () => {
+  try {
+    await connectDB();
+    console.log('✅ Database connected successfully');
+    
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+      console.log(`📡 API available at http://localhost:${PORT}/api`);
+    });
+  } catch (error) {
+    console.error('❌ Server startup error:', error);
+    process.exit(1);
+  }
+};
+
+startServer();

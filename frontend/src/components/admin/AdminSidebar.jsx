@@ -51,6 +51,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
       icon: 'fas fa-play-circle',
       submenu: [
         { title: 'All Courses', path: '/admin/courses' },
+        { title: 'Training Programs', path: '/admin/training-programs' },
         { title: 'Video Lectures', path: '/admin/video-lectures' },
         { title: 'Categories', path: '/admin/courses/categories' }
       ]

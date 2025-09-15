@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { HelmetProvider } from 'react-helmet-async';
@@ -31,11 +31,21 @@ import TermsPage from './pages/website/TermsPage';
 import VideoLectures from './pages/website/VideoLectures';
 import CourseDetailPage from './pages/website/CourseDetailPage';
 import CertificatePage from './pages/website/CertificatePage';
-import EnrollmentPage from './pages/website/SimpleEnrollmentPage';
+import UserDashboard from './pages/website/UserDashboard';
+import TrainingDetailPage from './pages/website/TrainingDetailPage';
+import WebDevelopmentPage from './pages/website/WebDevelopmentPage';
+import TrainingProgramsPage from './pages/website/TrainingProgramsPage';
+import EnrollmentPage from './pages/website/EnrollmentPage';
+import LoginPage from './pages/website/LoginPage';
+import RegisterPage from './pages/website/RegisterPage';
+import ForgotPasswordPage from './pages/website/ForgotPasswordPage';
+import UserDashboardLayout from './layouts/UserDashboardLayout';
+import ProtectedRoute from './components/common/ProtectedRoute';
+import ErrorBoundary from './components/common/ErrorBoundary';
 
 // Admin Pages
 import AdminDashboard from './pages/admin/Dashboard';
-import LoginPage from './pages/admin/LoginPage';
+import AdminLoginPage from './pages/admin/LoginPage';
 import InternshipManagement from './pages/admin/InternshipManagement';
 import StudentManagement from './pages/admin/StudentManagement';
 import EnrollmentManagement from './pages/admin/EnrollmentManagement';
@@ -49,35 +59,53 @@ import BannerManagement from './pages/admin/BannerManagement';
 import VideoLectureManagement from './pages/admin/VideoLectureManagement';
 import CourseManagement from './pages/admin/CourseManagement';
 import CategoryManagement from './pages/admin/CategoryManagement';
+import InternshipCategoryManagement from './pages/admin/InternshipCategoryManagement';
 import UserManagement from './pages/admin/UserManagement';
+import TrainingProgramManagement from './pages/admin/TrainingProgramManagement';
 import SettingsPage from './pages/admin/SettingsPage';
 
 // Auth Components
-import ProtectedRoute from './components/admin/ProtectedRoute';
 
 // Styles
 import './styles/globals.css';
 import './styles/admin.css';
 
-// Create a client
+// Create a client with optimized settings
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 1,
       refetchOnWindowFocus: false,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      cacheTime: 10 * 60 * 1000, // 10 minutes
     },
   },
 });
 
+// Loading component for lazy loaded routes
+const LoadingSpinner = () => (
+  <div style={{ 
+    display: 'flex', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    height: '200px',
+    fontSize: '18px',
+    color: '#e4770d'
+  }}>
+    Loading...
+  </div>
+);
+
 function App() {
   return (
-    <HelmetProvider>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider>
-          <AuthProvider>
-            <CartProvider>
-              <NotificationProvider>
-                <Router>
+    <ErrorBoundary>
+      <HelmetProvider>
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider>
+            <AuthProvider>
+              <CartProvider>
+                <NotificationProvider>
+                  <Router>
               <Routes>
                 {/* Website Routes */}
                 <Route path="/" element={<WebsiteLayout />}>
@@ -100,36 +128,136 @@ function App() {
                   <Route path="enroll/:courseId" element={<EnrollmentPage />} />
                   <Route path="enroll" element={<EnrollmentPage />} />
                   <Route path="certificate/:id" element={<CertificatePage />} />
+                  <Route path="training/:id" element={<TrainingDetailPage />} />
+                  <Route path="web-training" element={<WebDevelopmentPage />} />
+                  <Route path="training-programs" element={<TrainingProgramsPage />} />
+                  <Route path="login" element={<LoginPage />} />
+                  <Route path="register" element={<RegisterPage />} />
+                  <Route path="forgot-password" element={<ForgotPasswordPage />} />
+                </Route>
+
+                {/* User Dashboard Routes - Separate from Website */}
+                <Route path="/user-dashboard" element={
+                  <ProtectedRoute>
+                    <UserDashboardLayout />
+                  </ProtectedRoute>
+                }>
+                  <Route index element={<UserDashboard />} />
+                  <Route path="courses" element={<UserDashboard />} />
+                  <Route path="trainings" element={<UserDashboard />} />
+                  <Route path="internships" element={<UserDashboard />} />
+                  <Route path="payments" element={<UserDashboard />} />
+                  <Route path="certificates" element={<UserDashboard />} />
+                  <Route path="profile" element={<UserDashboard />} />
                 </Route>
 
                 {/* Admin Routes */}
                 <Route path="/admin" element={<AdminLayout />}>
-                  <Route index element={<AdminDashboard />} />
-                  <Route path="dashboard" element={<AdminDashboard />} />
-                  <Route path="internships" element={<InternshipManagement />} />
-                  <Route path="students" element={<StudentManagement />} />
-                  <Route path="enrollments" element={<EnrollmentManagement />} />
-                  <Route path="payments" element={<PaymentTracking />} />
-                  <Route path="certificates" element={<CertificateGeneration />} />
-                  <Route path="blogs" element={<BlogManagement />} />
-                  <Route path="testimonials" element={<TestimonialManagement />} />
-                  <Route path="gallery" element={<GalleryManagement />} />
-                  <Route path="faq" element={<FAQManagement />} />
-                  <Route path="banners" element={<BannerManagement />} />
-                  <Route path="video-lectures" element={<VideoLectureManagement />} />
-                  <Route path="courses" element={<CourseManagement />} />
-                  <Route path="courses/categories" element={<CategoryManagement />} />
-                  <Route path="users" element={<UserManagement />} />
-                  <Route path="settings" element={<SettingsPage />} />
+                  <Route index element={
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <AdminDashboard />
+                    </Suspense>
+                  } />
+                  <Route path="dashboard" element={
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <AdminDashboard />
+                    </Suspense>
+                  } />
+                  <Route path="internships" element={
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <InternshipManagement />
+                    </Suspense>
+                  } />
+                  <Route path="students" element={
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <StudentManagement />
+                    </Suspense>
+                  } />
+                  <Route path="enrollments" element={
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <EnrollmentManagement />
+                    </Suspense>
+                  } />
+                  <Route path="payments" element={
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <PaymentTracking />
+                    </Suspense>
+                  } />
+                  <Route path="certificates" element={
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <CertificateGeneration />
+                    </Suspense>
+                  } />
+                  <Route path="blogs" element={
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <BlogManagement />
+                    </Suspense>
+                  } />
+                  <Route path="testimonials" element={
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <TestimonialManagement />
+                    </Suspense>
+                  } />
+                  <Route path="gallery" element={
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <GalleryManagement />
+                    </Suspense>
+                  } />
+                  <Route path="faq" element={
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <FAQManagement />
+                    </Suspense>
+                  } />
+                  <Route path="banners" element={
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <BannerManagement />
+                    </Suspense>
+                  } />
+                  <Route path="video-lectures" element={
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <VideoLectureManagement />
+                    </Suspense>
+                  } />
+                  <Route path="courses" element={
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <CourseManagement />
+                    </Suspense>
+                  } />
+                  <Route path="courses/categories" element={
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <CategoryManagement />
+                    </Suspense>
+                  } />
+                  <Route path="internships/categories" element={
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <InternshipCategoryManagement />
+                    </Suspense>
+                  } />
+                  <Route path="users" element={
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <UserManagement />
+                    </Suspense>
+                  } />
+                  <Route path="training-programs" element={
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <TrainingProgramManagement />
+                    </Suspense>
+                  } />
+                  <Route path="settings" element={
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <SettingsPage />
+                    </Suspense>
+                  } />
                 </Route>
               </Routes>
-                </Router>
-              </NotificationProvider>
-            </CartProvider>
-          </AuthProvider>
-        </ThemeProvider>
-      </QueryClientProvider>
-    </HelmetProvider>
+            </Router>
+          </NotificationProvider>
+        </CartProvider>
+      </AuthProvider>
+    </ThemeProvider>
+  </QueryClientProvider>
+</HelmetProvider>
+</ErrorBoundary>
   );
 }
 

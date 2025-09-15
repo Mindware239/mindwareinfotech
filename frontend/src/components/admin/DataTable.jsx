@@ -42,8 +42,12 @@ const DataTable = ({
           <thead>
             <tr>
               {columns.map((column, index) => (
-                <th key={index} className="table-header">
-                  {column.label}
+                <th 
+                  key={index} 
+                  className="table-header"
+                  style={{ width: column.width }}
+                >
+                  {column.title || column.label}
                 </th>
               ))}
             </tr>
@@ -52,7 +56,11 @@ const DataTable = ({
             {data.map((row, rowIndex) => (
               <tr key={rowIndex} className="table-row">
                 {columns.map((column, colIndex) => (
-                  <td key={colIndex} className="table-cell">
+                  <td 
+                    key={colIndex} 
+                    className="table-cell"
+                    style={{ width: column.width }}
+                  >
                     {column.render ? column.render(row) : row[column.key]}
                   </td>
                 ))}

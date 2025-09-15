@@ -213,8 +213,20 @@ const EnrollmentForm = ({ onSubmit, onPreview, initialData = {}, isEdit = false 
   };
 
   const handlePreview = () => {
+    console.log('Preview clicked, formData:', formData);
+    
+    // Ensure certificates is always an array
+    const safeFormData = {
+      ...formData,
+      certificates: Array.isArray(formData.certificates) ? formData.certificates : []
+    };
+    
     setPreviewMode(true);
-    onPreview(formData);
+    if (onPreview) {
+      onPreview(safeFormData);
+    } else {
+      console.error('onPreview function is not provided');
+    }
   };
 
   const renderStepContent = () => {

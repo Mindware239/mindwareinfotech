@@ -514,7 +514,7 @@
 }
 
 .btn-enroll {
-  background: linear-gradient(135deg, #10b981, #059669);
+  background: linear-gradient(135deg, #3b82f6, #059669);
   color: white;
   padding: 12px 24px;
   border-radius: 8px;
@@ -540,7 +540,7 @@
 .premium-price .price {
   font-size: 2rem;
   font-weight: 700;
-  color: #22c55e;
+  color: #3b82f6;
 }
 
 .premium-price .currency {
@@ -550,7 +550,7 @@
 }
 
 .purchase-btn {
-  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   color: white;
   border: none;
   padding: 12px 30px;
@@ -723,7 +723,7 @@
 .price-display .price {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #16a34a;
+  color: #2563eb;
 }
 
 .price-display .currency {
@@ -765,7 +765,7 @@
 }
 
 .features-list li i {
-  color: #22c55e;
+  color: #3b82f6;
   font-size: 0.875rem;
 }
 
@@ -800,7 +800,7 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   color: white;
 }
 

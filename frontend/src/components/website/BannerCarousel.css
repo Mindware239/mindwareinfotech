@@ -24,6 +24,7 @@
   opacity: 0;
   transform: translateX(100%);
   transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  background: linear-gradient(135deg, #7d879c 0%, #759bdb 50%, #94a8eb 100%);
 }
 
 .carousel-slide.active {
@@ -44,8 +45,9 @@
 }
 
 .slide-text {
-  color: white;
+  color: #ffffff;
   max-width: 600px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .slide-title {
@@ -53,8 +55,10 @@
   font-weight: 800;
   line-height: 1.1;
   margin-bottom: 20px;
-  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  color: #ffffff;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.4);
   animation: slideInLeft 1s ease-out;
+  letter-spacing: -0.02em;
 }
 
 .slide-subtitle {
@@ -62,17 +66,20 @@
   font-weight: 600;
   color: #fbbf24;
   margin-bottom: 25px;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 3px 8px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3);
   animation: slideInLeft 1s ease-out 0.2s both;
+  letter-spacing: 0.01em;
 }
 
 .slide-description {
   font-size: 1.2rem;
   line-height: 1.6;
   margin-bottom: 40px;
+  color: #f8fafc;
   opacity: 0.95;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3);
   animation: slideInLeft 1s ease-out 0.4s both;
+  letter-spacing: 0.005em;
 }
 
 .slide-buttons {
@@ -114,9 +121,11 @@
 }
 
 .btn-primary {
-  background: white;
+  background: #ffffff;
   color: #1e40af;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  font-weight: 700;
+  text-shadow: none;
 }
 
 .btn-primary:hover {
@@ -126,40 +135,48 @@
 
 .btn-primary.red {
   background: #dc2626;
-  color: white;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .btn-primary.orange {
   background: #f59e0b;
-  color: white;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .btn-primary.purple {
   background: #8b5cf6;
-  color: white;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .btn-primary.blue {
   background: #3b82f6;
-  color: white;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .btn-primary.green {
-  background: #10b981;
-  color: white;
+  background: #3b82f6;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.4);
   backdrop-filter: blur(10px);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  font-weight: 600;
 }
 
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.6);
   transform: translateY(-3px);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
 .slide-image {
@@ -167,6 +184,41 @@
   align-items: center;
   justify-content: center;
   position: relative;
+  height: 100%;
+  min-height: 400px;
+}
+
+.banner-image-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.banner-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease;
+}
+
+.banner-image:hover {
+  transform: scale(1.05);
+}
+
+.image-fallback {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .image-placeholder {
@@ -194,21 +246,23 @@
   position: absolute;
   font-size: 2rem;
   animation: float 3s ease-in-out infinite;
-  opacity: 0.8;
+  opacity: 0.9;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 50px;
   height: 50px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 50%;
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .element i {
   font-size: 1.5rem;
-  color: white;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .element-1 {
@@ -255,7 +309,7 @@
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.95);
   border: none;
   color: #1e40af;
   font-size: 1.2rem;
@@ -265,13 +319,15 @@
   justify-content: center;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 10;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  font-weight: 600;
 }
 
 .carousel-nav:hover {
-  background: white;
+  background: #ffffff;
   transform: translateY(-50%) scale(1.1);
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+  color: #1e40af;
 }
 
 .carousel-nav.prev {
@@ -298,20 +354,22 @@
   height: 12px;
   border-radius: 50%;
   border: none;
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.5);
   cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .dot.active {
-  background: white;
+  background: #ffffff;
   transform: scale(1.3);
-  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.6);
 }
 
 .dot:hover {
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.8);
   transform: scale(1.1);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.3);
 }
 
 /* Progress Bar */
@@ -321,14 +379,15 @@
   left: 0;
   width: 100%;
   height: 4px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.3);
   z-index: 10;
 }
 
 .progress-bar {
   height: 100%;
-  background: linear-gradient(90deg, #fbbf24, #f59e0b);
+  background: linear-gradient(90deg, #fbbf24, #f59e0b, #f97316);
   transition: width 0.3s ease;
+  box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
 }
 
 @keyframes progress {

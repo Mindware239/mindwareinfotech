@@ -52,6 +52,57 @@ const Internship = sequelize.define('Internship', {
     type: DataTypes.ENUM('weeks', 'months'),
     defaultValue: 'months'
   },
+  // Pricing fields (students pay for internships)
+  price: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: false,
+    defaultValue: 0,
+    validate: {
+      min: 0
+    }
+  },
+  original_price: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: true,
+    validate: {
+      min: 0
+    }
+  },
+  discount_percentage: {
+    type: DataTypes.DECIMAL(5, 2),
+    allowNull: true,
+    defaultValue: 0,
+    validate: {
+      min: 0,
+      max: 100
+    }
+  },
+  currency: {
+    type: DataTypes.STRING(3),
+    defaultValue: 'INR'
+  },
+  is_free: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  enrollment_fee: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: true,
+    defaultValue: 0
+  },
+  installment_available: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  installment_count: {
+    type: DataTypes.INTEGER,
+    defaultValue: 1,
+    validate: {
+      min: 1,
+      max: 12
+    }
+  },
+  // Legacy stipend fields (for backward compatibility)
   stipend_amount: {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: true,
@@ -111,18 +162,18 @@ const Internship = sequelize.define('Internship', {
     type: DataTypes.BOOLEAN,
     defaultValue: false
   },
+  category_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: {
+      model: 'course_categories',
+      key: 'id'
+    }
+  },
+  // Legacy category field (for backward compatibility)
   category: {
-    type: DataTypes.ENUM(
-      'web-development',
-      'mobile-development',
-      'data-science',
-      'ai-ml',
-      'design',
-      'marketing',
-      'business',
-      'other'
-    ),
-    allowNull: false
+    type: DataTypes.STRING(50),
+    allowNull: true
   },
   tags: {
     type: DataTypes.JSON,
@@ -170,6 +221,27 @@ Internship.prototype.getRemainingDays = function() {
 Internship.prototype.canApply = function(userId) {
   return this.isApplicationOpen() && 
          this.status === 'active';
+};
+
+// Define associations
+Internship.associate = (models) => {
+  // Internship belongs to CourseCategory
+  Internship.belongsTo(models.CourseCategory, {
+    foreignKey: 'category_id',
+    as: 'courseCategory'
+  });
+  
+  // Internship belongs to User (created by)
+  Internship.belongsTo(models.User, {
+    foreignKey: 'created_by',
+    as: 'creator'
+  });
+  
+  // Internship has many JobApplications
+  Internship.hasMany(models.JobApplication, {
+    foreignKey: 'internship_id',
+    as: 'applications'
+  });
 };
 
 module.exports = Internship;

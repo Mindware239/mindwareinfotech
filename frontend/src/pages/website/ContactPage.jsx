@@ -10,18 +10,70 @@ const ContactPage = () => {
     subject: '',
     message: ''
   });
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: value
     });
+    
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors({
+        ...errors,
+        [name]: ''
+      });
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = 'First name is required';
+    }
+    
+    if (!formData.lastName.trim()) {
+      newErrors.lastName = 'Last name is required';
+    }
+    
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+    
+    if (!formData.phone.trim()) {
+      newErrors.phone = 'Phone number is required';
+    } else if (!/^[\+]?[1-9][\d]{0,15}$/.test(formData.phone.replace(/\s/g, ''))) {
+      newErrors.phone = 'Please enter a valid phone number';
+    }
+    
+    if (!formData.subject) {
+      newErrors.subject = 'Please select a subject';
+    }
+    
+    if (!formData.message.trim()) {
+      newErrors.message = 'Message is required';
+    } else if (formData.message.trim().length < 10) {
+      newErrors.message = 'Message must be at least 10 characters long';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+    
     setLoading(true);
     
     // Simulate form submission
@@ -37,6 +89,7 @@ const ContactPage = () => {
       subject: '',
       message: ''
     });
+    setErrors({});
   };
 
   if (submitted) {
@@ -135,8 +188,10 @@ const ContactPage = () => {
             
             <form className="contact-form" onSubmit={handleSubmit}>
               <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="firstName">First Name *</label>
+                <div className={`form-group ${errors.firstName ? 'error' : ''}`}>
+                  <label htmlFor="firstName">
+                    First Name <span className="required">*</span>
+                  </label>
                   <input
                     type="text"
                     id="firstName"
@@ -145,11 +200,20 @@ const ContactPage = () => {
                     onChange={handleChange}
                     required
                     disabled={loading}
+                    placeholder="Enter your first name"
                   />
+                  {errors.firstName && (
+                    <div className="error-message">
+                      <i className="fas fa-exclamation-circle"></i>
+                      {errors.firstName}
+                    </div>
+                  )}
                 </div>
                 
-                <div className="form-group">
-                  <label htmlFor="lastName">Last Name *</label>
+                <div className={`form-group ${errors.lastName ? 'error' : ''}`}>
+                  <label htmlFor="lastName">
+                    Last Name <span className="required">*</span>
+                  </label>
                   <input
                     type="text"
                     id="lastName"
@@ -158,13 +222,22 @@ const ContactPage = () => {
                     onChange={handleChange}
                     required
                     disabled={loading}
+                    placeholder="Enter your last name"
                   />
+                  {errors.lastName && (
+                    <div className="error-message">
+                      <i className="fas fa-exclamation-circle"></i>
+                      {errors.lastName}
+                    </div>
+                  )}
                 </div>
               </div>
               
               <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="email">Email Address *</label>
+                <div className={`form-group ${errors.email ? 'error' : ''}`}>
+                  <label htmlFor="email">
+                    Email Address <span className="required">*</span>
+                  </label>
                   <input
                     type="email"
                     id="email"
@@ -173,11 +246,20 @@ const ContactPage = () => {
                     onChange={handleChange}
                     required
                     disabled={loading}
+                    placeholder="Enter your email address"
                   />
+                  {errors.email && (
+                    <div className="error-message">
+                      <i className="fas fa-exclamation-circle"></i>
+                      {errors.email}
+                    </div>
+                  )}
                 </div>
                 
-                <div className="form-group">
-                  <label htmlFor="phone">Phone Number *</label>
+                <div className={`form-group ${errors.phone ? 'error' : ''}`}>
+                  <label htmlFor="phone">
+                    Phone Number <span className="required">*</span>
+                  </label>
                   <input
                     type="tel"
                     id="phone"
@@ -186,12 +268,21 @@ const ContactPage = () => {
                     onChange={handleChange}
                     required
                     disabled={loading}
+                    placeholder="Enter your phone number"
                   />
+                  {errors.phone && (
+                    <div className="error-message">
+                      <i className="fas fa-exclamation-circle"></i>
+                      {errors.phone}
+                    </div>
+                  )}
                 </div>
               </div>
               
-              <div className="form-group">
-                <label htmlFor="subject">Subject *</label>
+              <div className={`form-group ${errors.subject ? 'error' : ''}`}>
+                <label htmlFor="subject">
+                  Subject <span className="required">*</span>
+                </label>
                 <select
                   id="subject"
                   name="subject"
@@ -208,10 +299,18 @@ const ContactPage = () => {
                   <option value="support">Technical Support</option>
                   <option value="other">Other</option>
                 </select>
+                {errors.subject && (
+                  <div className="error-message">
+                    <i className="fas fa-exclamation-circle"></i>
+                    {errors.subject}
+                  </div>
+                )}
               </div>
               
-              <div className="form-group">
-                <label htmlFor="message">Message *</label>
+              <div className={`form-group ${errors.message ? 'error' : ''}`}>
+                <label htmlFor="message">
+                  Message <span className="required">*</span>
+                </label>
                 <textarea
                   id="message"
                   name="message"
@@ -222,6 +321,12 @@ const ContactPage = () => {
                   disabled={loading}
                   placeholder="Please describe your inquiry in detail..."
                 ></textarea>
+                {errors.message && (
+                  <div className="error-message">
+                    <i className="fas fa-exclamation-circle"></i>
+                    {errors.message}
+                  </div>
+                )}
               </div>
               
               <button

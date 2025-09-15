@@ -24,30 +24,31 @@ export const AuthProvider = ({ children }) => {
     try {
       const token = localStorage.getItem('token');
       if (token) {
+        // Set loading to false immediately for faster rendering
+        setLoading(false);
+        
+        // Check auth in background
         const userData = await authService.verifyToken(token);
-        // Fix: Handle the correct response structure from backend
         const user = userData.data?.user || userData.user;
         if (user) {
           setUser(user);
           setIsAdmin(user.role === 'admin');
         } else {
-          // If no user data, clear token
           localStorage.removeItem('token');
           setUser(null);
           setIsAdmin(false);
         }
+      } else {
+        setLoading(false);
       }
     } catch (error) {
       console.error('Auth check failed:', error);
-      // Only clear token if it's a 401 error, not network errors
+      setLoading(false);
       if (error.response?.status === 401) {
         localStorage.removeItem('token');
         setUser(null);
         setIsAdmin(false);
       }
-      // For network errors, keep the user logged in
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -144,6 +145,16 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const forgotPassword = async (email) => {
+    try {
+      await authService.forgotPassword(email);
+      return { success: true };
+    } catch (error) {
+      console.error('Forgot password failed:', error);
+      throw new Error(error.response?.data?.message || 'Failed to send password reset email');
+    }
+  };
+
   const value = {
     user,
     isAdmin,
@@ -153,6 +164,7 @@ export const AuthProvider = ({ children }) => {
     logout,
     updateProfile,
     changePassword,
+    forgotPassword,
     checkAuthStatus
   };
 

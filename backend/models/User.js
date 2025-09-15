@@ -114,10 +114,10 @@ User.prototype.getPublicProfile = function() {
 // Define associations
 User.associate = (models) => {
   // User has many Courses (as instructor)
-  User.hasMany(models.Course, {
-    foreignKey: 'instructor_id',
-    as: 'courses'
-  });
+  // User.hasMany(models.Course, {
+  //   foreignKey: 'instructor_id',
+  //   as: 'instructedCourses'
+  // });
 
   // User has many Enrollments
   User.hasMany(models.Enrollment, {

@@ -26,6 +26,30 @@ const WhyChooseSection = () => {
       title: '24/7 Support',
       description: 'Round-the-clock support for all your software needs with dedicated customer success team.',
       color: '#06b6d4'
+    },
+    {
+      icon: '🚀',
+      title: 'Modern Technology',
+      description: 'Stay ahead with the latest technologies including React, Node.js, Python, AI/ML, and cloud platforms.',
+      color: '#ef4444'
+    },
+    {
+      icon: '💼',
+      title: 'Job Placement',
+      description: '100% placement assistance with our strong industry network and career guidance programs.',
+      color: '#8b5cf6'
+    },
+    {
+      icon: '📚',
+      title: 'Hands-on Learning',
+      description: 'Practical, project-based learning approach with real-world case studies and industry projects.',
+      color: '#f59e0b'
+    },
+    {
+      icon: '🏆',
+      title: 'Industry Recognition',
+      description: 'Certified courses and industry-recognized certifications that boost your career prospects.',
+      color: '#10b981'
     }
   ];
 
@@ -34,10 +58,12 @@ const WhyChooseSection = () => {
       <div className="container">
         <div className="section-header">
           <h2 className="section-title">
-            Why Choose <span className="highlight">Mindware India</span>?
+            Why Choose <span className="highlight">Mindware Infotech</span>?
           </h2>
           <p className="section-subtitle">
-            We are committed to delivering excellence in software development and training with cutting-edge solutions.
+            We are committed to delivering excellence in software development and training with cutting-edge solutions. 
+            Our innovative approach combines industry expertise with modern technology to provide comprehensive learning experiences 
+            that prepare you for real-world challenges in the ever-evolving tech landscape.
           </p>
         </div>
         

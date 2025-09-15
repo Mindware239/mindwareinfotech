@@ -59,8 +59,12 @@ const register = async (req, res, next) => {
 
     // If user is a student, create student profile
     if (role === 'student') {
+      // Generate student ID (format: STU + timestamp + random number)
+      const studentId = `STU${Date.now()}${Math.floor(Math.random() * 1000)}`;
+      
       await Student.create({
-        user_id: user.id
+        user_id: user.id,
+        student_id: studentId
       });
     }
 

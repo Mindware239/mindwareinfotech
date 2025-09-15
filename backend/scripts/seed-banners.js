@@ -20,6 +20,18 @@ async function seedBanners() {
     // Create sample banners
     const banners = [
       {
+        title: 'Join Our Growing Team',
+        subtitle: 'Explore Exciting Career Opportunities',
+        description: 'Be part of our innovative team and work on cutting-edge projects. We offer competitive packages and growth opportunities.',
+        image_url: '/uploads/banners/banner-1757680907082-22582561.webp',
+        button_text: 'VIEW JOBS',
+        button_url: '/careers',
+        banner_type: 'header',
+        banner_position: 'header',
+        is_active: true,
+        created_by: 1
+      },
+      {
         title: 'Welcome to Mindware Infotech',
         subtitle: 'Complete Software Solutions & Training',
         description: 'We provide comprehensive software development services and professional training programs to help you succeed in the tech industry.',

@@ -15,9 +15,30 @@ const Payment = sequelize.define('Payment', {
       key: 'id'
     }
   },
+  student_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: {
+      model: 'users',
+      key: 'id'
+    }
+  },
+  enrollment_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: {
+      model: 'enrollments',
+      key: 'id'
+    }
+  },
   order_id: {
     type: DataTypes.STRING(50),
-    allowNull: false,
+    allowNull: true,
+    unique: true
+  },
+  transaction_id: {
+    type: DataTypes.STRING(100),
+    allowNull: true,
     unique: true
   },
   razorpay_order_id: {
@@ -48,8 +69,44 @@ const Payment = sequelize.define('Payment', {
     defaultValue: 'pending'
   },
   payment_method: {
-    type: DataTypes.ENUM('razorpay', 'card', 'netbanking', 'upi', 'wallet'),
+    type: DataTypes.ENUM('razorpay', 'stripe', 'paypal', 'card', 'netbanking', 'upi', 'wallet'),
     defaultValue: 'razorpay'
+  },
+  payment_gateway: {
+    type: DataTypes.ENUM('razorpay', 'stripe', 'paypal'),
+    allowNull: true
+  },
+  gateway_transaction_id: {
+    type: DataTypes.STRING(100),
+    allowNull: true
+  },
+  gateway_order_id: {
+    type: DataTypes.STRING(100),
+    allowNull: true
+  },
+  student_email: {
+    type: DataTypes.STRING(255),
+    allowNull: true
+  },
+  course_name: {
+    type: DataTypes.STRING(255),
+    allowNull: true
+  },
+  payment_date: {
+    type: DataTypes.DATE,
+    allowNull: true
+  },
+  verified_at: {
+    type: DataTypes.DATE,
+    allowNull: true
+  },
+  refunded_at: {
+    type: DataTypes.DATE,
+    allowNull: true
+  },
+  refund_reason: {
+    type: DataTypes.TEXT,
+    allowNull: true
   },
   items: {
     type: DataTypes.JSON,
@@ -121,6 +178,21 @@ Payment.prototype.processRefund = async function(amount, reason) {
     refund_id: `REF${Date.now()}`
   };
   return await this.save();
+};
+
+// Define associations
+Payment.associate = (models) => {
+  // Payment belongs to User (student)
+  Payment.belongsTo(models.User, {
+    foreignKey: 'student_id',
+    as: 'student'
+  });
+
+  // Payment belongs to Enrollment
+  Payment.belongsTo(models.Enrollment, {
+    foreignKey: 'enrollment_id',
+    as: 'enrollment'
+  });
 };
 
 module.exports = Payment;

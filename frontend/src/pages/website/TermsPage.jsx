@@ -11,7 +11,7 @@ const TermsPage = () => {
         <a href="#" className="social-icon linkedin">in</a>
         <a href="#" className="social-icon instagram">📷</a>
         <a href="#" className="social-icon youtube">▶</a>
-        <a href="#" className="social-icon share">></a>
+          <a href="#" className="social-icon share">&gt;</a>
       </div>
 
       {/* Last Updated Bar */}

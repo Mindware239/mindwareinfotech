@@ -96,7 +96,15 @@ const Enrollment = sequelize.define('Enrollment', {
     allowNull: true
   },
   
-  // Training Details
+  // Course Details
+  courseId: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: {
+      model: 'courses',
+      key: 'id'
+    }
+  },
   courseInterest: {
     type: DataTypes.ENUM(
       'web-development',
@@ -110,7 +118,7 @@ const Enrollment = sequelize.define('Enrollment', {
       'ui-ux-design',
       'other'
     ),
-    allowNull: false
+    allowNull: true // Keep for backward compatibility
   },
   preferredBatch: {
     type: DataTypes.ENUM('morning', 'afternoon', 'evening', 'weekend', 'flexible'),
@@ -323,6 +331,12 @@ Enrollment.associate = (models) => {
   Enrollment.belongsTo(models.Course, {
     foreignKey: 'courseId',
     as: 'course'
+  });
+
+  // Enrollment has many Payments
+  Enrollment.hasMany(models.Payment, {
+    foreignKey: 'enrollment_id',
+    as: 'payments'
   });
 };
 

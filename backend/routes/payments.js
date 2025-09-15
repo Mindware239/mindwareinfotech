@@ -1,31 +1,44 @@
 const express = require('express');
+const router = express.Router();
 const {
-  createPayment,
-  verifyPayment,
   getPayments,
   getPayment,
+  getMyPayments,
+  createPayment,
+  createRazorpayOrder,
+  verifyRazorpayPayment,
+  createStripePaymentIntent,
+  verifyStripePayment,
+  updatePayment,
+  deletePayment,
+  verifyPayment,
   refundPayment,
-  getMyPayments
+  getPaymentMethods,
+  getPaymentStats
 } = require('../controllers/paymentController');
-
 const { protect, authorize } = require('../middleware/auth');
-const { validateObjectId, validatePagination } = require('../middleware/validation');
 
-const router = express.Router();
+// Public routes
+router.get('/methods', getPaymentMethods);
 
-// All routes are protected
+// Protected routes
 router.use(protect);
-
-// Public payment routes
-router.post('/create', createPayment);
-router.post('/verify', verifyPayment);
 
 // User routes
 router.get('/my-payments', getMyPayments);
-router.get('/:id', validateObjectId('id'), getPayment);
+router.post('/', createPayment);
+router.post('/razorpay/create-order', createRazorpayOrder);
+router.post('/razorpay/verify', verifyRazorpayPayment);
+router.post('/stripe/create-payment-intent', createStripePaymentIntent);
+router.post('/stripe/verify', verifyStripePayment);
+router.get('/:id', getPayment);
+router.put('/:id', updatePayment);
+router.post('/:id/verify', verifyPayment);
 
 // Admin routes
-router.get('/', authorize('admin'), validatePagination, getPayments);
-router.post('/:id/refund', authorize('admin'), validateObjectId('id'), refundPayment);
+router.get('/', authorize('admin'), getPayments);
+router.get('/stats', authorize('admin'), getPaymentStats);
+router.delete('/:id', authorize('admin'), deletePayment);
+router.post('/:id/refund', authorize('admin'), refundPayment);
 
 module.exports = router;

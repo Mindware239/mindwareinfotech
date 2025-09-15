@@ -23,7 +23,7 @@ const SEOHead = ({
   const defaultDescription = 'India\'s leading software training institute offering courses in web development, mobile development, data science, AI/ML, and more. Expert instructors, hands-on training, and job placement assistance.';
   const defaultKeywords = 'software training, web development, mobile development, data science, AI ML, programming courses, IT training, job placement, Mindware India';
   const defaultImage = '/mindware-logo.png';
-  const baseUrl = process.env.REACT_APP_BASE_URL || 'http://localhost:3000';
+  const baseUrl = import.meta.env.VITE_BASE_URL || 'http://localhost:3000';
 
   // Use provided values or fallback to defaults
   const seoTitle = title || defaultTitle;

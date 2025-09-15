@@ -31,6 +31,11 @@ const SimpleEnrollmentPage = () => {
     setCurrentStep('preview');
   };
 
+  const handlePreview = (data) => {
+    setFormData(data);
+    setCurrentStep('preview');
+  };
+
   const handlePreviewSubmit = async () => {
     try {
       setIsSubmitting(true);
@@ -104,6 +109,7 @@ const SimpleEnrollmentPage = () => {
               <h3>Fill in your details to enroll</h3>
               <EnrollmentForm
                 onSubmit={handleFormSubmit}
+                onPreview={handlePreview}
                 initialData={formData}
               />
             </div>
@@ -113,7 +119,7 @@ const SimpleEnrollmentPage = () => {
             <div className="preview-section">
               <h3>Review your enrollment details</h3>
               <EnrollmentPreview
-                data={formData}
+                formData={formData}
                 course={course}
                 onEdit={handleEditForm}
                 onSubmit={handlePreviewSubmit}

@@ -114,7 +114,7 @@ const BlogDetails = () => {
       "@type": "WebPage",
       "@id": window.location.href
     },
-    "keywords": blog.meta_keywords || blog.tags?.join(', ') || '',
+    "keywords": blog.meta_keywords || (Array.isArray(blog.tags) ? blog.tags.join(', ') : '') || '',
     "articleSection": blog.category,
     "wordCount": blog.content?.split(' ').length || 0,
     "timeRequired": `PT${blog.reading_time || 5}M`
@@ -125,7 +125,7 @@ const BlogDetails = () => {
       <SEOHead
         title={blog.meta_title || blog.title}
         description={blog.meta_description || blog.excerpt}
-        keywords={blog.meta_keywords || blog.tags?.join(', ')}
+        keywords={blog.meta_keywords || (Array.isArray(blog.tags) ? blog.tags.join(', ') : '')}
         ogTitle={blog.og_title || blog.title}
         ogDescription={blog.og_description || blog.excerpt}
         ogImage={blog.og_image?.url || blog.featured_image?.url || blog.featured_image}

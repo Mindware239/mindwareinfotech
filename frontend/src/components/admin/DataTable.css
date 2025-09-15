@@ -26,6 +26,12 @@
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  min-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .table-row {
@@ -46,6 +52,11 @@
   vertical-align: middle;
   color: #495057;
   line-height: 1.4;
+  min-width: 120px;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .table-loading {
@@ -192,10 +203,14 @@
   .table-header,
   .table-cell {
     padding: 12px 15px;
+    min-width: 100px;
+    max-width: 150px;
   }
   
   .table-header {
     font-size: 0.8rem;
+    position: relative;
+    top: auto;
   }
   
   .table-pagination {
@@ -218,6 +233,14 @@
   .table-header,
   .table-cell {
     padding: 10px 12px;
+    min-width: 80px;
+    max-width: 120px;
+    font-size: 0.75rem;
+  }
+  
+  .table-header {
+    position: relative;
+    top: auto;
   }
   
   .pagination-btn {

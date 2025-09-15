@@ -24,7 +24,7 @@ export const generateKeywords = (keywords, defaultKeywords = 'software training,
 };
 
 export const generateStructuredData = (type, data) => {
-  const baseUrl = process.env.REACT_APP_BASE_URL || 'http://localhost:3000';
+  const baseUrl = import.meta.env.VITE_BASE_URL || 'http://localhost:3000';
   
   switch (type) {
     case 'organization':
@@ -150,11 +150,11 @@ export const getImageUrl = (image, defaultImage = '/mindware-logo.png') => {
   if (!image) return defaultImage;
   
   if (typeof image === 'string') {
-    return image.startsWith('http') ? image : `${process.env.REACT_APP_BASE_URL || 'http://localhost:3000'}${image}`;
+    return image.startsWith('http') ? image : `${import.meta.env.VITE_BASE_URL || 'http://localhost:3000'}${image}`;
   }
   
   if (typeof image === 'object' && image.url) {
-    return image.url.startsWith('http') ? image.url : `${process.env.REACT_APP_BASE_URL || 'http://localhost:3000'}${image.url}`;
+    return image.url.startsWith('http') ? image.url : `${import.meta.env.VITE_BASE_URL || 'http://localhost:3000'}${image.url}`;
   }
   
   return defaultImage;
@@ -168,7 +168,7 @@ export const calculateReadingTime = (content) => {
   return Math.ceil(wordCount / wordsPerMinute);
 };
 
-export const generateCanonicalUrl = (path, baseUrl = process.env.REACT_APP_BASE_URL || 'http://localhost:3000') => {
+export const generateCanonicalUrl = (path, baseUrl = import.meta.env.VITE_BASE_URL || 'http://localhost:3000') => {
   return `${baseUrl}${path}`;
 };
 
@@ -206,7 +206,7 @@ export const validateSeoData = (seoData) => {
 };
 
 export const generateSitemapData = (pages) => {
-  const baseUrl = process.env.REACT_APP_BASE_URL || 'http://localhost:3000';
+  const baseUrl = import.meta.env.VITE_BASE_URL || 'http://localhost:3000';
   
   return pages.map(page => ({
     url: `${baseUrl}${page.path}`,

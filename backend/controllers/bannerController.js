@@ -11,6 +11,8 @@ const getBanners = async (req, res, next) => {
       limit = 10,
       banner_type,
       is_active,
+      position,
+      status,
       sort = 'banner_position',
       order = 'ASC'
     } = req.query;
@@ -23,6 +25,8 @@ const getBanners = async (req, res, next) => {
     if (is_active !== undefined && is_active !== null) {
       whereClause.is_active = is_active === 'true' || is_active === true;
     }
+    if (position) whereClause.banner_position = position;
+    if (status) whereClause.is_active = status === 'active';
 
     const { count, rows: banners } = await Banner.findAndCountAll({
       where: whereClause,
@@ -36,6 +40,7 @@ const getBanners = async (req, res, next) => {
       count,
       pages: Math.ceil(count / limit),
       currentPage: parseInt(page),
+      banners: banners,
       data: banners
     });
   } catch (error) {

@@ -21,6 +21,16 @@ const enrollmentService = {
     }
   },
 
+  // Get my enrollments (for logged-in user)
+  getMyEnrollments: async () => {
+    try {
+      const response = await api.get('/enrollments/my-enrollments');
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
   // Create enrollment
   createEnrollment: async (enrollmentData) => {
     try {

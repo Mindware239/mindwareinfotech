@@ -13,17 +13,35 @@ require('dotenv').config();
 
 const { connectDB } = require('./config/database');
 const errorHandler = require('./middleware/errorHandler');
+const { 
+  compressionMiddleware, 
+  generalRateLimit, 
+  authRateLimit, 
+  apiRateLimit, 
+  optimizeQueries, 
+  memoryMonitor 
+} = require('./middleware/performance');
 
 // Import models
-const Gallery = require('./models/Gallery');
-const Blog = require('./models/Blog');
-const Testimonial = require('./models/Testimonial');
-const Internship = require('./models/Internship');
-const VideoLecture = require('./models/VideoLecture');
-const Job = require('./models/Job');
-const JobApplication = require('./models/JobApplication');
-const Banner = require('./models/Banner');
-const Course = require('./models/Course');
+const { 
+  User, 
+  Course, 
+  CourseCategory, 
+  Enrollment, 
+  Certificate, 
+  Payment, 
+  Student, 
+  VideoLecture, 
+  VideoAccess, 
+  Blog, 
+  Testimonial, 
+  Gallery, 
+  Internship, 
+  Job, 
+  JobApplication, 
+  Banner, 
+  FAQ 
+} = require('./models');
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -42,6 +60,8 @@ const notificationRoutes = require('./routes/notifications');
 const courseRoutes = require('./routes/courses');
 const enrollmentRoutes = require('./routes/enrollments');
 const faqRoutes = require('./routes/faqs');
+const courseCategoryRoutes = require('./routes/courseCategories');
+const trainingProgramRoutes = require('./routes/trainingPrograms');
 
 const app = express();
 
@@ -67,26 +87,18 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-  message: {
-    error: 'Too many requests from this IP, please try again later.'
-  },
-  standardHeaders: true,
-  legacyHeaders: false
-});
-
-app.use('/api/', limiter);
+// Rate limiting - Use optimized rate limits
+app.use('/api/', generalRateLimit);
+app.use('/api/auth/', authRateLimit);
+app.use('/api/admin/', apiRateLimit);
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
 
-// Compression middleware
-app.use(compression());
+// Compression middleware - Use optimized compression
+app.use(compressionMiddleware);
 
 // Logging middleware
 if (process.env.NODE_ENV === 'development') {
@@ -94,6 +106,10 @@ if (process.env.NODE_ENV === 'development') {
 } else {
   app.use(morgan('combined'));
 }
+
+// Performance monitoring
+app.use(memoryMonitor);
+app.use(optimizeQueries);
 
 // Serve static files from uploads directory with CORS headers
 app.use('/uploads', (req, res, next) => {
@@ -156,6 +172,9 @@ app.use('/api/jobs', jobRoutes);
 app.use('/api/banners', bannerRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/courses', courseRoutes);
+app.use('/api/course-categories', courseCategoryRoutes);
+app.use('/api/admin/course-categories', courseCategoryRoutes);
+app.use('/api/training-programs', trainingProgramRoutes);
 app.use('/api/enrollments', enrollmentRoutes);
 app.use('/api/faqs', faqRoutes);
 

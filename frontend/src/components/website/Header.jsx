@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { useQuery } from '@tanstack/react-query';
-import bannerService from '../../services/bannerService';
 import './Header.css';
 
 const Header = () => {
@@ -11,13 +9,6 @@ const Header = () => {
   const [activeMegaMenu, setActiveMegaMenu] = useState(null);
   const { user, logout } = useAuth();
   const location = useLocation();
-
-  // Fetch active banner
-  const { data: banner } = useQuery({
-    queryKey: ['banner', 'header'],
-    queryFn: () => bannerService.getBanners({ position: 'header', status: 'active', limit: 1 }),
-    select: (data) => data?.banners?.[0] || null
-  });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -62,46 +53,43 @@ const Header = () => {
     <header className={`header ${isScrolled ? 'scrolled' : ''}`}>
       {/* Top Contact Bar */}
       <div className="top-contact-bar">
-        <div className="container">
-          <div className="top-bar-content">
-            <div className="contact-info">
-              <div className="contact-item">
-                <i className="fas fa-phone"></i>
-                <span>+91-9717122688</span>
-              </div>
-              <div className="contact-item">
-                <i className="fas fa-graduation-cap"></i>
-                <span>+91-8527522688</span>
-              </div>
-            </div>
-            <div className="top-bar-actions">
-              <a href="mailto:info@mindwareindia.com" className="email-link">
-                <i className="fas fa-envelope"></i>
-                info@mindwareindia.com
-              </a>
-            </div>
+        <div className="contact-info">
+          <div className="contact-item">
+            <i className="fas fa-phone"></i>
+            <span>+91-9717122688</span>
           </div>
+          <div className="contact-item">
+            <i className="fas fa-envelope"></i>
+            <span>info@mindwareinfotech.com</span>
+          </div>
+        </div>
+        <div className="top-bar-actions">
+          {user ? (
+            <div className="user-menu-top">
+              <span className="user-name-top">Welcome, {user.firstName || user.name || 'User'}</span>
+              <div className="user-actions-top">
+                <Link to="/user-dashboard" className="btn btn-primary btn-xs">
+                  <i className="fas fa-tachometer-alt"></i> Dashboard
+                </Link>
+                <button onClick={handleLogout} className="btn btn-secondary btn-xs">
+                  <i className="fas fa-sign-out-alt"></i> Logout
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="auth-buttons-top">
+              <Link to="/login" className="btn btn-outline btn-xs">
+                <i className="fas fa-sign-in-alt"></i> Login
+              </Link>
+              <Link to="/register" className="btn btn-primary btn-xs">
+                <i className="fas fa-user-plus"></i> Register
+              </Link>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Professional Banner */}
-      {banner && (
-        <div className="professional-banner">
-          <div className="container">
-            <div className="banner-content">
-              <div className="banner-text">
-                <h3>{banner.title}</h3>
-                <p>{banner.description}</p>
-              </div>
-              {banner.button_text && banner.button_url && (
-                <a href={banner.button_url} className="banner-button">
-                  {banner.button_text}
-                </a>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      
 
       {/* Main Header */}
       <div className="main-header">
@@ -111,7 +99,7 @@ const Header = () => {
             <Link to="/" className="logo" onClick={closeMenu}>
               <div className="logo-container">
                 <div className="logo-image">
-                  <img src="/mindware-logo.png" alt="Mindware India" className="logo-img" />
+                  <img src="/mindware-logo.png" alt="Mindware Infotech" className="logo-img" />
                 </div>
                 {/* <div className="logo-text">
                   <div className="logo-main">
@@ -201,6 +189,7 @@ const Header = () => {
                         <div className="mega-menu-column">
                           <h3>Training Programs</h3>
                           <ul>
+                            <li><Link to="/training-programs">All Programs</Link></li>
                             <li><Link to="/web-training">Web Development</Link></li>
                             <li><Link to="/mobile-training">Mobile App Development</Link></li>
                             <li><Link to="/data-science">Data Science & AI</Link></li>
@@ -240,23 +229,32 @@ const Header = () => {
                   )}
                 </li>
 
-                {/* Other Navigation Items */}
+                {/* Regular Navigation Items */}
                 <li className="nav-item">
                   <Link to="/careers" className="nav-link">
                     <span className="nav-icon">👥</span>
                     <span className="nav-text">Careers</span>
                   </Link>
                 </li>
+
                 <li className="nav-item">
                   <Link to="/blog" className="nav-link">
                     <span className="nav-icon">📰</span>
                     <span className="nav-text">Blog</span>
                   </Link>
                 </li>
+
                 <li className="nav-item">
                   <Link to="/about" className="nav-link">
                     <span className="nav-icon">ℹ️</span>
                     <span className="nav-text">About</span>
+                  </Link>
+                </li>
+
+                <li className="nav-item">
+                  <Link to="/contact" className="nav-link">
+                    <span className="nav-icon">📞</span>
+                    <span className="nav-text">Contact</span>
                   </Link>
                 </li>
               </ul>

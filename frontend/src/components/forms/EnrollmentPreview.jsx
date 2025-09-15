@@ -2,6 +2,26 @@ import React from 'react';
 import './EnrollmentPreview.css';
 
 const EnrollmentPreview = ({ formData, onClose, onEdit }) => {
+  // Safety check for formData
+  if (!formData) {
+    return (
+      <div className="enrollment-preview-overlay">
+        <div className="enrollment-preview-container">
+          <div className="preview-header">
+            <h2>Enrollment Preview</h2>
+            <div className="preview-actions">
+              <button onClick={onClose} className="btn btn-secondary">
+                <i className="fas fa-times"></i> Close
+              </button>
+            </div>
+          </div>
+          <div className="preview-content">
+            <p>No data available for preview.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -55,15 +75,15 @@ const EnrollmentPreview = ({ formData, onClose, onEdit }) => {
             <div className="preview-grid">
               <div className="preview-item">
                 <label>Full Name:</label>
-                <span>{formData.firstName} {formData.lastName}</span>
+                <span>{formData.firstName || 'N/A'} {formData.lastName || 'N/A'}</span>
               </div>
               <div className="preview-item">
                 <label>Email:</label>
-                <span>{formData.email}</span>
+                <span>{formData.email || 'N/A'}</span>
               </div>
               <div className="preview-item">
                 <label>Phone:</label>
-                <span>{formData.phone}</span>
+                <span>{formData.phone || 'N/A'}</span>
               </div>
               <div className="preview-item">
                 <label>Date of Birth:</label>
@@ -239,7 +259,7 @@ const EnrollmentPreview = ({ formData, onClose, onEdit }) => {
                 </div>
               </div>
 
-              {formData.certificates && formData.certificates.length > 0 && (
+              {formData.certificates && Array.isArray(formData.certificates) && formData.certificates.length > 0 && (
                 <div className="preview-item full-width">
                   <label>Certificates:</label>
                   <div className="files-list">

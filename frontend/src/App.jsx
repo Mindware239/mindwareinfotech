@@ -10,6 +10,7 @@ import { CartProvider } from './context/CartContext';
 // Layouts
 import WebsiteLayout from './layouts/WebsiteLayout';
 import AdminLayout from './layouts/AdminLayout';
+import UserDashboardLayout from './layouts/UserDashboardLayout';
 
 // Website Pages
 import HomePage from './pages/website/HomePage';
@@ -30,6 +31,7 @@ import VideoLectures from './pages/website/VideoLectures';
 import CourseDetailPage from './pages/website/CourseDetailPage';
 import CertificatePage from './pages/website/CertificatePage';
 import ImageTestPage from './pages/website/ImageTestPage';
+import UserDashboard from './pages/website/UserDashboard';
 
 // Admin Pages
 import AdminDashboard from './pages/admin/Dashboard';
@@ -98,12 +100,25 @@ function App() {
                   <Route path="test-images" element={<ImageTestPage />} />
                 </Route>
 
+                {/* User Dashboard Routes */}
+                <Route path="/user-dashboard" element={<UserDashboardLayout />}>
+                  <Route index element={<UserDashboard />} />
+                  <Route path="courses" element={<UserDashboard />} />
+                  <Route path="trainings" element={<UserDashboard />} />
+                  <Route path="internships" element={<UserDashboard />} />
+                  <Route path="payments" element={<UserDashboard />} />
+                  <Route path="certificates" element={<UserDashboard />} />
+                  <Route path="profile" element={<UserDashboard />} />
+                </Route>
+
                 {/* Admin Routes */}
                 <Route path="/admin" element={<AdminLayout />}>
                   <Route index element={<LoginPage />} />
                   <Route path="dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
                   <Route path="internships" element={<ProtectedRoute><InternshipManagement /></ProtectedRoute>} />
+                  <Route path="internships/applications" element={<ProtectedRoute><InternshipManagement /></ProtectedRoute>} />
                   <Route path="students" element={<ProtectedRoute><StudentManagement /></ProtectedRoute>} />
+                  <Route path="students/applications" element={<ProtectedRoute><StudentManagement /></ProtectedRoute>} />
                   <Route path="payments" element={<ProtectedRoute><PaymentTracking /></ProtectedRoute>} />
                   <Route path="certificates" element={<ProtectedRoute><CertificateGeneration /></ProtectedRoute>} />
                   <Route path="blogs" element={<ProtectedRoute><BlogManagement /></ProtectedRoute>} />
