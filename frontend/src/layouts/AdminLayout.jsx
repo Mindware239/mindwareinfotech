@@ -6,6 +6,7 @@ import AdminSidebar from '../components/admin/AdminSidebar';
 import AdminHeader from '../components/admin/AdminHeader';
 import LoginPage from '../pages/admin/LoginPage';
 import './AdminLayout.css';
+import '../styles/admin.css';
 
 const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);

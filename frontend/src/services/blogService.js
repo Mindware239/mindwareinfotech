@@ -34,7 +34,9 @@ const blogService = {
   // Get featured blogs
   getFeaturedBlogs: async (limit = 3) => {
     try {
-      const response = await api.get(`/blogs/featured?limit=${limit}`);
+      // Add cache busting parameter
+      const cacheBuster = `t=${Date.now()}`;
+      const response = await api.get(`/blogs/featured?limit=${limit}&${cacheBuster}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching featured blogs:', error);

@@ -94,11 +94,162 @@ const GallerySection = () => {
 
         <div className="gallery-grid">
           {galleryItems.length === 0 ? (
-            <div className="no-gallery-items">
-              <p>No gallery items found. Loading sample data...</p>
-              <button onClick={() => window.open('http://localhost:5000/api/update-gallery-images', '_blank')} className="btn btn-primary">
-                Update Gallery Images
-              </button>
+            <div className="sample-gallery">
+              <div className="gallery-item">
+                <div className="gallery-item__image">
+                  <img src="/images/gallery-placeholder.jpg" alt="Web Development Workshop" />
+                  <div className="gallery-item__overlay">
+                    <div className="gallery-item__actions">
+                      <button className="gallery-action-btn" title="View">
+                        <i className="fas fa-eye"></i>
+                      </button>
+                      <button className="gallery-action-btn" title="Like">
+                        <i className="fas fa-heart"></i>
+                      </button>
+                      <button className="gallery-action-btn" title="Share">
+                        <i className="fas fa-share"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div className="gallery-item__content">
+                  <h3 className="gallery-item__title">Web Development Workshop</h3>
+                  <p className="gallery-item__description">Students learning React and Node.js in our comprehensive workshop</p>
+                  <div className="gallery-item__meta">
+                    <div className="gallery-item__category">
+                      <i className="fas fa-tag"></i>
+                      <span>WORKSHOPS</span>
+                    </div>
+                  </div>
+                  <div className="gallery-item__stats">
+                    <div className="gallery-stat">
+                      <i className="fas fa-eye"></i>
+                      <span>0</span>
+                    </div>
+                    <div className="gallery-stat">
+                      <i className="fas fa-heart"></i>
+                      <span>0</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="gallery-item">
+                <div className="gallery-item__image">
+                  <img src="/images/gallery-placeholder.jpg" alt="Data Science Training" />
+                  <div className="gallery-item__overlay">
+                    <div className="gallery-item__actions">
+                      <button className="gallery-action-btn" title="View">
+                        <i className="fas fa-eye"></i>
+                      </button>
+                      <button className="gallery-action-btn" title="Like">
+                        <i className="fas fa-heart"></i>
+                      </button>
+                      <button className="gallery-action-btn" title="Share">
+                        <i className="fas fa-share"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div className="gallery-item__content">
+                  <h3 className="gallery-item__title">Data Science Training</h3>
+                  <p className="gallery-item__description">Advanced Python and Machine Learning course for aspiring data scientists</p>
+                  <div className="gallery-item__meta">
+                    <div className="gallery-item__category">
+                      <i className="fas fa-tag"></i>
+                      <span>TRAINING</span>
+                    </div>
+                  </div>
+                  <div className="gallery-item__stats">
+                    <div className="gallery-stat">
+                      <i className="fas fa-eye"></i>
+                      <span>0</span>
+                    </div>
+                    <div className="gallery-stat">
+                      <i className="fas fa-heart"></i>
+                      <span>0</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="gallery-item">
+                <div className="gallery-item__image">
+                  <img src="/images/gallery-placeholder.jpg" alt="Mobile App Development" />
+                  <div className="gallery-item__overlay">
+                    <div className="gallery-item__actions">
+                      <button className="gallery-action-btn" title="View">
+                        <i className="fas fa-eye"></i>
+                      </button>
+                      <button className="gallery-action-btn" title="Like">
+                        <i className="fas fa-heart"></i>
+                      </button>
+                      <button className="gallery-action-btn" title="Share">
+                        <i className="fas fa-share"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div className="gallery-item__content">
+                  <h3 className="gallery-item__title">Mobile App Development</h3>
+                  <p className="gallery-item__description">Flutter and React Native development for cross-platform mobile apps</p>
+                  <div className="gallery-item__meta">
+                    <div className="gallery-item__category">
+                      <i className="fas fa-tag"></i>
+                      <span>MOBILE</span>
+                    </div>
+                  </div>
+                  <div className="gallery-item__stats">
+                    <div className="gallery-stat">
+                      <i className="fas fa-eye"></i>
+                      <span>0</span>
+                    </div>
+                    <div className="gallery-stat">
+                      <i className="fas fa-heart"></i>
+                      <span>0</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="gallery-item">
+                <div className="gallery-item__image">
+                  <img src="/images/gallery-placeholder.jpg" alt="Cloud Computing Workshop" />
+                  <div className="gallery-item__overlay">
+                    <div className="gallery-item__actions">
+                      <button className="gallery-action-btn" title="View">
+                        <i className="fas fa-eye"></i>
+                      </button>
+                      <button className="gallery-action-btn" title="Like">
+                        <i className="fas fa-heart"></i>
+                      </button>
+                      <button className="gallery-action-btn" title="Share">
+                        <i className="fas fa-share"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div className="gallery-item__content">
+                  <h3 className="gallery-item__title">Cloud Computing Workshop</h3>
+                  <p className="gallery-item__description">AWS and Azure cloud services training for modern developers</p>
+                  <div className="gallery-item__meta">
+                    <div className="gallery-item__category">
+                      <i className="fas fa-tag"></i>
+                      <span>CLOUD</span>
+                    </div>
+                  </div>
+                  <div className="gallery-item__stats">
+                    <div className="gallery-stat">
+                      <i className="fas fa-eye"></i>
+                      <span>0</span>
+                    </div>
+                    <div className="gallery-stat">
+                      <i className="fas fa-heart"></i>
+                      <span>0</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           ) : (
             galleryItems.map((item) => {
@@ -130,10 +281,9 @@ const GallerySection = () => {
                   <div className="gallery-item__image">
                     <img 
                       src={imageUrl || '/images/gallery-placeholder.jpg'} 
-                      alt={item.title}
+                      alt={item.title || 'Gallery Item'}
                       onError={(e) => {
                         console.log('Image failed to load:', e.target.src);
-                        console.log('Available image data:', item.images);
                         e.target.src = '/images/gallery-placeholder.jpg';
                       }}
                       onLoad={(e) => {
@@ -189,13 +339,13 @@ const GallerySection = () => {
               </div>
 
               <div className="gallery-item__content">
-                <h3 className="gallery-item__title">{item.title}</h3>
-                <p className="gallery-item__description">{item.description}</p>
+                <h3 className="gallery-item__title">{item.title || 'Gallery Item'}</h3>
+                <p className="gallery-item__description">{item.description || 'No description available'}</p>
                 
                 <div className="gallery-item__meta">
                   <div className="gallery-item__category">
                     <i className="fas fa-tag"></i>
-                    <span>{item.category.replace('-', ' ').toUpperCase()}</span>
+                    <span>{(item.category || 'GALLERY').replace('-', ' ').toUpperCase()}</span>
                   </div>
                   {item.eventDate && (
                     <div className="gallery-item__date">
@@ -208,11 +358,11 @@ const GallerySection = () => {
                 <div className="gallery-item__stats">
                   <div className="gallery-stat">
                     <i className="fas fa-eye"></i>
-                    <span>{item.views}</span>
+                    <span>{item.views || 0}</span>
                   </div>
                   <div className="gallery-stat">
                     <i className="fas fa-heart"></i>
-                    <span>{item.likes}</span>
+                    <span>{item.likes || 0}</span>
                   </div>
                 </div>
 

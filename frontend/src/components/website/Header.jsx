@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import trainingService from '../../services/trainingService';
 import './Header.css';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeMegaMenu, setActiveMegaMenu] = useState(null);
+  const [trainingPrograms, setTrainingPrograms] = useState([]);
+  const [categories, setCategories] = useState([]);
   const { user, logout } = useAuth();
   const location = useLocation();
 
@@ -18,6 +21,24 @@ const Header = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    fetchTrainingData();
+  }, []);
+
+  const fetchTrainingData = async () => {
+    try {
+      const [programsResponse, categoriesResponse] = await Promise.all([
+        trainingService.getTrainingPrograms({ limit: 20, status: 'published' }),
+        trainingService.getCourseCategories()
+      ]);
+      
+      setTrainingPrograms(programsResponse.data || []);
+      setCategories(categoriesResponse || []);
+    } catch (error) {
+      console.error('Error fetching training data:', error);
+    }
+  };
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -41,7 +62,7 @@ const Header = () => {
   };
 
   const navItems = [
-    { path: '/software-services', label: 'Services', icon: '💻', hasDropdown: true },
+    { path: '#', label: 'Services', icon: '💻', hasDropdown: true },
     { path: '/training-internships', label: 'Training', icon: '🎓', hasDropdown: true, active: true },
     { path: '/careers', label: 'Careers', icon: '👥' },
     { path: '/blog', label: 'Blog', icon: '📰' },
@@ -51,46 +72,6 @@ const Header = () => {
 
   return (
     <header className={`header ${isScrolled ? 'scrolled' : ''}`}>
-      {/* Top Contact Bar */}
-      <div className="top-contact-bar">
-        <div className="contact-info">
-          <div className="contact-item">
-            <i className="fas fa-phone"></i>
-            <span>+91-9717122688</span>
-          </div>
-          <div className="contact-item">
-            <i className="fas fa-envelope"></i>
-            <span>info@mindwareinfotech.com</span>
-          </div>
-        </div>
-        <div className="top-bar-actions">
-          {user ? (
-            <div className="user-menu-top">
-              <span className="user-name-top">Welcome, {user.firstName || user.name || 'User'}</span>
-              <div className="user-actions-top">
-                <Link to="/user-dashboard" className="btn btn-primary btn-xs">
-                  <i className="fas fa-tachometer-alt"></i> Dashboard
-                </Link>
-                <button onClick={handleLogout} className="btn btn-secondary btn-xs">
-                  <i className="fas fa-sign-out-alt"></i> Logout
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="auth-buttons-top">
-              <Link to="/login" className="btn btn-outline btn-xs">
-                <i className="fas fa-sign-in-alt"></i> Login
-              </Link>
-              <Link to="/register" className="btn btn-primary btn-xs">
-                <i className="fas fa-user-plus"></i> Register
-              </Link>
-            </div>
-          )}
-        </div>
-      </div>
-
-      
-
       {/* Main Header */}
       <div className="main-header">
         <div className="container">
@@ -119,7 +100,7 @@ const Header = () => {
                   onMouseEnter={() => handleMegaMenuHover('services')}
                   onMouseLeave={handleMegaMenuLeave}
                 >
-                  <Link to="/software-services" className="nav-link">
+                  <Link to="#" className="nav-link">
                     <span className="nav-icon">💻</span>
                     <span className="nav-text">Services</span>
                     <span className="nav-arrow">▼</span>
@@ -176,7 +157,7 @@ const Header = () => {
                   onMouseEnter={() => handleMegaMenuHover('training')}
                   onMouseLeave={handleMegaMenuLeave}
                 >
-                  <Link to="/training-internships" className="nav-link highlighted">
+                  <Link to="#" className="nav-link highlighted">
                     <span className="nav-icon">🎓</span>
                     <span className="nav-text">Training</span>
                     <span className="nav-arrow">▼</span>
@@ -189,12 +170,26 @@ const Header = () => {
                         <div className="mega-menu-column">
                           <h3>Training Programs</h3>
                           <ul>
-                            <li><Link to="/training-programs">All Programs</Link></li>
-                            <li><Link to="/web-training">Web Development</Link></li>
-                            <li><Link to="/mobile-training">Mobile App Development</Link></li>
-                            <li><Link to="/data-science">Data Science & AI</Link></li>
-                            <li><Link to="/cloud-training">Cloud Computing</Link></li>
-                            <li><Link to="/video-lectures">Video Lectures</Link></li>
+                            <li><Link to="/training-programs">All Programs ({trainingPrograms.length})</Link></li>
+                            {categories.slice(0, 6).map(category => (
+                              <li key={category.id}>
+                                <Link to={`/training-programs?category=${category.slug}`}>
+                                  {category.name}
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div className="mega-menu-column">
+                          <h3>Featured Programs</h3>
+                          <ul>
+                            {trainingPrograms.filter(program => program.is_featured).slice(0, 5).map(program => (
+                              <li key={program.id}>
+                                <Link to={`/training/${program.slug}`}>
+                                  {program.title}
+                                </Link>
+                              </li>
+                            ))}
                           </ul>
                         </div>
                         <div className="mega-menu-column">
@@ -237,29 +232,35 @@ const Header = () => {
                   </Link>
                 </li>
 
-                <li className="nav-item">
-                  <Link to="/blog" className="nav-link">
-                    <span className="nav-icon">📰</span>
-                    <span className="nav-text">Blog</span>
-                  </Link>
-                </li>
-
-                <li className="nav-item">
-                  <Link to="/about" className="nav-link">
-                    <span className="nav-icon">ℹ️</span>
-                    <span className="nav-text">About</span>
-                  </Link>
-                </li>
-
-                <li className="nav-item">
-                  <Link to="/contact" className="nav-link">
-                    <span className="nav-icon">📞</span>
-                    <span className="nav-text">Contact</span>
-                  </Link>
-                </li>
+                
               </ul>
             </nav>
 
+            {/* Login/Register Buttons */}
+            <div className="header-actions">
+              {user ? (
+                <div className="user-menu">
+                  <span className="user-name">Welcome, {user.firstName || user.name || 'User'}</span>
+                  <div className="user-actions">
+                    <Link to="/user-dashboard" className="btn btn-primary btn-sm">
+                      <i className="fas fa-tachometer-alt"></i> Dashboard
+                    </Link>
+                    <button onClick={handleLogout} className="btn btn-secondary btn-sm">
+                      <i className="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="auth-buttons">
+                  <Link to="/login" className="btn btn-outline btn-sm">
+                    <i className="fas fa-sign-in-alt"></i> Login
+                  </Link>
+                  <Link to="/register" className="btn btn-primary btn-sm">
+                    <i className="fas fa-user-plus"></i> Register
+                  </Link>
+                </div>
+              )}
+            </div>
 
             {/* Mobile Menu Button */}
             <button

@@ -86,7 +86,10 @@ const BlogManagement = () => {
       }
       setShowModal(false);
       setEditingBlog(null);
-      fetchBlogs();
+      // Force refresh the blogs list to show updated images
+      setTimeout(() => {
+        fetchBlogs();
+      }, 500);
     } catch (err) {
       console.error('Error saving blog:', err);
       showError('Failed to save blog post: ' + err.message);
@@ -337,13 +340,23 @@ const BlogManagement = () => {
           <h1>Blog Management</h1>
           <p>Manage your blog posts and articles</p>
         </div>
-        <button 
-          className="btn btn-primary"
-          onClick={handleCreateBlog}
-        >
-          <i className="fas fa-plus"></i>
-          Add New Post
-        </button>
+        <div className="header-actions">
+          <button 
+            className="btn btn-outline"
+            onClick={fetchBlogs}
+            title="Refresh blogs"
+          >
+            <i className="fas fa-sync-alt"></i>
+            Refresh
+          </button>
+          <button 
+            className="btn btn-primary"
+            onClick={handleCreateBlog}
+          >
+            <i className="fas fa-plus"></i>
+            Add New Post
+          </button>
+        </div>
       </div>
 
       <div className="page-content">

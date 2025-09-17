@@ -12,11 +12,24 @@ const BlogSection = () => {
   const fetchFeaturedBlogs = useCallback(async () => {
     try {
       setLoading(true);
+      setError(null);
+      // Add cache busting parameter to force fresh data
       const response = await blogService.getFeaturedBlogs(3);
+      console.log('Blogs fetched:', response.data);
+      console.log('Blog count:', response.data?.length);
+      response.data?.forEach((blog, index) => {
+        console.log(`Blog ${index + 1}:`, {
+          title: blog.title,
+          featured_image: blog.featured_image,
+          is_featured: blog.is_featured,
+          status: blog.status
+        });
+      });
       setBlogs(response.data || []);
     } catch (err) {
       setError('Failed to load blogs');
       console.error('Error fetching blogs:', err);
+      setBlogs([]);
     } finally {
       setLoading(false);
     }
@@ -24,6 +37,17 @@ const BlogSection = () => {
 
   useEffect(() => {
     fetchFeaturedBlogs();
+  }, [fetchFeaturedBlogs]);
+
+  // Add refresh mechanism when window gains focus (user comes back from admin panel)
+  useEffect(() => {
+    const handleFocus = () => {
+      console.log('Window focused, refreshing blogs...');
+      fetchFeaturedBlogs();
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
   }, [fetchFeaturedBlogs]);
 
   const formatDate = useCallback((dateString) => {
@@ -58,7 +82,11 @@ const BlogSection = () => {
             src={getBlogImageUrl(blog.featured_image)} 
             alt={blog.title}
             onError={(e) => {
+              console.log('Image failed to load:', e.target.src);
               e.target.src = '/images/blog-placeholder.jpg';
+            }}
+            onLoad={(e) => {
+              console.log('Image loaded successfully:', e.target.src);
             }}
           />
           <div className="blog-card__category">
@@ -174,6 +202,13 @@ const BlogSection = () => {
         <div className="section-header">
           <h2>Latest Blog Posts</h2>
           <p>Stay updated with industry insights and career tips</p>
+          <button 
+            onClick={fetchFeaturedBlogs} 
+            className="refresh-btn"
+            title="Refresh blogs"
+          >
+            <i className="fas fa-sync-alt"></i>
+          </button>
         </div>
 
         <div className="blogs-grid">

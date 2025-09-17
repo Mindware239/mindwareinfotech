@@ -1,5 +1,6 @@
 const TrainingProgram = require('../models/TrainingProgram');
 const { Op } = require('sequelize');
+const { sequelize } = require('../config/database');
 
 // @desc    Get all training programs
 // @route   GET /api/training-programs
@@ -89,7 +90,7 @@ const getTrainingPrograms = async (req, res, next) => {
   }
 };
 
-// @desc    Get single training program
+// @desc    Get single training program by ID
 // @route   GET /api/training-programs/:id
 // @access  Public
 const getTrainingProgram = async (req, res, next) => {
@@ -111,6 +112,34 @@ const getTrainingProgram = async (req, res, next) => {
     });
   } catch (error) {
     console.error('Error in getTrainingProgram:', error);
+    next(error);
+  }
+};
+
+// @desc    Get single training program by slug
+// @route   GET /api/training-programs/slug/:slug
+// @access  Public
+const getTrainingProgramBySlug = async (req, res, next) => {
+  try {
+    const { slug } = req.params;
+
+    const trainingProgram = await TrainingProgram.findOne({
+      where: { slug }
+    });
+
+    if (!trainingProgram) {
+      return res.status(404).json({
+        success: false,
+        message: 'Training program not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: trainingProgram
+    });
+  } catch (error) {
+    console.error('Error in getTrainingProgramBySlug:', error);
     next(error);
   }
 };
@@ -181,16 +210,13 @@ const getFeaturedTrainingPrograms = async (req, res, next) => {
 // @access  Public
 const getTrainingCategories = async (req, res, next) => {
   try {
-    const categories = await TrainingProgram.findAll({
-      attributes: [
-        'category',
-        [sequelize.fn('COUNT', sequelize.col('id')), 'count']
-      ],
+    const { CourseCategory } = require('../models');
+    
+    const categories = await CourseCategory.findAll({
       where: {
-        status: 'published'
+        is_active: true
       },
-      group: ['category'],
-      order: [['category', 'ASC']]
+      order: [['sort_order', 'ASC'], ['name', 'ASC']]
     });
 
     res.status(200).json({
@@ -210,16 +236,25 @@ const createTrainingProgram = async (req, res, next) => {
   try {
     const trainingProgramData = {
       ...req.body,
-      created_by: req.user.id,
-      updated_by: req.user.id
+      created_by: req.user?.id || req.body.created_by || 1,
+      updated_by: req.user?.id || req.body.created_by || 1
     };
 
     // Generate slug if not provided
     if (!trainingProgramData.slug) {
-      trainingProgramData.slug = trainingProgramData.title
+      let baseSlug = trainingProgramData.title
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/(^-|-$)/g, '');
+      
+      // Check if slug exists and make it unique
+      let slug = baseSlug;
+      let counter = 1;
+      while (await TrainingProgram.findOne({ where: { slug } })) {
+        slug = `${baseSlug}-${counter}`;
+        counter++;
+      }
+      trainingProgramData.slug = slug;
     }
 
     const trainingProgram = await TrainingProgram.create(trainingProgramData);
@@ -230,6 +265,31 @@ const createTrainingProgram = async (req, res, next) => {
     });
   } catch (error) {
     console.error('Error in createTrainingProgram:', error);
+    
+    // Handle validation errors
+    if (error.name === 'SequelizeValidationError') {
+      const validationErrors = error.errors.map(err => ({
+        field: err.path,
+        message: err.message,
+        value: err.value
+      }));
+      
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: validationErrors
+      });
+    }
+    
+    // Handle unique constraint errors
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      return res.status(400).json({
+        success: false,
+        message: 'A record with this information already exists',
+        field: error.errors[0]?.path || 'unknown'
+      });
+    }
+    
     next(error);
   }
 };
@@ -242,7 +302,7 @@ const updateTrainingProgram = async (req, res, next) => {
     const { id } = req.params;
     const updateData = {
       ...req.body,
-      updated_by: req.user.id
+      updated_by: req.user?.id || req.body.created_by || 1
     };
 
     const trainingProgram = await TrainingProgram.findByPk(id);
@@ -454,6 +514,55 @@ const seedTrainingPrograms = async (req, res, next) => {
         created_by: 1
       },
       {
+        title: 'Python for Data Science & AI',
+        slug: 'python-data-science-ai',
+        description: 'Comprehensive Python programming course focused on data science, machine learning, and artificial intelligence applications.',
+        short_description: 'Learn Python programming for data science, machine learning, and AI applications.',
+        category: 'data-science',
+        subcategory: 'python',
+        level: 'beginner',
+        duration: '4 months',
+        duration_hours: 320,
+        price: 20000,
+        original_price: 28000,
+        discount_percentage: 29,
+        currency: 'INR',
+        is_free: false,
+        is_featured: true,
+        status: 'published',
+        skills: ['Python', 'Pandas', 'NumPy', 'Matplotlib', 'Scikit-learn', 'TensorFlow'],
+        learning_outcomes: [
+          'Master Python programming fundamentals',
+          'Work with data using Pandas and NumPy',
+          'Create data visualizations with Matplotlib',
+          'Build machine learning models'
+        ],
+        prerequisites: [
+          'Basic computer skills',
+          'No prior programming experience required',
+          'Mathematical aptitude helpful'
+        ],
+        instructor: {
+          name: 'Dr. Amit Patel',
+          title: 'Data Science Lead & AI Researcher',
+          bio: 'PhD in Computer Science with 12+ years in data science',
+          rating: 4.9,
+          students: 3200,
+          courses: 20
+        },
+        start_date: new Date('2024-02-15'),
+        end_date: new Date('2024-06-15'),
+        location: 'Online + Mumbai',
+        max_students: 40,
+        enrolled_students: 28,
+        rating: 4.8,
+        total_reviews: 150,
+        tags: ['python', 'data-science', 'machine-learning', 'ai'],
+        meta_title: 'Python for Data Science & AI - Complete Course',
+        meta_description: 'Master Python for data science, machine learning, and AI.',
+        created_by: 1
+      },
+      {
         title: 'Free HTML & CSS Basics',
         slug: 'free-html-css-basics',
         description: 'Learn the fundamentals of web development with HTML5 and CSS3. Perfect for beginners who want to start their web development journey.',
@@ -499,6 +608,104 @@ const seedTrainingPrograms = async (req, res, next) => {
         meta_title: 'Free HTML & CSS Basics Course',
         meta_description: 'Learn HTML5 and CSS3 fundamentals for free.',
         created_by: 1
+      },
+      {
+        title: 'Mobile App Development with React Native',
+        slug: 'mobile-app-development-react-native',
+        description: 'Build cross-platform mobile applications using React Native. Learn to create iOS and Android apps with a single codebase.',
+        short_description: 'Master mobile app development with React Native for iOS and Android.',
+        category: 'mobile-development',
+        subcategory: 'react-native',
+        level: 'intermediate',
+        duration: '3 months',
+        duration_hours: 200,
+        price: 18000,
+        original_price: 25000,
+        discount_percentage: 28,
+        currency: 'INR',
+        is_free: false,
+        is_featured: true,
+        status: 'published',
+        skills: ['React Native', 'JavaScript', 'iOS', 'Android', 'Expo', 'Redux'],
+        learning_outcomes: [
+          'Build cross-platform mobile applications',
+          'Master React Native components and navigation',
+          'Integrate with device APIs and third-party libraries',
+          'Deploy apps to App Store and Google Play'
+        ],
+        prerequisites: [
+          'Basic knowledge of JavaScript and React',
+          'Understanding of mobile app concepts',
+          'Experience with development tools'
+        ],
+        instructor: {
+          name: 'Suresh Kumar',
+          title: 'Mobile App Development Expert',
+          bio: '8+ years in mobile app development with React Native',
+          rating: 4.8,
+          students: 1500,
+          courses: 10
+        },
+        start_date: new Date('2024-03-15'),
+        end_date: new Date('2024-06-15'),
+        location: 'Online + Bangalore',
+        max_students: 25,
+        enrolled_students: 18,
+        rating: 4.6,
+        total_reviews: 95,
+        tags: ['react-native', 'mobile', 'ios', 'android', 'cross-platform'],
+        meta_title: 'Mobile App Development with React Native',
+        meta_description: 'Learn to build cross-platform mobile apps with React Native.',
+        created_by: 1
+      },
+      {
+        title: 'Cloud Computing with AWS',
+        slug: 'cloud-computing-aws',
+        description: 'Master Amazon Web Services (AWS) cloud platform. Learn to deploy, manage, and scale applications in the cloud.',
+        short_description: 'Learn cloud computing fundamentals and AWS services.',
+        category: 'cloud-computing',
+        subcategory: 'aws',
+        level: 'intermediate',
+        duration: '2 months',
+        duration_hours: 120,
+        price: 12000,
+        original_price: 18000,
+        discount_percentage: 33,
+        currency: 'INR',
+        is_free: false,
+        is_featured: false,
+        status: 'published',
+        skills: ['AWS', 'EC2', 'S3', 'Lambda', 'RDS', 'CloudFormation'],
+        learning_outcomes: [
+          'Understand cloud computing concepts',
+          'Master AWS core services',
+          'Deploy and manage applications on AWS',
+          'Implement security and monitoring best practices'
+        ],
+        prerequisites: [
+          'Basic understanding of networking',
+          'Familiarity with command line interface',
+          'Basic knowledge of databases'
+        ],
+        instructor: {
+          name: 'Ravi Sharma',
+          title: 'AWS Solutions Architect',
+          bio: 'Certified AWS Solutions Architect with 10+ years experience',
+          rating: 4.9,
+          students: 2000,
+          courses: 12
+        },
+        start_date: new Date('2024-04-01'),
+        end_date: new Date('2024-06-01'),
+        location: 'Online',
+        max_students: 30,
+        enrolled_students: 24,
+        rating: 4.7,
+        total_reviews: 110,
+        tags: ['aws', 'cloud', 'devops', 'infrastructure', 'scalability'],
+        meta_title: 'Cloud Computing with AWS - Complete Course',
+        meta_description: 'Master AWS cloud platform and services.',
+        created_by: 1
       }
     ];
 
@@ -522,6 +729,7 @@ const seedTrainingPrograms = async (req, res, next) => {
 module.exports = {
   getTrainingPrograms,
   getTrainingProgram,
+  getTrainingProgramBySlug,
   getTrainingProgramsByCategory,
   getFeaturedTrainingPrograms,
   getTrainingCategories,

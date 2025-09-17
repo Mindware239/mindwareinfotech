@@ -6,6 +6,7 @@ import './TrainingProgramManagement.css';
 
 const TrainingProgramManagement = () => {
   const [trainingPrograms, setTrainingPrograms] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -15,7 +16,7 @@ const TrainingProgramManagement = () => {
     title: '',
     description: '',
     short_description: '',
-    category: 'web-development',
+    category: '',
     subcategory: '',
     level: 'beginner',
     duration: '',
@@ -27,9 +28,13 @@ const TrainingProgramManagement = () => {
     is_free: false,
     is_featured: false,
     status: 'published',
+    image: '',
+    thumbnail: '',
     skills: [],
     learning_outcomes: [],
     prerequisites: [],
+    curriculum: [],
+    instructor_id: '',
     instructor: {
       name: '',
       title: '',
@@ -45,231 +50,71 @@ const TrainingProgramManagement = () => {
     enrolled_students: 0,
     rating: 0,
     total_reviews: 0,
+    reviews: [],
     tags: [],
     meta_title: '',
-    meta_description: ''
+    meta_description: '',
+    meta_keywords: '',
+    og_title: '',
+    og_description: '',
+    og_image: '',
+    twitter_title: '',
+    twitter_description: '',
+    twitter_image: '',
+    canonical_url: '',
+    robots_meta: '',
+    focus_keyword: '',
+    seo_score: 0,
+    metadata: {}
   });
 
   useEffect(() => {
     fetchTrainingPrograms();
+    fetchCategories();
   }, []);
 
   const fetchTrainingPrograms = async () => {
     try {
       setLoading(true);
+      setError(null);
+      
+      // Fetch from API only - NO MOCK DATA
       const response = await trainingService.getTrainingPrograms({ limit: 100 });
-      setTrainingPrograms(response.data || []);
+      
+      // Parse JSON strings from database
+      const programs = Array.isArray(response.data) ? response.data.map(program => ({
+        ...program,
+        skills: typeof program.skills === 'string' ? JSON.parse(program.skills) : (program.skills || []),
+        learning_outcomes: typeof program.learning_outcomes === 'string' ? JSON.parse(program.learning_outcomes) : (program.learning_outcomes || []),
+        prerequisites: typeof program.prerequisites === 'string' ? JSON.parse(program.prerequisites) : (program.prerequisites || []),
+        tags: typeof program.tags === 'string' ? JSON.parse(program.tags) : (program.tags || []),
+        instructor: typeof program.instructor === 'string' ? JSON.parse(program.instructor) : (program.instructor || {}),
+        curriculum: typeof program.curriculum === 'string' ? JSON.parse(program.curriculum) : (program.curriculum || []),
+        reviews: typeof program.reviews === 'string' ? JSON.parse(program.reviews) : (program.reviews || []),
+        metadata: typeof program.metadata === 'string' ? JSON.parse(program.metadata) : (program.metadata || {}),
+        price: parseFloat(program.price) || 0,
+        original_price: program.original_price ? parseFloat(program.original_price) : null,
+        rating: parseFloat(program.rating) || 0
+      })) : [];
+      
+      setTrainingPrograms(programs);
+      
     } catch (err) {
-      setError('Failed to load training programs');
+      setError('Failed to load training programs. Please check if the server is running.');
       console.error('Error fetching training programs:', err);
-      // Use mock data as fallback
-      const mockPrograms = [
-        {
-          id: 1,
-          title: 'Complete Web Development Bootcamp',
-          slug: 'complete-web-development-bootcamp',
-          description: 'Master full-stack web development from scratch. Learn HTML5, CSS3, JavaScript, React, Node.js, and MongoDB to build modern web applications.',
-          short_description: 'Learn full-stack web development with hands-on projects and real-world applications.',
-          category: 'web-development',
-          subcategory: 'full-stack',
-          level: 'beginner',
-          duration: '6 months',
-          duration_hours: 480,
-          price: 25000,
-          original_price: 35000,
-          discount_percentage: 29,
-          currency: 'INR',
-          is_free: false,
-          is_featured: true,
-          status: 'published',
-          skills: ['HTML5', 'CSS3', 'JavaScript', 'React', 'Node.js', 'MongoDB'],
-          learning_outcomes: [
-            'Build responsive websites using HTML5 and CSS3',
-            'Create interactive web applications with JavaScript',
-            'Develop modern React applications with hooks and context',
-            'Build RESTful APIs with Node.js and Express'
-          ],
-          prerequisites: [
-            'Basic computer skills',
-            'No prior programming experience required',
-            'Willingness to learn and practice regularly'
-          ],
-          instructor: {
-            name: 'Rajesh Kumar',
-            title: 'Senior Full-Stack Developer',
-            bio: '10+ years of experience in web development',
-            rating: 4.9,
-            students: 2500,
-            courses: 15
-          },
-          start_date: '2024-02-01',
-          end_date: '2024-08-01',
-          location: 'Online + Delhi',
-          max_students: 50,
-          enrolled_students: 35,
-          rating: 4.8,
-          total_reviews: 120,
-          tags: ['web-development', 'react', 'nodejs', 'mongodb', 'full-stack'],
-          meta_title: 'Complete Web Development Bootcamp - Learn Full-Stack Development',
-          meta_description: 'Master full-stack web development with our comprehensive bootcamp.',
-          created_at: '2024-01-15T10:00:00Z',
-          updated_at: '2024-01-15T10:00:00Z'
-        },
-        {
-          id: 2,
-          title: 'Advanced React & Redux Mastery',
-          slug: 'advanced-react-redux-mastery',
-          description: 'Deep dive into advanced React concepts, Redux state management, performance optimization, and modern React patterns.',
-          short_description: 'Master advanced React concepts and Redux for building scalable applications.',
-          category: 'web-development',
-          subcategory: 'frontend',
-          level: 'intermediate',
-          duration: '3 months',
-          duration_hours: 180,
-          price: 15000,
-          original_price: 20000,
-          discount_percentage: 25,
-          currency: 'INR',
-          is_free: false,
-          is_featured: true,
-          status: 'published',
-          skills: ['React', 'Redux', 'TypeScript', 'Testing', 'Performance'],
-          learning_outcomes: [
-            'Master advanced React patterns and hooks',
-            'Implement complex state management with Redux',
-            'Optimize React application performance',
-            'Write comprehensive tests for React apps'
-          ],
-          prerequisites: [
-            'Basic knowledge of JavaScript and React',
-            'Understanding of ES6+ features',
-            'Experience with HTML and CSS'
-          ],
-          instructor: {
-            name: 'Priya Sharma',
-            title: 'React Expert & Tech Lead',
-            bio: '8+ years specializing in React ecosystem',
-            rating: 4.9,
-            students: 1800,
-            courses: 12
-          },
-          start_date: '2024-03-01',
-          end_date: '2024-06-01',
-          location: 'Online',
-          max_students: 30,
-          enrolled_students: 22,
-          rating: 4.7,
-          total_reviews: 85,
-          tags: ['react', 'redux', 'typescript', 'testing'],
-          meta_title: 'Advanced React & Redux Mastery Course',
-          meta_description: 'Master advanced React concepts and Redux state management.',
-          created_at: '2024-01-20T10:00:00Z',
-          updated_at: '2024-01-20T10:00:00Z'
-        },
-        {
-          id: 3,
-          title: 'Python for Data Science & AI',
-          slug: 'python-data-science-ai',
-          description: 'Comprehensive Python programming course focused on data science, machine learning, and artificial intelligence applications.',
-          short_description: 'Learn Python programming for data science, machine learning, and AI applications.',
-          category: 'data-science',
-          subcategory: 'python',
-          level: 'beginner',
-          duration: '4 months',
-          duration_hours: 320,
-          price: 20000,
-          original_price: 28000,
-          discount_percentage: 29,
-          currency: 'INR',
-          is_free: false,
-          is_featured: true,
-          status: 'published',
-          skills: ['Python', 'Pandas', 'NumPy', 'Matplotlib', 'Scikit-learn', 'TensorFlow'],
-          learning_outcomes: [
-            'Master Python programming fundamentals',
-            'Work with data using Pandas and NumPy',
-            'Create data visualizations with Matplotlib',
-            'Build machine learning models'
-          ],
-          prerequisites: [
-            'Basic computer skills',
-            'No prior programming experience required',
-            'Mathematical aptitude helpful'
-          ],
-          instructor: {
-            name: 'Dr. Amit Patel',
-            title: 'Data Science Lead & AI Researcher',
-            bio: 'PhD in Computer Science with 12+ years in data science',
-            rating: 4.9,
-            students: 3200,
-            courses: 20
-          },
-          start_date: '2024-02-15',
-          end_date: '2024-06-15',
-          location: 'Online + Mumbai',
-          max_students: 40,
-          enrolled_students: 28,
-          rating: 4.8,
-          total_reviews: 150,
-          tags: ['python', 'data-science', 'machine-learning', 'ai'],
-          meta_title: 'Python for Data Science & AI - Complete Course',
-          meta_description: 'Master Python for data science, machine learning, and AI.',
-          created_at: '2024-01-25T10:00:00Z',
-          updated_at: '2024-01-25T10:00:00Z'
-        },
-        {
-          id: 4,
-          title: 'Free HTML & CSS Basics',
-          slug: 'free-html-css-basics',
-          description: 'Learn the fundamentals of web development with HTML5 and CSS3. Perfect for beginners who want to start their web development journey.',
-          short_description: 'Start your web development journey with HTML5 and CSS3 fundamentals.',
-          category: 'web-development',
-          subcategory: 'frontend',
-          level: 'beginner',
-          duration: '1 month',
-          duration_hours: 40,
-          price: 0,
-          currency: 'INR',
-          is_free: true,
-          is_featured: false,
-          status: 'published',
-          skills: ['HTML5', 'CSS3', 'Responsive Design', 'Flexbox', 'Grid'],
-          learning_outcomes: [
-            'Create semantic HTML5 structure',
-            'Style websites with CSS3',
-            'Build responsive layouts',
-            'Use Flexbox and Grid systems'
-          ],
-          prerequisites: [
-            'Basic computer skills',
-            'No prior programming experience required',
-            'Access to a text editor'
-          ],
-          instructor: {
-            name: 'Anita Singh',
-            title: 'Frontend Development Instructor',
-            bio: '5+ years teaching web development fundamentals',
-            rating: 4.7,
-            students: 5000,
-            courses: 8
-          },
-          start_date: '2024-01-01',
-          end_date: '2024-12-31',
-          location: 'Online',
-          max_students: 1000,
-          enrolled_students: 450,
-          rating: 4.5,
-          total_reviews: 200,
-          tags: ['html', 'css', 'beginner', 'free'],
-          meta_title: 'Free HTML & CSS Basics Course',
-          meta_description: 'Learn HTML5 and CSS3 fundamentals for free.',
-          created_at: '2024-01-01T10:00:00Z',
-          updated_at: '2024-01-01T10:00:00Z'
-        }
-      ];
-      setTrainingPrograms(mockPrograms);
+      setTrainingPrograms([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const response = await trainingService.getCourseCategories();
+      setCategories(response || []);
+    } catch (err) {
+      console.error('Error fetching categories:', err);
+      setCategories([]);
     }
   };
 
@@ -278,7 +123,7 @@ const TrainingProgramManagement = () => {
       title: '',
       description: '',
       short_description: '',
-      category: 'web-development',
+      category: '',
       subcategory: '',
       level: 'beginner',
       duration: '',
@@ -290,9 +135,13 @@ const TrainingProgramManagement = () => {
       is_free: false,
       is_featured: false,
       status: 'published',
+      image: '',
+      thumbnail: '',
       skills: [],
       learning_outcomes: [],
       prerequisites: [],
+      curriculum: [],
+      instructor_id: '',
       instructor: {
         name: '',
         title: '',
@@ -308,10 +157,24 @@ const TrainingProgramManagement = () => {
       enrolled_students: 0,
       rating: 0,
       total_reviews: 0,
+      reviews: [],
       tags: [],
       meta_title: '',
-      meta_description: ''
+      meta_description: '',
+      meta_keywords: '',
+      og_title: '',
+      og_description: '',
+      og_image: '',
+      twitter_title: '',
+      twitter_description: '',
+      twitter_image: '',
+      canonical_url: '',
+      robots_meta: '',
+      focus_keyword: '',
+      seo_score: 0,
+      metadata: {}
     });
+    setSelectedProgram(null);
     setShowAddModal(true);
   };
 
@@ -322,6 +185,8 @@ const TrainingProgramManagement = () => {
       skills: Array.isArray(program.skills) ? program.skills : [],
       learning_outcomes: Array.isArray(program.learning_outcomes) ? program.learning_outcomes : [],
       prerequisites: Array.isArray(program.prerequisites) ? program.prerequisites : [],
+      curriculum: Array.isArray(program.curriculum) ? program.curriculum : [],
+      reviews: Array.isArray(program.reviews) ? program.reviews : [],
       tags: Array.isArray(program.tags) ? program.tags : [],
       instructor: program.instructor || {
         name: '',
@@ -330,7 +195,8 @@ const TrainingProgramManagement = () => {
         rating: 0,
         students: 0,
         courses: 0
-      }
+      },
+      metadata: program.metadata || {}
     });
     setShowEditModal(true);
   };
@@ -350,24 +216,42 @@ const TrainingProgramManagement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Prepare form data for submission
+      const submitData = {
+        ...formData,
+        skills: JSON.stringify(formData.skills),
+        learning_outcomes: JSON.stringify(formData.learning_outcomes),
+        prerequisites: JSON.stringify(formData.prerequisites),
+        tags: JSON.stringify(formData.tags),
+        instructor: JSON.stringify(formData.instructor),
+        curriculum: JSON.stringify([]),
+        reviews: JSON.stringify([]),
+        metadata: JSON.stringify({}),
+        created_by: 1
+      };
+
       if (selectedProgram) {
         // Update existing program
-        await trainingService.updateTrainingProgram(selectedProgram.id, formData);
+        const response = await trainingService.updateTrainingProgram(selectedProgram.id, submitData);
         setTrainingPrograms(trainingPrograms.map(program => 
           program.id === selectedProgram.id ? { ...program, ...formData } : program
         ));
         setShowEditModal(false);
+        alert('Training program updated successfully!');
       } else {
         // Create new program
-        const newProgram = await trainingService.createTrainingProgram(formData);
-        setTrainingPrograms([...trainingPrograms, newProgram.data]);
+        const response = await trainingService.createTrainingProgram(submitData);
+        setTrainingPrograms([...trainingPrograms, response.data]);
         setShowAddModal(false);
+        alert('Training program created successfully!');
       }
+      
+      // Reset form
       setFormData({
         title: '',
         description: '',
         short_description: '',
-        category: 'web-development',
+        category: '',
         subcategory: '',
         level: 'beginner',
         duration: '',
@@ -379,9 +263,13 @@ const TrainingProgramManagement = () => {
         is_free: false,
         is_featured: false,
         status: 'published',
+        image: '',
+        thumbnail: '',
         skills: [],
         learning_outcomes: [],
         prerequisites: [],
+        curriculum: [],
+        instructor_id: '',
         instructor: {
           name: '',
           title: '',
@@ -397,13 +285,36 @@ const TrainingProgramManagement = () => {
         enrolled_students: 0,
         rating: 0,
         total_reviews: 0,
+        reviews: [],
         tags: [],
         meta_title: '',
-        meta_description: ''
+        meta_description: '',
+        meta_keywords: '',
+        og_title: '',
+        og_description: '',
+        og_image: '',
+        twitter_title: '',
+        twitter_description: '',
+        twitter_image: '',
+        canonical_url: '',
+        robots_meta: '',
+        focus_keyword: '',
+        seo_score: 0,
+        metadata: {}
       });
+      setSelectedProgram(null);
     } catch (err) {
       console.error('Error saving training program:', err);
-      alert('Failed to save training program');
+      
+      // Handle validation errors
+      if (err.response?.data?.errors) {
+        const errorMessages = err.response.data.errors.map(error => 
+          `${error.field}: ${error.message}`
+        ).join('\n');
+        alert(`Validation failed:\n${errorMessages}`);
+      } else {
+        alert(`Failed to save training program: ${err.response?.data?.message || err.message}`);
+      }
     }
   };
 
@@ -631,12 +542,13 @@ const TrainingProgramManagement = () => {
             </div>
             <form onSubmit={handleSubmit} className="modal-body">
               <div className="form-grid">
+                {/* Basic Information */}
                 <div className="form-group">
                   <label>Title *</label>
                   <input
                     type="text"
                     name="title"
-                    value={formData.title}
+                    value={formData.title || ''}
                     onChange={handleInputChange}
                     required
                   />
@@ -645,16 +557,27 @@ const TrainingProgramManagement = () => {
                   <label>Category *</label>
                   <select
                     name="category"
-                    value={formData.category}
+                    value={formData.category || ''}
                     onChange={handleInputChange}
                     required
                   >
-                    <option value="web-development">Web Development</option>
-                    <option value="data-science">Data Science</option>
-                    <option value="mobile-development">Mobile Development</option>
-                    <option value="cloud-computing">Cloud Computing</option>
-                    <option value="cybersecurity">Cybersecurity</option>
+                    <option value="">Select Category</option>
+                    {categories.map(category => (
+                      <option key={category.id} value={category.slug}>
+                        {category.name}
+                      </option>
+                    ))}
                   </select>
+                </div>
+                <div className="form-group">
+                  <label>Subcategory</label>
+                  <input
+                    type="text"
+                    name="subcategory"
+                    value={formData.subcategory || ''}
+                    onChange={handleInputChange}
+                    placeholder="e.g., frontend, backend, full-stack"
+                  />
                 </div>
                 <div className="form-group">
                   <label>Level *</label>
@@ -667,6 +590,7 @@ const TrainingProgramManagement = () => {
                     <option value="beginner">Beginner</option>
                     <option value="intermediate">Intermediate</option>
                     <option value="advanced">Advanced</option>
+                    <option value="expert">Expert</option>
                   </select>
                 </div>
                 <div className="form-group">
@@ -674,10 +598,21 @@ const TrainingProgramManagement = () => {
                   <input
                     type="text"
                     name="duration"
-                    value={formData.duration}
+                    value={formData.duration || ''}
                     onChange={handleInputChange}
                     placeholder="e.g., 6 months"
                     required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Duration Hours</label>
+                  <input
+                    type="number"
+                    name="duration_hours"
+                    value={formData.duration_hours || 0}
+                    onChange={handleInputChange}
+                    min="0"
+                    placeholder="e.g., 480"
                   />
                 </div>
                 <div className="form-group">
@@ -685,7 +620,7 @@ const TrainingProgramManagement = () => {
                   <input
                     type="number"
                     name="price"
-                    value={formData.price}
+                    value={formData.price || 0}
                     onChange={handleInputChange}
                     min="0"
                   />
@@ -695,10 +630,33 @@ const TrainingProgramManagement = () => {
                   <input
                     type="number"
                     name="original_price"
-                    value={formData.original_price}
+                    value={formData.original_price || 0}
                     onChange={handleInputChange}
                     min="0"
                   />
+                </div>
+                <div className="form-group">
+                  <label>Discount Percentage</label>
+                  <input
+                    type="number"
+                    name="discount_percentage"
+                    value={formData.discount_percentage || 0}
+                    onChange={handleInputChange}
+                    min="0"
+                    max="100"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Currency</label>
+                  <select
+                    name="currency"
+                    value={formData.currency}
+                    onChange={handleInputChange}
+                  >
+                    <option value="INR">INR</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                  </select>
                 </div>
                 <div className="form-group">
                   <label>Status *</label>
@@ -708,8 +666,8 @@ const TrainingProgramManagement = () => {
                     onChange={handleInputChange}
                     required
                   >
-                    <option value="published">Published</option>
                     <option value="draft">Draft</option>
+                    <option value="published">Published</option>
                     <option value="archived">Archived</option>
                   </select>
                 </div>
@@ -718,16 +676,152 @@ const TrainingProgramManagement = () => {
                   <input
                     type="text"
                     name="location"
-                    value={formData.location}
+                    value={formData.location || ''}
                     onChange={handleInputChange}
                     placeholder="e.g., Online, Delhi, Mumbai"
                   />
+                </div>
+                <div className="form-group">
+                  <label>Max Students</label>
+                  <input
+                    type="number"
+                    name="max_students"
+                    value={formData.max_students || 0}
+                    onChange={handleInputChange}
+                    min="0"
+                    placeholder="0 for unlimited"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Enrolled Students</label>
+                  <input
+                    type="number"
+                    name="enrolled_students"
+                    value={formData.enrolled_students || 0}
+                    onChange={handleInputChange}
+                    min="0"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Rating</label>
+                  <input
+                    type="number"
+                    name="rating"
+                    value={formData.rating || 0}
+                    onChange={handleInputChange}
+                    min="0"
+                    max="5"
+                    step="0.1"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Total Reviews</label>
+                  <input
+                    type="number"
+                    name="total_reviews"
+                    value={formData.total_reviews || 0}
+                    onChange={handleInputChange}
+                    min="0"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>SEO Score</label>
+                  <input
+                    type="number"
+                    name="seo_score"
+                    value={formData.seo_score || 0}
+                    onChange={handleInputChange}
+                    min="0"
+                    max="100"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Start Date</label>
+                  <input
+                    type="date"
+                    name="start_date"
+                    value={formData.start_date || ''}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>End Date</label>
+                  <input
+                    type="date"
+                    name="end_date"
+                    value={formData.end_date || ''}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Image URL</label>
+                  <input
+                    type="url"
+                    name="image"
+                    value={formData.image || ''}
+                    onChange={handleInputChange}
+                    placeholder="https://example.com/image.jpg"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Thumbnail URL</label>
+                  <input
+                    type="url"
+                    name="thumbnail"
+                    value={formData.thumbnail || ''}
+                    onChange={handleInputChange}
+                    placeholder="https://example.com/thumb.jpg"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Instructor ID</label>
+                  <input
+                    type="number"
+                    name="instructor_id"
+                    value={formData.instructor_id || ''}
+                    onChange={handleInputChange}
+                    min="1"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Focus Keyword</label>
+                  <input
+                    type="text"
+                    name="focus_keyword"
+                    value={formData.focus_keyword || ''}
+                    onChange={handleInputChange}
+                    placeholder="e.g., web development course"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Canonical URL</label>
+                  <input
+                    type="url"
+                    name="canonical_url"
+                    value={formData.canonical_url || ''}
+                    onChange={handleInputChange}
+                    placeholder="https://example.com/course"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Robots Meta</label>
+                  <select
+                    name="robots_meta"
+                    value={formData.robots_meta || ''}
+                    onChange={handleInputChange}
+                  >
+                    <option value="">Select Robots Meta</option>
+                    <option value="index, follow">Index, Follow</option>
+                    <option value="noindex, nofollow">No Index, No Follow</option>
+                    <option value="index, nofollow">Index, No Follow</option>
+                    <option value="noindex, follow">No Index, Follow</option>
+                  </select>
                 </div>
                 <div className="form-group full-width">
                   <label>Short Description *</label>
                   <textarea
                     name="short_description"
-                    value={formData.short_description}
+                    value={formData.short_description || ''}
                     onChange={handleInputChange}
                     rows="3"
                     required
@@ -737,7 +831,7 @@ const TrainingProgramManagement = () => {
                   <label>Description *</label>
                   <textarea
                     name="description"
-                    value={formData.description}
+                    value={formData.description || ''}
                     onChange={handleInputChange}
                     rows="5"
                     required
@@ -747,7 +841,7 @@ const TrainingProgramManagement = () => {
                   <label>Skills (comma-separated)</label>
                   <input
                     type="text"
-                    value={formData.skills.join(', ')}
+                    value={(formData.skills || []).join(', ')}
                     onChange={(e) => handleArrayInputChange('skills', e.target.value)}
                     placeholder="e.g., React, Node.js, MongoDB"
                   />
@@ -755,10 +849,118 @@ const TrainingProgramManagement = () => {
                 <div className="form-group full-width">
                   <label>Learning Outcomes (comma-separated)</label>
                   <textarea
-                    value={formData.learning_outcomes.join(', ')}
+                    value={(formData.learning_outcomes || []).join(', ')}
                     onChange={(e) => handleArrayInputChange('learning_outcomes', e.target.value)}
                     rows="3"
                     placeholder="e.g., Build responsive websites, Create interactive applications"
+                  />
+                </div>
+                <div className="form-group full-width">
+                  <label>Prerequisites (comma-separated)</label>
+                  <textarea
+                    value={(formData.prerequisites || []).join(', ')}
+                    onChange={(e) => handleArrayInputChange('prerequisites', e.target.value)}
+                    rows="3"
+                    placeholder="e.g., Basic HTML knowledge, JavaScript fundamentals"
+                  />
+                </div>
+                <div className="form-group full-width">
+                  <label>Tags (comma-separated)</label>
+                  <input
+                    type="text"
+                    value={(formData.tags || []).join(', ')}
+                    onChange={(e) => handleArrayInputChange('tags', e.target.value)}
+                    placeholder="e.g., web-development, react, javascript"
+                  />
+                </div>
+                <div className="form-group full-width">
+                  <label>Meta Title</label>
+                  <input
+                    type="text"
+                    name="meta_title"
+                    value={formData.meta_title || ''}
+                    onChange={handleInputChange}
+                    placeholder="SEO title for search engines"
+                  />
+                </div>
+                <div className="form-group full-width">
+                  <label>Meta Description</label>
+                  <textarea
+                    name="meta_description"
+                    value={formData.meta_description || ''}
+                    onChange={handleInputChange}
+                    rows="3"
+                    placeholder="SEO description for search engines"
+                  />
+                </div>
+                <div className="form-group full-width">
+                  <label>Meta Keywords</label>
+                  <input
+                    type="text"
+                    name="meta_keywords"
+                    value={formData.meta_keywords || ''}
+                    onChange={handleInputChange}
+                    placeholder="SEO keywords separated by commas"
+                  />
+                </div>
+                <div className="form-group full-width">
+                  <label>OG Title</label>
+                  <input
+                    type="text"
+                    name="og_title"
+                    value={formData.og_title || ''}
+                    onChange={handleInputChange}
+                    placeholder="Open Graph title for social sharing"
+                  />
+                </div>
+                <div className="form-group full-width">
+                  <label>OG Description</label>
+                  <textarea
+                    name="og_description"
+                    value={formData.og_description || ''}
+                    onChange={handleInputChange}
+                    rows="3"
+                    placeholder="Open Graph description for social sharing"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>OG Image URL</label>
+                  <input
+                    type="url"
+                    name="og_image"
+                    value={formData.og_image || ''}
+                    onChange={handleInputChange}
+                    placeholder="https://example.com/og-image.jpg"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Twitter Title</label>
+                  <input
+                    type="text"
+                    name="twitter_title"
+                    value={formData.twitter_title || ''}
+                    onChange={handleInputChange}
+                    placeholder="Twitter card title"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Twitter Description</label>
+                  <textarea
+                    name="twitter_description"
+                    value={formData.twitter_description || ''}
+                    onChange={handleInputChange}
+                    rows="2"
+                    placeholder="Twitter card description"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Twitter Image URL</label>
+                  <input
+                    type="url"
+                    name="twitter_image"
+                    value={formData.twitter_image || ''}
+                    onChange={handleInputChange}
+                    placeholder="https://example.com/twitter-image.jpg"
                   />
                 </div>
                 <div className="form-group">

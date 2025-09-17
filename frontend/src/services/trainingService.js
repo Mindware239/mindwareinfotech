@@ -12,13 +12,24 @@ const trainingService = {
     }
   },
 
-  // Get single training program
+  // Get single training program by ID
   getTrainingProgram: async (id) => {
     try {
       const response = await api.get(`/training-programs/${id}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching training program:', error);
+      throw error;
+    }
+  },
+
+  // Get single training program by slug
+  getTrainingProgramBySlug: async (slug) => {
+    try {
+      const response = await api.get(`/training-programs/slug/${slug}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching training program by slug:', error);
       throw error;
     }
   },
@@ -54,6 +65,17 @@ const trainingService = {
       return response.data;
     } catch (error) {
       console.error('Error fetching training categories:', error);
+      throw error;
+    }
+  },
+
+  // Get course categories (for admin panel)
+  getCourseCategories: async () => {
+    try {
+      const response = await api.get('/course-categories');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching course categories:', error);
       throw error;
     }
   },
@@ -187,6 +209,37 @@ const trainingService = {
       'social-media': 'Social Media Marketing'
     };
     return subcategories[subcategory] || subcategory;
+  },
+
+  // CRUD Operations for Admin
+  createTrainingProgram: async (programData) => {
+    try {
+      const response = await api.post('/training-programs', programData);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating training program:', error);
+      throw error;
+    }
+  },
+
+  updateTrainingProgram: async (id, programData) => {
+    try {
+      const response = await api.put(`/training-programs/${id}`, programData);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating training program:', error);
+      throw error;
+    }
+  },
+
+  deleteTrainingProgram: async (id) => {
+    try {
+      const response = await api.delete(`/training-programs/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting training program:', error);
+      throw error;
+    }
   }
 };
 

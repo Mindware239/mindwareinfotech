@@ -11,8 +11,8 @@ const getFeaturedBlogs = async (req, res, next) => {
     
     const blogs = await Blog.findAll({
       where: {
-        status: 'published',
-        is_featured: true
+        status: 'published'
+        // Removed is_featured: true to get all published blogs
       },
       include: [
         {
@@ -28,10 +28,16 @@ const getFeaturedBlogs = async (req, res, next) => {
       nest: true
     });
 
-    // Add cache headers
+    // Add cache headers for better performance but allow updates
     res.set({
-      'Cache-Control': 'public, max-age=300', // 5 minutes cache
-      'ETag': `"${Date.now()}"`
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    });
+    
+    console.log(`Found ${blogs.length} published blogs`);
+    blogs.forEach((blog, index) => {
+      console.log(`Blog ${index + 1}: ${blog.title} - Featured: ${blog.is_featured} - Image: ${blog.featured_image}`);
     });
     
     res.status(200).json({

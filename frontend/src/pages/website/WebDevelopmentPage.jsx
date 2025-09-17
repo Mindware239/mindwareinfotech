@@ -14,168 +14,31 @@ const WebDevelopmentPage = () => {
   const fetchTrainingPrograms = async () => {
     try {
       setLoading(true);
+      setError(null);
       
-      // Try to fetch from API first
-      try {
-        const response = await trainingService.getTrainingProgramsByCategory('web-development', { limit: 20 });
-        if (response.data && response.data.length > 0) {
-          setTrainingPrograms(Array.isArray(response.data) ? response.data : []);
-          return;
-        }
-      } catch (apiError) {
-        console.log('API not available, using mock data:', apiError.message);
-      }
+      // Fetch from API only - NO MOCK DATA
+      const response = await trainingService.getTrainingProgramsByCategory('web-development', { limit: 20 });
       
-      // Fallback to mock data if API fails
-      const mockPrograms = [
-        {
-          id: 1,
-          title: 'Complete Web Development Bootcamp',
-          slug: 'complete-web-development-bootcamp',
-          description: 'Master full-stack web development from scratch. Learn HTML5, CSS3, JavaScript, React, Node.js, and MongoDB to build modern web applications.',
-          short_description: 'Learn full-stack web development with hands-on projects and real-world applications.',
-          category: 'web-development',
-          subcategory: 'full-stack',
-          level: 'beginner',
-          duration: '6 months',
-          duration_hours: 480,
-          price: 25000,
-          original_price: 35000,
-          discount_percentage: 29,
-          currency: 'INR',
-          is_free: false,
-          is_featured: true,
-          status: 'published',
-          skills: ['HTML5', 'CSS3', 'JavaScript', 'React', 'Node.js', 'MongoDB'],
-          learning_outcomes: [
-            'Build responsive websites using HTML5 and CSS3',
-            'Create interactive web applications with JavaScript',
-            'Develop modern React applications with hooks and context',
-            'Build RESTful APIs with Node.js and Express'
-          ],
-          prerequisites: [
-            'Basic computer skills',
-            'No prior programming experience required',
-            'Willingness to learn and practice regularly'
-          ],
-          instructor: {
-            name: 'Rajesh Kumar',
-            title: 'Senior Full-Stack Developer',
-            bio: '10+ years of experience in web development',
-            rating: 4.9,
-            students: 2500,
-            courses: 15
-          },
-          start_date: new Date('2024-02-01'),
-          end_date: new Date('2024-08-01'),
-          location: 'Online + Delhi',
-          max_students: 50,
-          enrolled_students: 35,
-          rating: 4.8,
-          total_reviews: 120,
-          tags: ['web-development', 'react', 'nodejs', 'mongodb', 'full-stack'],
-          created_by: 1
-        },
-        {
-          id: 2,
-          title: 'Advanced React & Redux Mastery',
-          slug: 'advanced-react-redux-mastery',
-          description: 'Deep dive into advanced React concepts, Redux state management, performance optimization, and modern React patterns.',
-          short_description: 'Master advanced React concepts and Redux for building scalable applications.',
-          category: 'web-development',
-          subcategory: 'frontend',
-          level: 'intermediate',
-          duration: '3 months',
-          duration_hours: 180,
-          price: 15000,
-          original_price: 20000,
-          discount_percentage: 25,
-          currency: 'INR',
-          is_free: false,
-          is_featured: true,
-          status: 'published',
-          skills: ['React', 'Redux', 'TypeScript', 'Testing', 'Performance'],
-          learning_outcomes: [
-            'Master advanced React patterns and hooks',
-            'Implement complex state management with Redux',
-            'Optimize React application performance',
-            'Write comprehensive tests for React apps'
-          ],
-          prerequisites: [
-            'Basic knowledge of JavaScript and React',
-            'Understanding of ES6+ features',
-            'Experience with HTML and CSS'
-          ],
-          instructor: {
-            name: 'Priya Sharma',
-            title: 'React Expert & Tech Lead',
-            bio: '8+ years specializing in React ecosystem',
-            rating: 4.9,
-            students: 1800,
-            courses: 12
-          },
-          start_date: new Date('2024-03-01'),
-          end_date: new Date('2024-06-01'),
-          location: 'Online',
-          max_students: 30,
-          enrolled_students: 22,
-          rating: 4.7,
-          total_reviews: 85,
-          tags: ['react', 'redux', 'typescript', 'testing'],
-          created_by: 1
-        },
-        {
-          id: 4,
-          title: 'Free HTML & CSS Basics',
-          slug: 'free-html-css-basics',
-          description: 'Learn the fundamentals of web development with HTML5 and CSS3. Perfect for beginners who want to start their web development journey.',
-          short_description: 'Start your web development journey with HTML5 and CSS3 fundamentals.',
-          category: 'web-development',
-          subcategory: 'frontend',
-          level: 'beginner',
-          duration: '1 month',
-          duration_hours: 40,
-          price: 0,
-          currency: 'INR',
-          is_free: true,
-          is_featured: false,
-          status: 'published',
-          skills: ['HTML5', 'CSS3', 'Responsive Design', 'Flexbox', 'Grid'],
-          learning_outcomes: [
-            'Create semantic HTML5 structure',
-            'Style websites with CSS3',
-            'Build responsive layouts',
-            'Use Flexbox and Grid systems'
-          ],
-          prerequisites: [
-            'Basic computer skills',
-            'No prior programming experience required',
-            'Access to a text editor'
-          ],
-          instructor: {
-            name: 'Anita Singh',
-            title: 'Frontend Development Instructor',
-            bio: '5+ years teaching web development fundamentals',
-            rating: 4.7,
-            students: 5000,
-            courses: 8
-          },
-          start_date: new Date('2024-01-01'),
-          end_date: new Date('2024-12-31'),
-          location: 'Online',
-          max_students: 1000,
-          enrolled_students: 450,
-          rating: 4.5,
-          total_reviews: 200,
-          tags: ['html', 'css', 'beginner', 'free'],
-          created_by: 1
-        }
-      ];
+      // Parse JSON strings from database
+      const programs = Array.isArray(response.data) ? response.data.map(program => ({
+        ...program,
+        skills: typeof program.skills === 'string' ? JSON.parse(program.skills) : (program.skills || []),
+        learning_outcomes: typeof program.learning_outcomes === 'string' ? JSON.parse(program.learning_outcomes) : (program.learning_outcomes || []),
+        prerequisites: typeof program.prerequisites === 'string' ? JSON.parse(program.prerequisites) : (program.prerequisites || []),
+        tags: typeof program.tags === 'string' ? JSON.parse(program.tags) : (program.tags || []),
+        instructor: typeof program.instructor === 'string' ? JSON.parse(program.instructor) : (program.instructor || {}),
+        curriculum: typeof program.curriculum === 'string' ? JSON.parse(program.curriculum) : (program.curriculum || []),
+        reviews: typeof program.reviews === 'string' ? JSON.parse(program.reviews) : (program.reviews || []),
+        metadata: typeof program.metadata === 'string' ? JSON.parse(program.metadata) : (program.metadata || {}),
+        price: parseFloat(program.price) || 0,
+        original_price: program.original_price ? parseFloat(program.original_price) : null,
+        rating: parseFloat(program.rating) || 0
+      })) : [];
       
-      setTrainingPrograms(mockPrograms);
+      setTrainingPrograms(programs);
       
     } catch (err) {
-      setError('Failed to load training programs');
+      setError('Failed to load training programs. Please check if the server is running.');
       console.error('Error fetching training programs:', err);
       setTrainingPrograms([]);
     } finally {

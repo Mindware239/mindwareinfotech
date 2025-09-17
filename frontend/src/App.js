@@ -64,11 +64,15 @@ import UserManagement from './pages/admin/UserManagement';
 import TrainingProgramManagement from './pages/admin/TrainingProgramManagement';
 import SettingsPage from './pages/admin/SettingsPage';
 
+// New Admin Components
+import NewAdminDashboard from './pages/admin/AdminDashboard';
+import NewTrainingProgramManager from './pages/admin/TrainingProgramManager';
+import ContentManager from './pages/admin/ContentManager';
+
 // Auth Components
 
 // Styles
 import './styles/globals.css';
-import './styles/admin.css';
 
 // Create a client with optimized settings
 const queryClient = new QueryClient({
@@ -76,8 +80,11 @@ const queryClient = new QueryClient({
     queries: {
       retry: 1,
       refetchOnWindowFocus: false,
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      cacheTime: 10 * 60 * 1000, // 10 minutes
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+      staleTime: 10 * 60 * 1000, // 10 minutes
+      cacheTime: 30 * 60 * 1000, // 30 minutes
+      enabled: true,
     },
   },
 });
@@ -128,7 +135,7 @@ function App() {
                   <Route path="enroll/:courseId" element={<EnrollmentPage />} />
                   <Route path="enroll" element={<EnrollmentPage />} />
                   <Route path="certificate/:id" element={<CertificatePage />} />
-                  <Route path="training/:id" element={<TrainingDetailPage />} />
+                  <Route path="training/:slug" element={<TrainingDetailPage />} />
                   <Route path="web-training" element={<WebDevelopmentPage />} />
                   <Route path="training-programs" element={<TrainingProgramsPage />} />
                   <Route path="login" element={<LoginPage />} />
@@ -241,6 +248,21 @@ function App() {
                   <Route path="training-programs" element={
                     <Suspense fallback={<LoadingSpinner />}>
                       <TrainingProgramManagement />
+                    </Suspense>
+                  } />
+                  <Route path="new-dashboard" element={
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <NewAdminDashboard />
+                    </Suspense>
+                  } />
+                  <Route path="program-manager" element={
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <NewTrainingProgramManager />
+                    </Suspense>
+                  } />
+                  <Route path="content-manager" element={
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <ContentManager />
                     </Suspense>
                   } />
                   <Route path="settings" element={

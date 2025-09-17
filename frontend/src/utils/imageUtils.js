@@ -28,12 +28,19 @@ export const getBlogImageUrl = (featuredImage) => {
   if (!featuredImage) return '/images/blog-placeholder.jpg';
   
   if (typeof featuredImage === 'string') {
+    // Remove extra quotes if present
+    let cleanImage = featuredImage.trim();
+    if (cleanImage.startsWith('"') && cleanImage.endsWith('"')) {
+      cleanImage = cleanImage.slice(1, -1);
+    }
+    
     // Handle JSON string format
-    if (featuredImage.startsWith('{')) {
+    if (cleanImage.startsWith('{')) {
       try {
-        const parsed = JSON.parse(featuredImage);
+        const parsed = JSON.parse(cleanImage);
         if (parsed.url) {
-          return parsed.url.startsWith('http') ? parsed.url : getImageUrl(parsed.url);
+          const url = parsed.url.startsWith('http') ? parsed.url : getImageUrl(parsed.url);
+          return url;
         }
       } catch (e) {
         // If parsing fails, treat as regular string
@@ -41,27 +48,31 @@ export const getBlogImageUrl = (featuredImage) => {
     }
     
     // Handle regular string format
-    if (featuredImage.startsWith('http')) {
-      return featuredImage;
+    if (cleanImage.startsWith('http')) {
+      return cleanImage;
     }
     
     // If it starts with /uploads/, it's a backend image
-    if (featuredImage.startsWith('/uploads/')) {
-      return getImageUrl(featuredImage);
+    if (cleanImage.startsWith('/uploads/')) {
+      const url = getImageUrl(cleanImage);
+      return url;
     }
     
     // If it starts with /images/, it's a frontend image (might not exist)
-    if (featuredImage.startsWith('/images/')) {
-      return getImageUrl(featuredImage);
+    if (cleanImage.startsWith('/images/')) {
+      const url = getImageUrl(cleanImage);
+      return url;
     }
     
-    // Default case
-    return getImageUrl(featuredImage);
+    // Default case - assume it's a backend path
+    const url = getImageUrl(cleanImage);
+    return url;
   }
   
   // Handle object format
   if (typeof featuredImage === 'object' && featuredImage.url) {
-    return featuredImage.url.startsWith('http') ? featuredImage.url : getImageUrl(featuredImage.url);
+    const url = featuredImage.url.startsWith('http') ? featuredImage.url : getImageUrl(featuredImage.url);
+    return url;
   }
   
   return '/images/blog-placeholder.jpg';

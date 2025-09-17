@@ -194,7 +194,7 @@
 }
 
 .nav-link:hover {
-  background: #34495e;
+  /* background: #34495e; */
   color: white;
 }
 

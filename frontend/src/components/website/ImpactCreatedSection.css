@@ -1,0 +1,237 @@
+/* Impact Created Section */
+.impact-created-section {
+  padding: 80px 0;
+  background: linear-gradient(180deg, #2563eb, #3b82f6);
+  position: relative;
+  overflow: hidden;
+}
+
+.impact-created-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('/impactSectionBg.0ff54bf9 (1).svg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.15;
+  z-index: 0;
+}
+
+.impact-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 60px;
+  position: relative;
+  z-index: 1;
+}
+
+.impact-title-container {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.impact-section-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 15px 0;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.impact-underline {
+  width: 80px;
+  height: 3px;
+  background: #ffffff;
+  margin: 0 auto;
+  border-radius: 2px;
+}
+
+.impact-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  margin-top: 50px;
+  /* background: rgba(255, 255, 255, 0.1); */
+  border-radius: 12px;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  /* border: 1px solid rgba(255, 255, 255, 0.2); */
+}
+
+.impact-stat-item {
+  background: transparent;
+  padding: 50px 30px;
+  text-align: center;
+  position: relative;
+  border-right: 1px solid #ffff;
+  transition: all 0.3s ease;
+}
+
+.impact-stat-item:last-child {
+  border-right: none;
+}
+
+.impact-stat-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #ffffff !important;
+  margin: 0 0 20px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0.9;
+}
+
+.impact-stat-value {
+  font-size: 3.2rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1;
+  color: #ffffff !important;
+}
+
+.counter {
+  display: inline-block;
+  position: relative;
+}
+
+.counter-display {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1;
+  display: inline-block;
+  animation: countUp 0.5s ease-out;
+  color: #ffffff !important;
+}
+
+@keyframes countUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .impact-container {
+    padding: 0 40px;
+  }
+  
+  .impact-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .impact-stat-item:nth-child(2) {
+    border-right: none;
+  }
+  
+  .impact-stat-item:nth-child(3) {
+    border-right: 1px solid rgba(255, 255, 255, 0.15);
+  }
+  
+  .impact-section-title {
+    font-size: 2.5rem;
+  }
+  
+  .impact-stat-value,
+  .counter-display {
+    font-size: 2.8rem;
+  }
+  
+  .impact-stat-item {
+    padding: 40px 25px;
+  }
+}
+
+@media (max-width: 768px) {
+  .impact-created-section {
+    padding: 60px 0;
+  }
+  
+  .impact-container {
+    padding: 0 30px;
+  }
+  
+  .impact-title-container {
+    margin-bottom: 50px;
+  }
+  
+  .impact-section-title {
+    font-size: 2.2rem;
+  }
+  
+  .impact-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .impact-stat-item:nth-child(2) {
+    border-right: none;
+  }
+  
+  .impact-stat-item:nth-child(3) {
+    border-right: 1px solid rgba(255, 255, 255, 0.15);
+  }
+  
+  .impact-stat-item {
+    padding: 35px 20px;
+  }
+  
+  .impact-stat-value,
+  .counter-display {
+    font-size: 2.4rem;
+  }
+  
+  .stat-label {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .impact-created-section {
+    padding: 50px 0;
+  }
+  
+  .impact-container {
+    padding: 0 20px;
+  }
+  
+  .impact-section-title {
+    font-size: 1.8rem;
+  }
+  
+  .impact-stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .impact-stat-item {
+    border-right: none !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 30px 20px;
+  }
+  
+  .impact-stat-item:last-child {
+    border-bottom: none;
+  }
+  
+  .impact-stat-value,
+  .counter-display {
+    font-size: 2.2rem;
+  }
+  
+  .stat-label {
+    font-size: 0.75rem;
+  }
+}

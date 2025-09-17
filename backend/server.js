@@ -60,6 +60,7 @@ const notificationRoutes = require('./routes/notifications');
 const courseRoutes = require('./routes/courses');
 const enrollmentRoutes = require('./routes/enrollments');
 const faqRoutes = require('./routes/faqs');
+const contactRoutes = require('./routes/contact');
 const courseCategoryRoutes = require('./routes/courseCategories');
 const trainingProgramRoutes = require('./routes/trainingPrograms');
 
@@ -177,6 +178,7 @@ app.use('/api/admin/course-categories', courseCategoryRoutes);
 app.use('/api/training-programs', trainingProgramRoutes);
 app.use('/api/enrollments', enrollmentRoutes);
 app.use('/api/faqs', faqRoutes);
+app.use('/api/contact', contactRoutes);
 
 // Multer configuration for file uploads
 const storage = multer.diskStorage({

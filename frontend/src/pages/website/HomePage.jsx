@@ -1,22 +1,41 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import HeroBanner from '../../components/website/HeroBanner';
 import AboutSection from '../../components/website/AboutSection';
-import WhyChooseSection from '../../components/website/WhyChooseSection';
-import TransformFutureSection from '../../components/website/TransformFutureSection';
-import TrainingProgramsSection from '../../components/website/TrainingProgramsSection';
-import StatsSection from '../../components/website/StatsSection';
-import ServiceCards from '../../components/website/ServiceCards';
-import InternshipSection from '../../components/website/InternshipSection';
-import VideoSection from '../../components/website/VideoSection';
-import TestimonialSection from '../../components/website/TestimonialSection';
-import BlogSection from '../../components/website/BlogSection';
-import GallerySection from '../../components/website/GallerySection';
-import FAQSection from '../../components/website/FAQSection';
+import ImpactCreatedSection from '../../components/website/ImpactCreatedSection';
+import OurServicesSection from '../../components/website/OurServicesSection';
 import SEOHead from '../../components/SEOHead';
 import { generateStructuredData } from '../../utils/seoUtils';
 import './HomePage.css';
 
-const HomePage = () => {
+// Lazy load heavy components
+const WhyChooseSectionNew = lazy(() => import('../../components/website/WhyChooseSectionNew'));
+const TransformFutureSection = lazy(() => import('../../components/website/TransformFutureSection'));
+const TrainingProgramsSection = lazy(() => import('../../components/website/TrainingProgramsSection'));
+const StatsSection = lazy(() => import('../../components/website/StatsSection'));
+const ServiceCards = lazy(() => import('../../components/website/ServiceCards'));
+const InternshipSection = lazy(() => import('../../components/website/InternshipSection'));
+const VideoSection = lazy(() => import('../../components/website/VideoSection'));
+const TestimonialSection = lazy(() => import('../../components/website/TestimonialSection'));
+const BlogSection = lazy(() => import('../../components/website/BlogSection'));
+const GallerySection = lazy(() => import('../../components/website/GallerySection'));
+const FAQSection = lazy(() => import('../../components/website/FAQSection'));
+const ApplyForBatchesSection = lazy(() => import('../../components/website/ApplyForBatchesSection'));
+
+// Loading component
+const SectionLoader = () => (
+  <div style={{ 
+    display: 'flex', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    height: '200px',
+    fontSize: '16px',
+    color: '#64748b'
+  }}>
+    Loading...
+  </div>
+);
+
+const HomePage = React.memo(() => {
   // Generate structured data for the homepage
   const structuredData = generateStructuredData('organization');
 
@@ -37,22 +56,61 @@ const HomePage = () => {
         structuredData={structuredData}
       />
       <div className="home-page">
-      <HeroBanner />
-      <AboutSection />
-      <WhyChooseSection />
-      <TransformFutureSection />
-      <TrainingProgramsSection />
-      <StatsSection />
-      <ServiceCards />
-      <InternshipSection />
-      <VideoSection />
-      <TestimonialSection />
-      <BlogSection />
-      <GallerySection />
-      <FAQSection />
+        <HeroBanner />
+        <AboutSection />
+        <ImpactCreatedSection />
+        <OurServicesSection />
+        
+        <Suspense fallback={<SectionLoader />}>
+          <WhyChooseSectionNew />
+        </Suspense>
+        
+        <Suspense fallback={<SectionLoader />}>
+          <TransformFutureSection />
+        </Suspense>
+        
+        <Suspense fallback={<SectionLoader />}>
+          <TrainingProgramsSection />
+        </Suspense>
+        
+        <Suspense fallback={<SectionLoader />}>
+          <StatsSection />
+        </Suspense>
+        
+        <Suspense fallback={<SectionLoader />}>
+          <ServiceCards />
+        </Suspense>
+        
+        <Suspense fallback={<SectionLoader />}>
+          <InternshipSection />
+        </Suspense>
+        
+        <Suspense fallback={<SectionLoader />}>
+          <VideoSection />
+        </Suspense>
+        
+        <Suspense fallback={<SectionLoader />}>
+          <TestimonialSection />
+        </Suspense>
+        
+        <Suspense fallback={<SectionLoader />}>
+          <BlogSection />
+        </Suspense>
+        
+        <Suspense fallback={<SectionLoader />}>
+          <GallerySection />
+        </Suspense>
+        
+        <Suspense fallback={<SectionLoader />}>
+          <FAQSection />
+        </Suspense>
+        
+        <Suspense fallback={<SectionLoader />}>
+          <ApplyForBatchesSection />
+        </Suspense>
       </div>
     </>
   );
-};
+});
 
 export default HomePage;
